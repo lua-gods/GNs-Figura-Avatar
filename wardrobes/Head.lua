@@ -1,13 +1,13 @@
 local c = require"libraries.clothesLib"
-local eye = require("libraries.eyesLib")
+--local eye = require("libraries.eyesLib")
 local head = c.newWardrobe("head")
 ---@param self Wardrobe
 head.ON_CHANGE:register(function (new,old)
    local current_clothes = head.clothes[new]
-   if current_clothes.custom_properties.leftEyeOffset then
-      local p = current_clothes.custom_properties
-      eye:setPreset(p.leftEyeClamp,p.leftEyeOffset,p.leftEyeMultiply,p.rightEyeClamp,p.rightEyeOffset,p.rightEyeMultiply,p.eyelashesOffset,p.offset)
-   end
+   --if current_clothes.custom_properties.leftEyeOffset then
+   --   local p = current_clothes.custom_properties
+   --   eye:setPreset(p.leftEyeClamp,p.leftEyeOffset,p.leftEyeMultiply,p.rightEyeClamp,p.rightEyeOffset,p.rightEyeMultiply,p.eyelashesOffset,p.offset)
+   --end
 end)
 head:setSelection{
    c.newClothes():setTexture(textures["clothes.default_skin"]):set("offset",vec(0,0)):set("eyelashesOffset",vec(0,0))
