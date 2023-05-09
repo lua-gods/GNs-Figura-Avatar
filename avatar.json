@@ -1,0 +1,13 @@
+{
+    "authors":["GNamimates","§f§nLibraries Used","GNClothesLib, GNEyeRigLib","GNanimLib, GNUI","GNPanelLib, InitHandler, GSClass","KattEventsAPI, TimerAPI","WorldAffectLib"],
+    "color": "#4dd966",
+    "autoScripts": ["initQueue"],
+    "customizations": {
+        "sword":{
+            "moveTo": "gn.base.Torso.Body"
+        },
+        "staff":{
+            "moveTo": "gn.base.Torso.RightArm"
+        }
+    }
+}   

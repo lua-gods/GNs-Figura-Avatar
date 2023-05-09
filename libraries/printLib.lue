@@ -1,0 +1,38 @@
+local h = models.prnt
+h:setParentType("HUD")
+local line = 0
+local line_height = 8
+local odd = false
+local max_lines = math.floor(client:getScaledWindowSize().y/line_height)
+local tasks = {}
+local texts = {}
+
+function printRaw(text)
+   if line > max_lines then
+      for i = max_lines+1, 2, -1 do
+         texts[i] = texts[i-1]
+         odd = not odd
+         if odd then
+            tasks[i]:text(texts[i])
+         else
+            tasks[i]:text("§7"..texts[i])
+         end
+      end
+      texts[1] = text
+      tasks[1]:text(texts[1])
+   else
+      odd = not odd
+      table.insert(texts,text)
+      table.insert(tasks,h:newText(tostring(line)):text(text):pos(0,-line*line_height,0):shadow(true))
+      line = line + 1
+   end
+   
+end
+
+--function print(...)
+--   local compose = ""
+--   for _, val in pairs{...} do
+--      compose = compose .. tostring(val) .. " "
+--   end
+--   printRaw(compose)
+--end

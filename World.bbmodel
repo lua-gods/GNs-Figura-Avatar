@@ -1,0 +1,68 @@
+{
+	"meta": {
+		"format_version": "4.5",
+		"model_format": "free",
+		"box_uv": false
+	},
+	"name": "World",
+	"model_identifier": "",
+	"visible_box": [1, 1, 0],
+	"variable_placeholders": "",
+	"variable_placeholder_buttons": [],
+	"timeline_setups": [],
+	"resolution": {
+		"width": 16,
+		"height": 16
+	},
+	"elements": [
+		{
+			"name": "cube",
+			"box_uv": false,
+			"rescale": false,
+			"locked": false,
+			"from": [-1, 0, -1],
+			"to": [1, 2, 1],
+			"autouv": 1,
+			"color": 5,
+			"origin": [0, 0, 0],
+			"faces": {
+				"north": {
+					"uv": [0, 0, 2, 2]
+				},
+				"east": {
+					"uv": [0, 0, 2, 2]
+				},
+				"south": {
+					"uv": [0, 0, 2, 2]
+				},
+				"west": {
+					"uv": [0, 0, 2, 2]
+				},
+				"up": {
+					"uv": [0, 0, 2, 2]
+				},
+				"down": {
+					"uv": [0, 0, 2, 2]
+				}
+			},
+			"type": "cube",
+			"uuid": "1465bfb6-3498-673d-e5f3-8f9cc2ffa68e"
+		}
+	],
+	"outliner": [
+		{
+			"name": "splat",
+			"origin": [0, 0, 0],
+			"color": 0,
+			"uuid": "89fe3425-ac5b-c444-f026-b098882b3b67",
+			"export": true,
+			"mirror_uv": false,
+			"isOpen": true,
+			"locked": false,
+			"visibility": true,
+			"autouv": 0,
+			"children": ["1465bfb6-3498-673d-e5f3-8f9cc2ffa68e"]
+		}
+	],
+	"textures": []
+}

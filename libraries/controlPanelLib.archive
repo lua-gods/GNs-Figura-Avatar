@@ -1,0 +1,6 @@
+---@class ControlPanelPage
+---@field Elements table
+local c = {}
+
+
+return c

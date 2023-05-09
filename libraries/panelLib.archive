@@ -1,0 +1,404 @@
+--[[______   __                _                 __
+  / ____/ | / /___ _____ ___  (_)___ ___  ____ _/ /____  _____
+ / / __/  |/ / __ `/ __ `__ \/ / __ `__ \/ __ `/ __/ _ \/ ___/
+/ /_/ / /|  / /_/ / / / / / / / / / / / / /_/ / /_/  __(__  )
+\____/_/ |_/\__,_/_/ /_/ /_/_/_/ /_/ /_/\__,_/\__/\___/____]]
+if not H then return end
+local pl = {}
+local katt = require("libraries.KattEventsAPI")
+local gnui = require("libraries.GNUILib")
+
+local cfg = {
+   model = models.menu,
+   taskPrefix = "GNPanel",
+   spacing = 10,
+}
+local activePanel = nil -- used to stop highlighting from selecting multiple panels at once
+local panels = {}
+cfg.model:setParentType("HUD")
+
+pl.WINDOW_RESIZED = katt:newEvent()
+
+local lastWinSize = vectors.vec2()
+events.TICK:register(function ()
+   local winSize = client:getWindowSize()
+   if lastWinSize ~= winSize then
+      pl.WINDOW_RESIZED:invoke(winSize.x,winSize.y)
+      lastWinSize = winSize
+   end
+end)
+-->========================================[ API ]=========================================<--
+
+---@class Panel
+---@field PanelID integer
+---@field Pages table
+---@field Pos Vector2
+---@field Anchor Vector2
+---@field Dimensions Vector2
+---@field CurrentPage integer
+---@field Visible boolean
+---@field CURRENT_PAGE_CHANGED KattEvent
+---@field ACTIVE_CHANGED KattEvent
+---@field POSITION_CHANGED KattEvent
+---@field UPDATE KattEvent
+---@field TaskName table
+---@field VISIBLILITY_CHANGED KattEvent
+---@field DRAW_REFRESH KattEvent
+local Panel = {}
+Panel.__index = Panel
+
+local panelID = 0
+function pl:newPanel()
+   ---@type Panel
+   local compose = {
+      PanelID = panelID,
+      Pages = {},
+      CurrentPage = 1,
+      Pos=vectors.vec2(),
+      Anchor=vectors.vec2(),
+      Dimensions=vectors.vec2(),
+      Visible = true,
+      CURRENT_PAGE_CHANGED = katt:newEvent(),
+      ACTIVE_CHANGED = katt:newEvent(),
+      VISIBLILITY_CHANGED = katt:newEvent(),
+      DRAW_REFRESH = katt:newEvent(),
+      POSITION_CHANGED = katt:newEvent(),
+      UPDATE = katt:newEvent(),
+      TaskName = {},
+   }
+   
+   setmetatable(compose,Panel)
+   compose.DRAW_REFRESH:register(function () compose:rebuildTasks() end)
+   compose.POSITION_CHANGED:register(function ()
+      if #compose.TaskName ~= 0 then
+         compose:updateTasks()
+      end
+   end)
+   pl.WINDOW_RESIZED:register(function ()
+      compose.POSITION_CHANGED:invoke()
+   end)
+   compose.UPDATE:register(function ()
+      compose:recalculateDimensions()
+      compose:updateTasks()
+   end)
+   table.insert(panels,compose)
+   return compose
+end
+
+function Panel:setCurrent(id)
+   if self.CurrentPage ~= id then
+      self.CURRENT_PAGE_CHANGED:invoke(self.CurrentPage,id)
+      Panel:rebuildTasks()
+      self.CurrentPage = id
+      self:recalculateDimensions()
+   end
+end
+
+function Panel:active(toggle)
+   if self.Active ~= toggle then
+      self.ACTIVE_CHANGED:invoke(toggle)
+      self.Active = toggle
+      if self.Active then
+         self.Pages[self.CurrentPage]:setHighlighted(1)
+      else
+         self.Pages[self.CurrentPage]:setHighlighted(nil)
+      end
+   end
+end
+
+function Panel:visible(toggle)
+   if self.Visible ~= toggle then
+      self.Visible = toggle
+      self.VISIBLILITY_CHANGED:invoke(toggle)
+   end
+end
+
+function Panel:setPos(x,y)
+   if self.Pos.x ~= x or self.Pos.y ~= y then
+      self.Pos = vectors.vec2(x,y)
+      self.POSITION_CHANGED:invoke(x,y,self.Anchor.x,self.Anchor.y)
+   end
+   return self
+end
+
+function Panel:setAnchor(x,y)
+   if self.Anchor.x ~= x or self.Anchor.y ~= y then
+      self.Anchor = vectors.vec2(x,y)
+      self.POSITION_CHANGED:invoke(self.Pos.x,self.Pos.y,x,y)
+   end
+   return self
+end
+
+function Panel:recalculateDimensions()
+   local wide = 0
+   local height = 0
+   for id, element in pairs(self.Pages[self.CurrentPage].Elements) do
+      wide = math.max(wide,client.getTextWidth(element.Text))
+      height = height + cfg.spacing
+   end
+   self.Dimensions = vectors.vec2(wide,height)
+end
+
+--cfg.model:removeTask()
+function Panel:rebuildTasks()
+   -- clear all last tasks
+   for key, name in pairs(self.TaskName) do
+      cfg.model:removeTask(name)
+   end
+   self.TaskName = {}
+   -- rebuild tasks
+   self.UPDATE:invoke()
+   --print(self.Pages[self.CurrentPage].Elements)
+   for id, element in pairs(self.Pages[self.CurrentPage].Elements) do
+      --(self.Anchor.x+1)*self.Dimensions.x
+      ---self.Dimensions.y*(self.Anchor.y+0.5)
+      
+      local taskName = cfg.taskPrefix .. "id" .. self.PanelID .."label" .. id
+      cfg.model:newText(taskName):shadow(true)
+      table.insert(self.TaskName,taskName)
+   end
+   self:updateTasks()
+   return self
+end
+
+function Panel:updateTasks()
+   ---@type PanelPage
+   local current_page = self.Pages[self.CurrentPage]
+   for id, taskName in pairs(self.TaskName) do
+      local element = current_page.Elements[id]
+      local task = cfg.model:getTask(taskName)
+      local pos = gnui.anchorToPos(
+               self.Anchor.x,
+               self.Anchor.y,
+               self.Pos.x+self.Dimensions.x*(self.Anchor.x*0.5+0.5),
+               self.Pos.y+id*cfg.spacing+self.Dimensions.y*(self.Anchor.y*0.5-0.5))
+      task:pos(pos.x,pos.y,0)
+      if id == current_page.Highlighted then
+         task:text(element.Text):setOutline(true)
+      else
+         task:text(element.Text):setOutline(false)
+      end
+   end
+end
+
+-->====================[ Panel Page Class ]====================<--
+
+---@class PanelPage
+---@field Elements table<PanelButton>
+---@field Highlighted integer
+---@field LockedMovement boolean
+---@field HIGHLIGHTED_CHANGED KattEvent
+---@field DRAW_REFRESH KattEvent
+---@field UPDATE KattEvent
+local PanelPage = {}
+PanelPage.__index = PanelPage
+
+function Panel:newPage()
+   ---@type PanelPage
+   local compose = {
+      Elements={},
+      Highlighted = 1,
+      LockedMovement = false,
+      HIGHLIGHTED_CHANGED = katt:newEvent(),
+      DRAW_REFRESH = katt:newEvent(),
+      UPDATE = katt:newEvent(),
+   }
+   setmetatable(compose,PanelPage)
+   table.insert(self.Pages,compose)
+   compose.UPDATE:register(function ()
+      self.UPDATE:invoke()
+      self:recalculateDimensions()
+   end)
+   compose.HIGHLIGHTED_CHANGED:register(function ()
+      compose:update()
+   end)
+   compose.DRAW_REFRESH:register(function ()self.DRAW_REFRESH:invoke()end)
+   return compose
+end
+
+function PanelPage:setHighlighted(id)
+   if type(id) == "number" then
+      id = ((id-1) % #self.Elements)+1
+      if id ~= self.Highlighted then
+         self.Highlighted = id
+         sounds:playSound("minecraft:entity.item_frame.rotate_item",client:getCameraPos(),0.2,math.lerp(0.5,1.5,self.Highlighted/#self.Elements))
+      end
+   else
+      if self.Highlighted then
+         self.HIGHLIGHTED_CHANGED:invoke(self.Highlighted,nil)
+         self.Highlighted = nil
+      end
+   end
+end
+
+function PanelPage:select()
+   self.Elements[self.Highlighted]:press()
+end
+
+function PanelPage:update()
+   self.UPDATE:invoke()
+   self.DRAW_REFRESH:invoke()
+end
+
+
+-->====================[ Panel Button Class ]====================<--
+
+---@class PanelButton
+---@field Text string
+---@field PRESSED KattEvent
+---@field UPDATE KattEvent
+local PanelButton = {}
+PanelButton.__index = PanelButton
+
+function PanelPage:newButton()
+   ---@type PanelButton
+   local compose = {
+      Text = "Unnamed Button",
+      PRESSED = katt:newEvent(),
+      UPDATE = katt:newEvent()
+   }
+   setmetatable(compose,PanelButton)
+   compose.UPDATE:register(function ()
+      self.UPDATE:invoke()
+   end)
+   table.insert(self.Elements,1,compose)
+   return compose
+end
+
+---@param name string
+---@return PanelButton
+function PanelButton:text(name)
+   self.Text = name
+   self.UPDATE:invoke()
+   return self
+end
+
+function PanelButton:press()
+   self.PRESSED:invoke()
+   return self
+end
+
+-->====================[ Panel Toggle Button Class ]====================<--
+
+---@class PanelToggleButton
+---@field Text string
+---@field Pressed boolean
+---@field TOGGLED KattEvent
+local PanelToggleButton = {}
+PanelToggleButton.__index = PanelToggleButton
+
+function PanelPage:newToggleButton()
+   ---@type PanelToggleButton
+   local compose = {
+      Text = "Unnamed Toggle Button",
+      Pressed = false,
+      TOGGLED = katt:newEvent(),
+      UPDATE = katt:newEvent()
+   }
+   setmetatable(compose,PanelToggleButton)
+   table.insert(self.Elements,1,compose)
+   return compose
+end
+
+
+---@param name string
+---@return PanelToggleButton
+function PanelToggleButton:text(name)
+   self.Text = name
+   return self
+end
+
+---@param toggle boolean|nil
+function PanelToggleButton:press(toggle)
+   if type(toggle) == "boolean" then
+      if self.Pressed ~= toggle then
+         self.TOGGLED:invoke()
+      end
+      self.Pressed = toggle
+   else
+      self.Pressed = not self.Pressed
+      self.TOGGLED:invoke()
+   end
+end
+
+-->====================[ Panel Text Edit Class ]====================<--
+
+---@class PanelTextEdit
+---@field Name string
+---@field Text string
+---@field Selected boolean
+---@field SELECTED KattEvent
+---@field TEXT_CHANGED KattEvent
+local PanelTextEdit = {}
+PanelTextEdit.__index = PanelTextEdit
+
+function PanelPage:newTextEdit()
+   ---@type PanelTextEdit
+   local compose = {
+      Text = "",
+      Name = "Unnamed Text Edit",
+      Selected = false,
+      SELECTED = katt:newEvent(),
+      TEXT_CHANGED = katt:newEvent(),
+      UPDATE = katt:newEvent()
+   }
+   setmetatable(compose,PanelTextEdit)
+   table.insert(self.Elements,1,compose)
+   return compose
+end
+
+function PanelTextEdit:name(name)
+   self.Name = name
+   return self
+end
+
+function PanelTextEdit:getText()
+   return self.Text
+end
+
+function PanelTextEdit:text(text)
+   if self.Text ~= text then
+      self.TEXT_CHANGED:invoke()
+      self.Text = text
+      self.UPDATE:invoke()
+   end
+   return self
+end
+
+function PanelTextEdit:press()
+   self.Selected = not self.Selected
+   self.SELECTED:invoke(self.Selected)
+end
+
+-->========================================[ SELECTION ]=========================================<--
+local actively_selected = nil ---@type Panel|nil
+events.RENDER:register(function (x,y)
+   if host:isChatOpen() then
+      local mpos = client:getMousePos()/-client:getGuiScale()
+      ---@param p Panel
+      for id, p in pairs(panels) do
+         local pos = gnui.anchorToPos(
+               p.Anchor.x,
+               p.Anchor.y,
+               p.Pos.x+p.Dimensions.x*(p.Anchor.x*0.5-0.5),
+               p.Pos.y+p.Dimensions.y*(p.Anchor.y*0.5-0.5))
+         --print(pos)
+         if pos.x < mpos.x and pos.x+p.Dimensions.x > mpos.x 
+         and pos.y < mpos.y and pos.y+p.Dimensions.y > mpos.y then
+            ---@type PanelPage
+            local page = p.Pages[p.CurrentPage]
+            page:setHighlighted(math.ceil(((mpos.y-pos.y)/10)))
+            actively_selected = p
+            p:active(true)
+            break
+         else
+            if actively_selected and actively_selected == p then
+               actively_selected:active(false)
+               actively_selected = nil
+            end
+         end
+      end
+   end
+end)
+
+return pl
