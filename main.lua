@@ -62,28 +62,3 @@ renderer:setShadowRadius(0)
 local dog = ""
 
 --TODO Separate the ninepatch elements into separate metatables for reusing values
-
-local data = {}
-local id = 0
-function loopchild(path)
-   for key, value in pairs(path:getAllVertices()) do
-      for key, value in pairs(value) do
-         id = id + 1
-         if not data[id] then
-            data[id] = {value:getPos(),vectors.vec3(0,0,0)}
-         else
-            value:setPos(data[id].pos)
-         end
-      end
-   end
-   for key, value in pairs(path:getChildren()) do
-      loopchild(value)
-   end
-end
-
-local a = 1
-events.SKULL_RENDER:register(function (delta, block, item)
-   id = 0
-   loopchild(models.plushie)
-end)
-
