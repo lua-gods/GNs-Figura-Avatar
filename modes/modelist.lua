@@ -70,7 +70,7 @@ function grid_start(grid)
         write("By Auria & GN (lua gods organization)")
         write("List of Currently Available Grid Modes:")
         write(">-------------------------------")
-        local _,list = require "grid_api"
+        local _,list = require "services.grid_api"
         for key, value in pairs(list) do
             write("| "..value)
         end
