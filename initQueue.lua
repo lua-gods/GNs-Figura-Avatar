@@ -2,6 +2,7 @@ local phase = 0
 local i = 0
 local queue = {}
 local function printError(err)
+   i = i + 1
    printJson('{"color":"red","text":">============= [Just GN '..i..' ] =============<\n"}')
    printJson('{"color":"red","text":"'..err:gsub('"','\\"')..'\n"}')
    printJson('{"color":"red","text":">-----------------------------------<\n"}')
@@ -11,10 +12,11 @@ events.WORLD_TICK:register(function()
       queue = listFiles("services",true)
       phase = 1
    elseif phase == 1 then
-      i = i + 1
-      local ok,err = pcall(require,queue[i])
+      local ok,err = pcall(require,queue[1])
+      table.remove(queue,1)
       if not ok then printError(err) end
-      print(i,queue[i])
-      if i == #queue then phase = 2 end
+      if #queue == 0 then
+         events.WORLD_TICK:remove("preproccessor")
+      end
    end
-end,"queueInitProcessor")
+end,"preproccessor")
