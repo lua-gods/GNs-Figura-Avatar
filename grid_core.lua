@@ -1,4 +1,5 @@
 local config = {
+    enabled = true,
     model = models.grid.Skull,
     match_block = "minecraft:iron_block",
     match_offset = vec(0, 0, 0),
@@ -74,77 +75,82 @@ end
 -- find grid
 local grid_found = false
 function events.skull_render(delta, block)
-    local isGrid = false
-
-    if not grid_found and block and block.id == "minecraft:player_head" and block.properties and block.properties.rotation then
-    local pos = block:getPos()
-
-        local grid_start = 0
-        for _ = 1, 32 do
-            grid_start = grid_start - 1
-            if world.getBlockState(pos + vec(grid_start, 0, grid_start) + config.match_offset).id ~= config.match_block then
-                grid_start = grid_start + 1
-                break
-            end
-        end
+    if config.enabled then
         
-        local grid_end = 0
-        for _ = 1, 32 do
-            grid_end = grid_end + 1
-            if world.getBlockState(pos + vec(grid_end, 0, grid_end) + config.match_offset).id ~= config.match_block then
-                grid_end = grid_end - 1
-                break
+        local isGrid = false
+    
+        if not grid_found and block and block.id == "minecraft:player_head" and block.properties and block.properties.rotation then
+        local pos = block:getPos()
+    
+            local grid_start = 0
+            for _ = 1, 32 do
+                grid_start = grid_start - 1
+                if world.getBlockState(pos + vec(grid_start, 0, grid_start) + config.match_offset).id ~= config.match_block then
+                    grid_start = grid_start + 1
+                    break
+                end
             end
-        end
-
-        if grid_start < 0 and grid_end > 0 then
-            -- grid found
-            grid_found = true
             
-            grid_pos = pos + vec(grid_start, 0, grid_start) + config.grid_render_offset 
-            config.margin = math.max(vectors.toCameraSpace(pos).z,0.01)
-            grid_pos.y = grid_pos.y 
-            local new_grid_size = grid_end - grid_start + 1
-            if grid_size ~= new_grid_size then
-                grid_size = new_grid_size
-                grid_last_mode = false
+            local grid_end = 0
+            for _ = 1, 32 do
+                grid_end = grid_end + 1
+                if world.getBlockState(pos + vec(grid_end, 0, grid_end) + config.match_offset).id ~= config.match_block then
+                    grid_end = grid_end - 1
+                    break
+                end
             end
-
-            grid_head_update_time = 600
-
-            -- set model
-            isGrid = true
-
-            config.model.grid:setPos((grid_pos - pos) * 16)
-            config.model.grid:setScale(grid_size, 1, grid_size)
-            config.model:setRot(0, block.properties.rotation * 22.5, 0)
-            --find signs
-            for _, v in ipairs(config.special_signs_pos) do
-                local bl = world.getBlockState(pos + v + config.match_offset)
-                if bl.id:match("sign") then
-                    local data = bl:getEntityData()
-                    if data then
-                        if data.Text1:match("grid_mode") then
-                            local x, y, z = tonumber(data.Text2:match("[%d-.]+")) or 0, tonumber(data.Text3:match("[%d-.]+")) or 0, tonumber(data.Text4:match("[%d-.]+")) or 0
-                            if x and y and z then
-                                if data.Text2:match("~") then x = x + pos.x end
-                                if data.Text3:match("~") then y = y + pos.y end
-                                if data.Text4:match("~") then z = z + pos.z end
-                                grid_mode_sign_pos = vec(x, y, z)
+    
+            if grid_start < 0 and grid_end > 0 then
+                -- grid found
+                grid_found = true
+                
+                grid_pos = pos + vec(grid_start, 0, grid_start) + config.grid_render_offset 
+                config.margin = math.max(vectors.toCameraSpace(pos).z,0.01)
+                grid_pos.y = grid_pos.y 
+                local new_grid_size = grid_end - grid_start + 1
+                if grid_size ~= new_grid_size then
+                    grid_size = new_grid_size
+                    grid_last_mode = false
+                end
+    
+                grid_head_update_time = 600
+    
+                -- set model
+                isGrid = true
+    
+                config.model.grid:setPos((grid_pos - pos) * 16)
+                config.model.grid:setScale(grid_size, 1, grid_size)
+                config.model:setRot(0, block.properties.rotation * 22.5, 0)
+                --find signs
+                for _, v in ipairs(config.special_signs_pos) do
+                    local bl = world.getBlockState(pos + v + config.match_offset)
+                    if bl.id:match("sign") then
+                        local data = bl:getEntityData()
+                        if data then
+                            if data.Text1:match("grid_mode") then
+                                local x, y, z = tonumber(data.Text2:match("[%d-.]+")) or 0, tonumber(data.Text3:match("[%d-.]+")) or 0, tonumber(data.Text4:match("[%d-.]+")) or 0
+                                if x and y and z then
+                                    if data.Text2:match("~") then x = x + pos.x end
+                                    if data.Text3:match("~") then y = y + pos.y end
+                                    if data.Text4:match("~") then z = z + pos.z end
+                                    grid_mode_sign_pos = vec(x, y, z)
+                                end
                             end
                         end
                     end
                 end
             end
         end
+    
+        config.model:setVisible(isGrid)
+    else
+        config.model:setVisible(false)
     end
-
-    config.model:setVisible(isGrid)
 end
 
 -- update grid
 function events.world_tick()
-    if grid_head_update_time == 0 then
+    if grid_head_update_time == 0 or not config.enabled then
         return
     end
     grid_head_update_time = grid_head_update_time - 1
@@ -204,10 +210,12 @@ function events.world_tick()
 end
 
 events.WORLD_RENDER:register(function()
-    grid_found = false -- reset check, triggers first before skull render
-    -- render function
-    if grid_modes[grid_current_mode_id] and grid_mode_state == 1 then
-        call_func(grid_modes[grid_current_mode_id].RENDER)
+    if config.enabled then
+        grid_found = false -- reset check, triggers first before skull render
+        -- render function
+        if grid_modes[grid_current_mode_id] and grid_mode_state == 1 then
+            call_func(grid_modes[grid_current_mode_id].RENDER)
+        end
     end
 end)
 
@@ -234,7 +242,7 @@ end
 
 -- render grid
 events.WORLD_RENDER:register(function()
-    if grid_head_update_time == 0 then
+    if grid_head_update_time == 0 or not config.enabled then
         return
     end
 
@@ -280,3 +288,5 @@ end
 function grid_api_and_core_functions.parameters()
     return mode_parameters, mode_parameters_list
 end
+
+return config

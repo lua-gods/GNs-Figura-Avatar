@@ -15,7 +15,7 @@
 
 #* :==:==:==:==:==:==:==:==:==:==:==:==:==:==:==:==:==:==:==:==:==:==:==:==:==:==:==:==:==:==:==: *#
 clear
-set -eo pipefail
+set -o pipefail
 
 #* :==:==:==:==:==:==:==:==:==:==:==:==:==:==:=CONFIG=:==:==:==:==:==:==:==:==:==:==:==:==:==:==: *#
 declare REPO="https://github.com/GrandpaScout/FiguraRewriteVSDocs/"
@@ -37,14 +37,14 @@ if ! which git &>/dev/null; then
         echo ""
         echo "Once you are done downloading it, start this script again."
         if which xdg-open &>/dev/null; then
-          read -p "Press any key to continue and exit . . ." -n 1 -rs
+          read -p "Press any key to continue and exit . . . " -n 1 -rs
           xdg-open "https://git-scm.com/downloads"
         elif which start &>/dev/null; then
-          read -p "Press any key to continue and exit . . ." -n 1 -rs
+          read -p "Press any key to continue and exit . . . " -n 1 -rs
           start "" "https://git-scm.com/downloads"
         else
           echo "Download git at <https://git-scm.com/downloads>"
-          read -p "Press any key to exit . . ." -n 1 -rs
+          read -p "Press any key to exit . . . " -n 1 -rs
         fi
         break;;
       [Nn])
@@ -53,7 +53,7 @@ if ! which git &>/dev/null; then
         echo "Would you like to download it?"
         echo ""
         echo "This script cannot run without git installed."
-        read -p "Press any key to exit . . ." -n 1 -rs
+        read -p "Press any key to exit . . . " -n 1 -rs
         break;;
       *) echo -e "\a";;
     esac
@@ -65,7 +65,7 @@ fi
 if [[ -d $TEMP ]]; then
   echo "The \"$TEMP\" folder is used to store downloaded files from git."
   echo "Make sure that folder is gone before running this script."
-  read -p "Press any key to exit . . ." -n 1 -rs
+  read -p "Press any key to exit . . . " -n 1 -rs
   exit 1
 fi
 
@@ -217,16 +217,31 @@ else
   mv "./$TEMP/src/.vscode" "./.vscode" &>/dev/null
 fi
 
-rm -f --preserve-root "./avatar.code-workspace" &>/dev/null
-rm -f --preserve-root "./$folder_name.code-workspace" &>/dev/null
-mv "./$TEMP/src/avatar.code-workspace" "./$folder_name.code-workspace" &>/dev/null
+glob_exists() {
+  [[ -e "$1" ]]
+}
+shopt -q dotglob
+declare -i was_set=$?
+shopt -s dotglob
+
+if ! glob_exists *.code-workspace; then
+  mv "./$TEMP/src/avatar.code-workspace" "./$folder_name.code-workspace" &>/dev/null
+fi
+
+if (( $was_set != 0 )); then
+  shopt -u dotglob
+fi
+
+if [[ ! -e ./.luarc.json ]]; then
+  mv "./$TEMP/src/.luarc.json" "./.luarc.json" &>/dev/null
+fi
 
 rm -rf --preserve-root "./$TEMP" &>/dev/null
 
 echo ""
 echo "Done."
 echo ""
-read -p "Press any key to finish . . ." -n 1 -rs
+read -p "Press any key to finish . . . " -n 1 -rs
 exit 0
 
 
@@ -320,7 +335,7 @@ ECHO Git has been found.
 ECHO Getting branches...
 
 :: Get Standard branches from the repo.
-SET #=0
+SET N=0
 SET "branch[L]="
 SET "branch[U]="
 FOR /F "usebackq delims=" %%B IN (`git ls-remote "%REPO%" "refs/heads/*"`) DO (
@@ -329,9 +344,9 @@ FOR /F "usebackq delims=" %%B IN (`git ls-remote "%REPO%" "refs/heads/*"`) DO (
   ) ELSE IF /I "upcoming"=="%%~nxB" (
     SET "branch[U]=%%~nxB"
   ) ELSE (
-    SET /A #+=1
+    SET /A N+=1
     SET "branchN[%%~nxB]=true"
-    SET "branch[!#!]=%%~nxB"
+    SET "branch[!N!]=%%~nxB"
   )
 )
 
@@ -362,8 +377,8 @@ ECHO Do not select [U] if you do not know what you are doing.
 ECHO:
 IF DEFINED branch[C] ECHO [C] Currently installed branch (%branch[C]%) [%branch[C].FULL%]
 IF DEFINED branch[L] ECHO [L] Latest branch (%branch[L]%)
-IF DEFINED branch[U] ECHO [U] Experimental branch (%branch[U]%)
-FOR /L %%I IN (1,1,%#%) DO  ECHO [%%I] !branch[%%I]!
+IF DEFINED branch[U] ECHO [U] Upcoming branch (%branch[U]%)
+FOR /L %%I IN (1,1,%N%) DO  ECHO [%%I] !branch[%%I]!
 
 ECHO:
 SET "Selected="
@@ -409,10 +424,10 @@ ECHO:
 ECHO If you are not sure which one to select, choose [L].
 ECHO Do not select [U] if you do not know what you are doing.
 ECHO:
-IF DEFINED branch[C] ECHO [C] Currently installed branch (%branch[C]%)
+IF DEFINED branch[C] ECHO [C] Currently installed branch (%branch[C]%) [%branch[C].FULL%]
 IF DEFINED branch[L] ECHO [L] Latest branch (%branch[L]%)
-IF DEFINED branch[U] ECHO [U] Experimental branch (%branch[U]%)
-FOR /L %%I IN (1,1,%#%) DO ECHO [%%I] !branch[%%I]!
+IF DEFINED branch[U] ECHO [U] Upcoming branch (%branch[U]%)
+FOR /L %%I IN (1,1,%N%) DO ECHO [%%I] !branch[%%I]!
 ECHO:
 ECHO Selected "%SelectedBranch%". Is this correct?
 ECHO:
@@ -455,9 +470,13 @@ IF EXIST ".\.vscode" (
   MOVE ".\%TEMP%\src\.vscode" ".\.vscode" >nul 2>&1
 )
 
-DEL /Q /F ".\avatar.code-workspace" >nul 2>&1
-DEL /Q /F ".\%FolderName%.code-workspace" >nul 2>&1
-MOVE ".\%TEMP%\src\avatar.code-workspace" ".\%FolderName%.code-workspace" >nul 2>&1
+IF NOT EXIST "*.code-workspace" (
+  MOVE ".\%TEMP%\src\avatar.code-workspace" ".\%FolderName%.code-workspace" >nul 2>&1
+)
+
+IF NOT EXIST ".luarc.json" (
+  MOVE ".\%TEMP%\src\.luarc.json" ".\.luarc.json" >nul 2>&1
+)
 
 RMDIR /Q /S ".\%TEMP%" >nul 2>&1
 

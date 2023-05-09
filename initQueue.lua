@@ -8,7 +8,7 @@ local function printError(err)
 end
 events.WORLD_TICK:register(function()
    if phase ~= 2 then
-      for _ = 1, 100, 1 do
+      for _ = 1, 10, 1 do
          if not InitQueue then
             if phase == 0 then
                require("services.trust")
