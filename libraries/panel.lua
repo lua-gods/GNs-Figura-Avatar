@@ -173,7 +173,9 @@ events.WORLD_RENDER:register(function (delta)
                elseif typ == "paneltextedit" then
                   config.hud:newText(i.."text"):text(e.text):outline(true):pos(0,(i-1) * config.line_height)
                   config.hud:newText(i.."underline"):text('{"text":"____________________","underlined":true}'):outline(true):pos(0,(i-1) * config.line_height - 1)
+                  config.hud:newText(i.."underline2"):text('{"text":"____________________","underlined":true}'):outline(true):pos(2,(i-1) * config.line_height - 1)
                   table.insert(names,i.."underline")
+                  table.insert(names,i.."underline2")
                   table.insert(names,i.."text")
                end
                table.insert(taskLines,names)
@@ -198,23 +200,25 @@ events.WORLD_RENDER:register(function (delta)
                         break
                      end
                   end
-                  config.hud:getTask(value[2]):text(disp.."|")
+                  config.hud:getTask(value[3]):text(disp.."|")
                else
                   if element.text == "" then
-                     config.hud:getTask(value[2]):text("§7"..element.placeholder)
+                     config.hud:getTask(value[3]):text("§7"..element.placeholder)
                   else
                      if i == panel.selected then
-                        config.hud:getTask(value[2]):text('{"color":"white","text":"'..element.text..'"}')
+                        config.hud:getTask(value[3]):text('{"color":"white","text":"'..element.text..'"}')
                      else
-                        config.hud:getTask(value[2]):text('{"color":"gray","text":"'..element.text..'"}')
+                        config.hud:getTask(value[3]):text('{"color":"gray","text":"'..element.text..'"}')
                      end
                   end
                end
                
                if i == panel.selected then
                   config.hud:getTask(value[1]):text('{"text":"____________________","underlined":true}')
+                  config.hud:getTask(value[2]):text('{"text":"____________________","underlined":true}')
                else
                   config.hud:getTask(value[1]):text('{"color":"gray","text":"____________________","underlined":true}')
+                  config.hud:getTask(value[2]):text('{"color":"gray","text":"____________________","underlined":true}')
                end
             end
          end
@@ -235,9 +239,11 @@ config.select.press = function ()
 end
 
 events.MOUSE_SCROLL:register(function (dir)
-   panel.selected = (panel.selected + dir - 1) % #panel.current_page.elements + 1
-   panel.SELECTED_CHANGED:invoke(panel.selected)
-   panel:update()
+   if panel.visible and not panel.interacting then
+      panel.selected = (panel.selected + dir - 1) % #panel.current_page.elements + 1
+      panel.SELECTED_CHANGED:invoke(panel.selected)
+      panel:update()
+   end
    return panel.visible
 end)
 
@@ -293,7 +299,7 @@ local lookup = {[32]=" ",
 
 events.KEY_PRESS:register(function (key,status,modifier)
    local c = panel.current_page.elements[panel.selected]
-   if status == 1 then    
+   if status == 1 then
       if type(c) == "paneltextedit" and panel.interacting then
          if key == 259 then
             c.text = string.sub(c.text,1,string.len(c.text)-1)
@@ -304,7 +310,7 @@ events.KEY_PRESS:register(function (key,status,modifier)
                c.text = c.text..string.lower(lookup[key])
             end
          end
-         if key == 256 then
+         if key == 256 or key == 257 then
             panel.interacting = false
             panel:update()
          end
