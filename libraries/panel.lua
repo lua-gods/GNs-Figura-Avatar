@@ -9,7 +9,30 @@ if not host:isHost() then return end
 local config = {
    hud = models.menu,
    line_height = 11,
-   select = keybinds:newKeybind("Panel Select","key.keyboard.grave.accent",false)
+   select = keybinds:newKeybind("Panel Select","key.keyboard.grave.accent",false),
+   theme = {
+      sounds = {
+         hover={id="minecraft:block.note_block.hat",pitch=1,volume=1},
+         select={id="minecraft:block.note_block.hat",pitch=0.9,volume=1},
+         deselect={id="minecraft:block.note_block.hat",pitch=0.95,volume=1},
+         intro={id="minecraft:block.note_block.hat",pitch=1.5,volume=1},
+         outro={id="minecraft:block.note_block.hat",pitch=1.3,volume=1},
+      },
+      style = {
+         button = {
+            normal = '{"text":${TEXT},"color":"gray"}',
+            hover = '{"text":${TEXT},"color":"white"}',
+            active = '{"text":${TEXT},"color":"dark_gray"}',
+            disabled = '{"text":${TEXT},"color":"dark_gray"}',
+         },
+         textEdit = {
+            normal = '{"text":${TEXT},"color":"gray"}',
+            hover = '{"text":${TEXT},"color":"white"}',
+            active = '{"text":${TEXT},"color":"green"}',
+            disabled = '{"text":${TEXT},"color":"dark_gray"}',
+         }
+      }
+   }
 }
 
 local kitkat = require("libraries.KattEventsAPI")
@@ -35,6 +58,10 @@ end
 
 function panel:update()
    panel.update_queue = true
+end
+
+function panel.reload()
+   panel.reload_queue = true
 end
 
 -->====================[ API ]====================<--
@@ -75,13 +102,6 @@ function PanelPage:forceUpdate()
    return self
 end
 
-
----@alias InputEvent string
----| "BUTTON_DOWN"
----| "BUTTON_UP"
----| "SCROLL_UP"
----| "SCROLL_DOWN"
-
 ---@class PanelButton
 ---@field text string
 ---@field input function
@@ -112,6 +132,11 @@ function PanelButton:inputListener(func)
    panel:update()
    return self
 end
+
+function PanelButton:onInput(func)
+   self.input = func
+end
+
 
 -->==========[ Text Input ]==========<--
 ---@class PanelTextEdit
@@ -157,6 +182,7 @@ events.WORLD_RENDER:register(function (delta)
    if panel.current_page then
       if panel.reload_queue then
          panel.reload_queue = false
+         panel:update()
          for _, value in pairs(taskLines) do
             for key, names in pairs(value) do
                config.hud:removeTask(names)
@@ -167,13 +193,15 @@ events.WORLD_RENDER:register(function (delta)
             for i, e in pairs(panel.current_page.elements) do
                local names = {}
                local typ = type(e)
+
                if typ == "panelbutton" then
-                  config.hud:newText(i):text(e.text):outline(true):pos(0,(i-1) * config.line_height)
+                  config.hud:newText(i):outline(true):pos(0,(i-1) * config.line_height)
                   table.insert(names,i)
+               
                elseif typ == "paneltextedit" then
-                  config.hud:newText(i.."text"):text(e.text):outline(true):pos(0,(i-1) * config.line_height)
-                  config.hud:newText(i.."underline"):text('{"text":"____________________","underlined":true}'):outline(true):pos(0,(i-1) * config.line_height - 1)
-                  config.hud:newText(i.."underline2"):text('{"text":"____________________","underlined":true}'):outline(true):pos(2,(i-1) * config.line_height - 1)
+                  config.hud:newText(i.."text"):outline(true):pos(0,(i-1) * config.line_height)
+                  config.hud:newText(i.."underline"):outline(true):pos(0,(i-1) * config.line_height - 1)
+                  config.hud:newText(i.."underline2"):outline(true):pos(2,(i-1) * config.line_height - 1)
                   table.insert(names,i.."underline")
                   table.insert(names,i.."underline2")
                   table.insert(names,i.."text")
@@ -182,6 +210,7 @@ events.WORLD_RENDER:register(function (delta)
             end
          end
       elseif panel.update_queue then
+         panel.update_queue = false
          for i, value in pairs(taskLines) do
             local element = panel.current_page.elements[i]
             local typ = type(element)
@@ -203,22 +232,26 @@ events.WORLD_RENDER:register(function (delta)
                   config.hud:getTask(value[3]):text(disp.."|")
                else
                   if element.text == "" then
-                     config.hud:getTask(value[3]):text("§7"..element.placeholder)
+                     config.hud:getTask(value[3]):text(string.gsub(config.theme.style.textEdit.normal,"${TEXT}",'"'..element.placeholder..'"'))
                   else
                      if i == panel.selected then
-                        config.hud:getTask(value[3]):text('{"color":"white","text":"'..element.text..'"}')
+                        if panel.interacting then
+                           config.hud:getTask(value[3]):text(string.gsub(config.theme.style.textEdit.active,"${TEXT}",'"'..element.text..'"'))
+                        else
+                           config.hud:getTask(value[3]):text(string.gsub(config.theme.style.textEdit.hover,"${TEXT}",'"'..element.text..'"'))
+                        end
                      else
-                        config.hud:getTask(value[3]):text('{"color":"gray","text":"'..element.text..'"}')
+                        config.hud:getTask(value[3]):text(string.gsub(config.theme.style.textEdit.normal,"${TEXT}",'"'..element.text..'"'))
                      end
                   end
                end
                
                if i == panel.selected then
-                  config.hud:getTask(value[1]):text('{"text":"____________________","underlined":true}')
-                  config.hud:getTask(value[2]):text('{"text":"____________________","underlined":true}')
+                  config.hud:getTask(value[1]):text(string.gsub(config.theme.style.textEdit.hover,"${TEXT}",'"'.."____________________"..'"'))
+                  config.hud:getTask(value[2]):text(string.gsub(config.theme.style.textEdit.hover,"${TEXT}",'"'.."____________________"..'"'))
                else
-                  config.hud:getTask(value[1]):text('{"color":"gray","text":"____________________","underlined":true}')
-                  config.hud:getTask(value[2]):text('{"color":"gray","text":"____________________","underlined":true}')
+                  config.hud:getTask(value[1]):text(string.gsub(config.theme.style.textEdit.normal,"${TEXT}",'"'.."____________________"..'"'))
+                  config.hud:getTask(value[2]):text(string.gsub(config.theme.style.textEdit.normal,"${TEXT}",'"'.."____________________"..'"'))
                end
             end
          end
@@ -226,20 +259,48 @@ events.WORLD_RENDER:register(function (delta)
    end
 end)
 
+---@param sound Minecraft.soundID
+---@param pitch number
+---@param volume number
+local function UIplaySound(sound,pitch,volume)
+   sounds:playSound(sound,client:getCameraPos()+vectors.vec3(0,-1,0),volume,pitch)
+end
+
 -->====================[ Input Handler ]====================<--
 
+---@alias InputEvent string
+---| "BUTTON_DOWN"
+---| "BUTTON_UP"
+---| "SCROLL_UP"
+---| "SCROLL_DOWN"
+
 config.select.press = function ()
-   if not panel.visible then panel.visible = true end
-   panel.reload_queue = true
-   local c = panel.current_page.elements[panel.selected]
-   if type(c) == "paneltextedit" then
-      panel.interacting = true
+   if panel.visible then
+      UIplaySound(config.theme.sounds.select.id,config.theme.sounds.select.pitch,config.theme.sounds.select.volume)
+      local c = panel.current_page.elements[panel.selected]
+      if c.input then
+         c.input(c,"BUTTON_DOWN")
+      end
+      if type(c) == "paneltextedit" then
+         panel.interacting = true
+      end
+      panel:update()
    end
+   if not panel.visible then panel.visible = true panel:reload() UIplaySound(config.theme.sounds.intro.id,config.theme.sounds.intro.pitch,config.theme.sounds.intro.volume) end
    return true
+end
+
+config.select.release = function ()
+   panel:update()
+   local c = panel.current_page.elements[panel.selected]
+   if c.input then
+      c.input(c,"BUTTON_UP")
+   end
 end
 
 events.MOUSE_SCROLL:register(function (dir)
    if panel.visible and not panel.interacting then
+      UIplaySound(config.theme.sounds.hover.id,config.theme.sounds.hover.pitch,config.theme.sounds.hover.volume)
       panel.selected = (panel.selected + dir - 1) % #panel.current_page.elements + 1
       panel.SELECTED_CHANGED:invoke(panel.selected)
       panel:update()
@@ -299,24 +360,36 @@ local lookup = {[32]=" ",
 
 events.KEY_PRESS:register(function (key,status,modifier)
    local c = panel.current_page.elements[panel.selected]
+   local typ = type(c)
    if status == 1 then
-      if type(c) == "paneltextedit" and panel.interacting then
-         if key == 259 then
+      if typ == "paneltextedit" and panel.interacting then
+         if key == 259 then -- backspace
             c.text = string.sub(c.text,1,string.len(c.text)-1)
+            panel:update()
          elseif lookup[key] then
             if modifier == 1 then
                c.text = c.text..lookup[key]
             else
                c.text = c.text..string.lower(lookup[key])
             end
+            panel:update()
          end
-         if key == 256 or key == 257 then
+         if key == 256 or key == 257 then -- exit edit mode
             panel.interacting = false
             panel:update()
+            UIplaySound(config.theme.sounds.deselect.id,config.theme.sounds.deselect.pitch,config.theme.sounds.deselect.volume)
          end
          return true
       end
+      if key == 256 and panel.visible then -- exit edit mode
+         panel.visible = false
+         panel.reload_queue = true
+         panel.interacting = false
+         UIplaySound(config.theme.sounds.outro.id,config.theme.sounds.outro.pitch,config.theme.sounds.outro.volume)
+         return true
+      end
    end
+   
 end)
 
 return panel
