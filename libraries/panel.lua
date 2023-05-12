@@ -6,6 +6,8 @@
 if not host:isHost() then return end
 ---@diagnostic disable: undefined-field
 
+local k2s = require("libraries.key2stringLib")
+
 local config = {
    hud = models.menu,
    line_height = 11,
@@ -141,6 +143,7 @@ end
 -->==========[ Text Input ]==========<--
 ---@class PanelTextEdit
 ---@field text string
+---@field width number
 ---@field input function
 local PanelTextEdit = {}
 PanelTextEdit.__index = PanelTextEdit
@@ -171,10 +174,17 @@ function PanelTextEdit:inputListener(func)
    return self
 end
 
+function PanelTextEdit:setWidth(func)
+   self.input = func
+   panel:update()
+   return self
+end
+
 -->====================[ Renderer ]====================<--
 config.hud:setParentType("Hud")
 
 local taskLines = {}
+local textedit_cursor_pos = 0
 
 events.WORLD_RENDER:register(function (delta)
    local pos = client:getScaledWindowSize()/vec(-2,-1) + vec(-96,12)
@@ -222,14 +232,35 @@ events.WORLD_RENDER:register(function (delta)
                end
             elseif typ then
                if panel.interacting then
-                  local disp = ""
+                  local display_text = ""
+                  local post_cursor_display_text = ""
+                  local post_cursor = false
+                  if textedit_cursor_pos == 0 then
+                     display_text = "|"
+                  end
                   for l = string.len(element.text), 1, -1 do
-                     disp = element.text:sub(l,l)..disp
-                     if client.getTextWidth(disp) > 115 then
+                     if l == textedit_cursor_pos then
+                        post_cursor = true
+                        display_text = "|"..display_text
+                     end
+                     if post_cursor then
+                        post_cursor_display_text = element.text:sub(l,l)..post_cursor_display_text
+                     end
+                     display_text = element.text:sub(l,l)..display_text
+                     if client.getTextWidth(post_cursor_display_text) > 57 and client.getTextWidth(display_text) > 115 then
                         break
                      end
                   end
-                  config.hud:getTask(value[3]):text(disp.."|")
+
+                  local trimmed_display_text = ""
+                  for e = 1, #display_text, 1 do
+                     if client.getTextWidth(trimmed_display_text) > 115 then
+                        break
+                     end
+                     trimmed_display_text = trimmed_display_text..display_text:sub(e,e)
+                  end
+                  display_text = trimmed_display_text
+                  config.hud:getTask(value[3]):text(display_text)
                else
                   if element.text == "" then
                      config.hud:getTask(value[3]):text(string.gsub(config.theme.style.textEdit.normal,"${TEXT}",'"'..element.placeholder..'"'))
@@ -283,6 +314,7 @@ config.select.press = function ()
       end
       if type(c) == "paneltextedit" then
          panel.interacting = true
+         textedit_cursor_pos = #c.text
       end
       panel:update()
    end
@@ -299,83 +331,40 @@ config.select.release = function ()
 end
 
 events.MOUSE_SCROLL:register(function (dir)
-   if panel.visible and not panel.interacting then
-      UIplaySound(config.theme.sounds.hover.id,config.theme.sounds.hover.pitch,config.theme.sounds.hover.volume)
-      panel.selected = (panel.selected + dir - 1) % #panel.current_page.elements + 1
-      panel.SELECTED_CHANGED:invoke(panel.selected)
-      panel:update()
+   if panel.visible then
+      if not panel.interacting then
+         UIplaySound(config.theme.sounds.hover.id,config.theme.sounds.hover.pitch,config.theme.sounds.hover.volume)
+         panel.selected = (panel.selected + dir - 1) % #panel.current_page.elements + 1
+         panel.SELECTED_CHANGED:invoke(panel.selected)
+         panel:update()
+      else
+         if type(panel.current_page.elements[panel.selected]) == "paneltextedit" then
+            textedit_cursor_pos = math.clamp(textedit_cursor_pos + dir,0,#panel.current_page.elements[panel.selected].text)
+            panel:update()
+         end
+      end
    end
    return panel.visible
 end)
-
-local lookup = {[32]=" ",
-[39]="'",
-[44]=",",
-[45]="-",
-[46]=".",
-[47]="/",
-[48]="0",
-[49]="1",
-[50]="2",
-[51]="3",
-[52]="4",
-[53]="5",
-[54]="6",
-[55]="7",
-[56]="8",
-[57]="9",
-[59]=";",
-[61]="=",
-[65]="A",
-[66]="B",
-[67]="C",
-[68]="D",
-[69]="E",
-[60]="F",
-[62]="H",
-[71]="G",
-[73]="I",
-[74]="J",
-[75]="K",
-[76]="L",
-[77]="M",
-[78]="N",
-[79]="O",
-[70]="F",
-[81]="Q",
-[72]="H",
-[80]="P",
-[82]="R",
-[83]="S",
-[84]="T",
-[85]="U",
-[86]="V",
-[87]="W",
-[88]="X",
-[89]="Y",
-[90]="Z",
-[92]="\\",
-[93]="]",
-[96]="`"}
 
 events.KEY_PRESS:register(function (key,status,modifier)
    local c = panel.current_page.elements[panel.selected]
    local typ = type(c)
    if status == 1 then
       if typ == "paneltextedit" and panel.interacting then
+         local keystring = k2s.key2string(key,modifier)
          if key == 259 then -- backspace
             c.text = string.sub(c.text,1,string.len(c.text)-1)
+            textedit_cursor_pos = textedit_cursor_pos - 1
             panel:update()
-         elseif lookup[key] then
-            if modifier == 1 then
-               c.text = c.text..lookup[key]
-            else
-               c.text = c.text..string.lower(lookup[key])
-            end
+         elseif keystring then
+            c.text = c.text:sub(1,textedit_cursor_pos)..keystring..c.text:sub(1+textedit_cursor_pos,#c.text)
+            textedit_cursor_pos = textedit_cursor_pos + 1
             panel:update()
          end
          if key == 256 or key == 257 then -- exit edit mode
             panel.interacting = false
+            textedit_cursor_pos = 0
             panel:update()
             UIplaySound(config.theme.sounds.deselect.id,config.theme.sounds.deselect.pitch,config.theme.sounds.deselect.volume)
          end
@@ -389,7 +378,6 @@ events.KEY_PRESS:register(function (key,status,modifier)
          return true
       end
    end
-   
 end)
 
 return panel
