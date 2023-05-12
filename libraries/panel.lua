@@ -270,7 +270,7 @@ events.WORLD_RENDER:register(function (delta)
 
                   local unselect_text = ""
                   local is_overflow = false
-                  for e = 1, #display_text, 1 do
+                  for e = 1, #element.text, 1 do
                      if client.getTextWidth(unselect_text) > element._pxwidth then
                         is_overflow = true
                         break
