@@ -3,7 +3,7 @@
  / / __/  |/ /
 / /_/ / /|  /
 \____/_/ |_/ ]]
-if not host:isHost() then return end
+if not H then return end
 ---@diagnostic disable: undefined-field
 
 local k2s = require("libraries.key2stringLib")
