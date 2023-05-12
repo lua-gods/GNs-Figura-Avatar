@@ -155,6 +155,8 @@ function PanelPage:newTextEdit(placeholder)
       text = "",
       placeholder = placeholder,
       input = nil,
+      width = 20,
+      _pxwidth = 120,
    }
    setmetatable(compose,PanelTextEdit)
    panel:update()
@@ -174,8 +176,9 @@ function PanelTextEdit:inputListener(func)
    return self
 end
 
-function PanelTextEdit:setWidth(func)
-   self.input = func
+function PanelTextEdit:setWidth(width)
+   self.width = width
+   self._pxwidth = client.getTextWidth(("_"):rep(width))
    panel:update()
    return self
 end
@@ -247,14 +250,14 @@ events.WORLD_RENDER:register(function (delta)
                         post_cursor_display_text = element.text:sub(l,l)..post_cursor_display_text
                      end
                      display_text = element.text:sub(l,l)..display_text
-                     if client.getTextWidth(post_cursor_display_text) > 57 and client.getTextWidth(display_text) > 115 then
+                     if client.getTextWidth(post_cursor_display_text) > element._pxwidth * 0.5 and client.getTextWidth(display_text) > element._pxwidth then
                         break
                      end
                   end
 
                   local trimmed_display_text = ""
                   for e = 1, #display_text, 1 do
-                     if client.getTextWidth(trimmed_display_text) > 115 then
+                     if client.getTextWidth(trimmed_display_text) > element._pxwidth then
                         break
                      end
                      trimmed_display_text = trimmed_display_text..display_text:sub(e,e)
@@ -276,13 +279,13 @@ events.WORLD_RENDER:register(function (delta)
                      end
                   end
                end
-               
+               local underline = ("_"):rep(element.width)
                if i == panel.selected then
-                  config.hud:getTask(value[1]):text(string.gsub(config.theme.style.textEdit.hover,"${TEXT}",'"'.."____________________"..'"'))
-                  config.hud:getTask(value[2]):text(string.gsub(config.theme.style.textEdit.hover,"${TEXT}",'"'.."____________________"..'"'))
+                  config.hud:getTask(value[1]):text(string.gsub(config.theme.style.textEdit.hover,"${TEXT}",'"'..underline..'"'))
+                  config.hud:getTask(value[2]):text(string.gsub(config.theme.style.textEdit.hover,"${TEXT}",'"'..underline..'"'))
                else
-                  config.hud:getTask(value[1]):text(string.gsub(config.theme.style.textEdit.normal,"${TEXT}",'"'.."____________________"..'"'))
-                  config.hud:getTask(value[2]):text(string.gsub(config.theme.style.textEdit.normal,"${TEXT}",'"'.."____________________"..'"'))
+                  config.hud:getTask(value[1]):text(string.gsub(config.theme.style.textEdit.normal,"${TEXT}",'"'..underline..'"'))
+                  config.hud:getTask(value[2]):text(string.gsub(config.theme.style.textEdit.normal,"${TEXT}",'"'..underline..'"'))
                end
             end
          end
