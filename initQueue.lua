@@ -12,9 +12,8 @@ events.WORLD_TICK:register(function()
       queue = listFiles("services",true)
       phase = 1
    elseif phase == 1 then
-      local ok,err = pcall(require,queue[1])
+      require(queue[1])
       table.remove(queue,1)
-      if not ok then printError(err) end
       if #queue == 0 then
          events.WORLD_TICK:remove("preproccessor")
       end
