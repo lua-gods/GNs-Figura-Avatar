@@ -21,7 +21,7 @@ function c.newWardrobe(name)
       texturable = {},
       lastSelected = 1,
       selected = 1,
-      ON_CHANGE=katt:newEvent()
+      ON_CHANGE=katt.newEvent()
    }
    setmetatable(compose,Wardrobe)
    return compose
