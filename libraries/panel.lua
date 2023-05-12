@@ -28,6 +28,9 @@ local config = {
             disabled = '{"text":${TEXT},"color":"dark_gray"}',
          },
          textEdit = {
+
+            cursor = "|",
+
             normal = '{"text":${TEXT},"color":"gray"}',
             hover = '{"text":${TEXT},"color":"white"}',
             active = '{"text":${TEXT},"color":"green"}',
@@ -153,6 +156,7 @@ function PanelPage:newTextEdit(placeholder)
    ---@PanelTextEdit
    local compose = {
       text = "",
+      display_text = "",
       placeholder = placeholder,
       input = nil,
       width = 20,
@@ -233,18 +237,18 @@ events.WORLD_RENDER:register(function (delta)
                else
                   config.hud:getTask(value[1]):text('{"color":"gray","text":"'..element.text..'"}')
                end
-            elseif typ then
+            elseif typ == "paneltextedit" then
                if panel.interacting then
                   local display_text = ""
                   local post_cursor_display_text = ""
                   local post_cursor = false
                   if textedit_cursor_pos == 0 then
-                     display_text = "|"
+                     display_text = config.theme.style.textEdit.cursor
                   end
                   for l = string.len(element.text), 1, -1 do
                      if l == textedit_cursor_pos then
                         post_cursor = true
-                        display_text = "|"..display_text
+                        display_text = config.theme.style.textEdit.cursor..display_text
                      end
                      if post_cursor then
                         post_cursor_display_text = element.text:sub(l,l)..post_cursor_display_text
@@ -263,6 +267,21 @@ events.WORLD_RENDER:register(function (delta)
                      trimmed_display_text = trimmed_display_text..display_text:sub(e,e)
                   end
                   display_text = trimmed_display_text
+
+                  local unselect_text = ""
+                  local is_overflow = false
+                  for e = 1, #display_text, 1 do
+                     if client.getTextWidth(unselect_text) > element._pxwidth then
+                        is_overflow = true
+                        break
+                     end
+                     unselect_text = unselect_text..element.text:sub(e,e)
+                  end
+                  if is_overflow then
+                     unselect_text = unselect_text.."..."
+                  end
+                  element.display_text = unselect_text
+
                   config.hud:getTask(value[3]):text(display_text)
                else
                   if element.text == "" then
@@ -270,12 +289,12 @@ events.WORLD_RENDER:register(function (delta)
                   else
                      if i == panel.selected then
                         if panel.interacting then
-                           config.hud:getTask(value[3]):text(string.gsub(config.theme.style.textEdit.active,"${TEXT}",'"'..element.text..'"'))
+                           config.hud:getTask(value[3]):text(string.gsub(config.theme.style.textEdit.active,"${TEXT}",'"'..element.display_text..'"'))
                         else
-                           config.hud:getTask(value[3]):text(string.gsub(config.theme.style.textEdit.hover,"${TEXT}",'"'..element.text..'"'))
+                           config.hud:getTask(value[3]):text(string.gsub(config.theme.style.textEdit.hover,"${TEXT}",'"'..element.display_text..'"'))
                         end
                      else
-                        config.hud:getTask(value[3]):text(string.gsub(config.theme.style.textEdit.normal,"${TEXT}",'"'..element.text..'"'))
+                        config.hud:getTask(value[3]):text(string.gsub(config.theme.style.textEdit.normal,"${TEXT}",'"'..element.display_text..'"'))
                      end
                   end
                end
