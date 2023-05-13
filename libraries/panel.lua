@@ -72,6 +72,12 @@ for _, path in pairs(listFiles("libraries/panel_elements",false)) do
 end
 
 
+---@alias PanelElementState string
+---| "normal" -- element idle
+---| "hover" -- selector on element
+---| "active" -- element being pressed
+---| "disabled" -- element disabled
+
 -->====================[ API ]====================<--
 
 ---@class PaneldPage
