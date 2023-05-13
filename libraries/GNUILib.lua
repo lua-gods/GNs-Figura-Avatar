@@ -10,8 +10,8 @@ local cfg = {
 }
 local katt = require("libraries.KattEventsAPI")
 local ui = {
-   WINDOW_SIZE_CHANGED = katt:newEvent(),
-   GUI_SCALE_CHANGED = katt:newEvent(),
+   WINDOW_SIZE_CHANGED = katt.newEvent(),
+   GUI_SCALE_CHANGED = katt.newEvent(),
 }
 cfg.model:setParentType("HUD")
 ----------------------------------------------------------------| Utilities
@@ -94,7 +94,7 @@ local resource = {}
 ---@field RECT_CHANGED KattEvent
 local rect = {
    rect = vectors.vec4(),
-   RECT_CHANGED = katt:newEvent()
+   RECT_CHANGED = katt.newEvent()
 }
 local rectMetafunc = {}
 rect.__index = rectMetafunc
@@ -105,7 +105,7 @@ function resource:appendRectProperties(compose)
       compose = {}
    end
    compose.rect = vectors.vec4()
-   compose.RECT_CHANGED = katt:newEvent()
+   compose.RECT_CHANGED = katt.newEvent()
    
    setmetatable(compose,rectMetafunc)
    return compose
@@ -203,10 +203,10 @@ function ui:newNinepatchTexture()
       patch_margin = vectors.vec4(16,16,32,32),
       tasks = {},
       id = ninepatchID,
-      TEXTURE_CHANGED = katt:newEvent(),
-      RECT_CHANGED = katt:newEvent(),
-      MARGIN_CHANGED = katt:newEvent(),
-      ANCHOR_CHANGED = katt:newEvent(),
+      TEXTURE_CHANGED = katt.newEvent(),
+      RECT_CHANGED = katt.newEvent(),
+      MARGIN_CHANGED = katt.newEvent(),
+      ANCHOR_CHANGED = katt.newEvent(),
       depth = 0,
    }
    setmetatable(compose,Ninepatch)
