@@ -2,6 +2,8 @@
 this is the main avatar I (GNamimates) use for the mod [Figura](https://modrinth.com/mod/figura).
 this avatar is full of scripts n things, yet it runs really fast compared to other avatars (the grid core is taking so much instructions, removing it will drastically improve instructions count)
 
+
+##### Avatar is under the Apache License 2.0 Lisence
 # Table of Contents
 🥶 Documented
 😡 Undocumented
@@ -13,21 +15,22 @@ this avatar is full of scripts n things, yet it runs really fast compared to oth
 ⚠️ W.I.P
 ☣️ Heavily W.I.P
 ## Libraries
-
-| Library        | State | Owner               |
-| -------------- | ----- | ------------------- |
-| GNanim         | 😡✅⚠️   | GNamimates          |
-| GNUILib        | 😡✅⚠️   | GNamimates          |
-| GNUIUtil       | 😡✅⚠️   | GNamimates          |
-| Panel          | 😡❌☣️   | GNamimates          |
-| WorldAffectLib | 😡✅🏆   | GNamimates          |
-| ClothesLib     | 😡✅🏆   | GNamimates          |
-| TimerAPI       | 🥶✅🏆   | KitCat & GNamiamtes |
-| KattEventsAPI  | 🥶✅🏆   | KitCat              |
+A collection of reusable, compiled, and tested code that can facilitate the automation or augmentation of application functionalities.
+| Library        | State | Author              | Description                                                                                                  |
+| -------------- | ----- | ------------------- | ------------------------------------------------------------------------------------------------------------ |
+| GNanim         | 😡✅⚠️   | GNamimates          | A state machine library made specifically for animations                                                     |
+| GNUILib        | 😡✅⚠️   | GNamimates          | Handles all the UI element arrangement and instancing                                                        |
+| GNUIUtil       | 😡✅⚠️   | GNamimates          | Literally does one thing, yet its its own file, might remove later                                           |
+| Panel          | 😡❌☣️   | GNamimates          | A quick popup panel that appears at the bottom right corner of the screen, can be accessed by pressing [ ` ] |
+| WorldAffectLib | 😡✅🏆   | GNamimates          | A Library that handles watching specific blocks in the world                                                 |
+| ClothesLib     | 😡✅🏆   | GNamimates          | A state machine library that handles cosmetic and scripts                                                    |
+| TimerAPI       | 🥶✅🏆   | KitCat & GNamiamtes | A library about making timers, count down clocks                                                             |
+| KattEventsAPI  | 🥶✅🏆   | KitCat              | A library that allows the creation of custom events                                                          |
 
 
 
 ## Services
+A bunch of scripts that get called on initialization
 | Service            | Description                                   |
 | ------------------ | --------------------------------------------- |
 | Grid API           | the interface from controlling the grid floor |
@@ -46,6 +49,9 @@ Contains the individual types of clothing the avatar uses.
 
 ## 📁 Weapons
 Contains cosmetic weapons which can be toggled with the wardrobe.
+
+## 📁 libraries.panel_elements
+Contains modules for the panel.
 
 ## 📁 Modes
 Converts strings into instructions on how to draw the text
