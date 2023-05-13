@@ -19,7 +19,7 @@ A collection of reusable, compiled, and tested code that can facilitate the auto
 | Library        | State | Author              | Description                                                                                                  |
 | -------------- | ----- | ------------------- | ------------------------------------------------------------------------------------------------------------ |
 | GNanim         | 😡✅⚠️   | GNamimates          | A state machine library made specifically for animations                                                     |
-| GNUILib        | 😡✅⚠️   | GNamimates          | Handles all the UI element arrangement and instancing                                                        |
+| GNUILib        | 😡❌⚠️   | GNamimates          | Handles all the UI element arrangement and instancing                                                        |
 | GNUIUtil       | 😡✅⚠️   | GNamimates          | Literally does one thing, yet its its own file, might remove later                                           |
 | Panel          | 😡❌☣️   | GNamimates          | A quick popup panel that appears at the bottom right corner of the screen, can be accessed by pressing [ ` ] |
 | WorldAffectLib | 😡✅🏆   | GNamimates          | A Library that handles watching specific blocks in the world                                                 |
