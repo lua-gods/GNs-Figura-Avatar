@@ -1,3 +1,8 @@
+--[[______   __                _                 __
+  / ____/ | / /___ _____ ___  (_)___ ___  ____ _/ /____  _____
+ / / __/  |/ / __ `/ __ `__ \/ / __ `__ \/ __ `/ __/ _ \/ ___/
+/ /_/ / /|  / /_/ / / / / / / / / / / / / /_/ / /_/  __(__  )
+\____/_/ |_/\__,_/_/ /_/ /_/_/_/ /_/ /_/\__,_/\__/\___/____]]
 local worldAffectLib = {}
 local katt = require("libraries.KattEventsAPI")
 
@@ -7,8 +12,8 @@ local lastStates = {}
 ---@class WorldButton
 ---@field pos Vector3
 ---@field BLOCK_UPDATED KattEvent
-local Constraint = {}
-Constraint.__index = Constraint
+local BlockObserver = {}
+BlockObserver.__index = BlockObserver
 
 
 events.WORLD_TICK:register(function()
@@ -29,13 +34,16 @@ events.WORLD_TICK:register(function()
    end
 end)
 
-
-function worldAffectLib.newConstraint()
+--- Creates a new observer
+---@param pos any
+---@return WorldButton
+function worldAffectLib.newObserver(pos)
    ---@type WorldButton
    local package = {
-      BLOCK_UPDATED = katt:newEvent()
+      pos = pos:copy(),
+      BLOCK_UPDATED = katt.newEvent()
    }
-   setmetatable(package,Constraint)
+   setmetatable(package,BlockObserver)
    table.insert(elements,package)
    return package
 end
@@ -45,7 +53,7 @@ end
 ---@param y number
 ---@param z number
 ---@return WorldButton
-function Constraint:setTargetPos(x,y,z)
+function BlockObserver:setTargetPos(x,y,z)
    self.pos = vec(x,y,z)
    self.stringPos = "x"..x.."y"..y.."z"..z
    return self
