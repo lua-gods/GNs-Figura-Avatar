@@ -7,15 +7,7 @@ local function printError(err)
    printJson('{"color":"red","text":"'..err:gsub('"','\\"')..'\n"}')
    printJson('{"color":"red","text":">-----------------------------------<\n"}')
 end
-events.WORLD_TICK:register(function()
-   if phase == 0 then
-      queue = listFiles("services",true)
-      phase = 1
-   elseif phase == 1 then
-      require(queue[1])
-      table.remove(queue,1)
-      if #queue == 0 then
-         events.WORLD_TICK:remove("preproccessor")
-      end
-   end
-end,"preproccessor")
+
+for key, value in pairs(listFiles("services",true)) do
+   require(value)
+end
