@@ -399,7 +399,7 @@
   \*==============================================================================================*/
   "hint": {
     // Enable inline hints.
-    "enable": true,
+    "enable": false,
 
     // Show an inline hint at assignment.
     "setType": true,
