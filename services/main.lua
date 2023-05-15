@@ -61,4 +61,74 @@ renderer:setShadowRadius(0)
 ---@type VectorAPI|string|MatricesAPI|Action
 local dog = ""
 
+local eyes = models.gn.base.Torso.Head.HClothing.eyes
+
+vanilla_model.HEAD:setVisible(false)
+
+local look = vec(0,0)
+
+local check_look_update = 0
+local stare_at = nil
+
+events.TICK:register(function()
+   check_look_update = check_look_update + 1
+   if check_look_update > 5 then
+      check_look_update = 0
+      local can_look_at = {}
+      local closest = 99999
+      stare_at = nil
+      for i, p in pairs(world.getPlayers()) do
+         if p:getName() ~= player:getName() then
+            local mat = matrices.mat4()
+            local head_rot = player:getRot()
+            mat:rotate(head_rot.x,-head_rot.y,0)
+            mat:invert()
+
+            local B = p:getPos()+vec(0,p:getEyeHeight(),0)
+            local A = player:getPos()+vec(0,player:getEyeHeight(),0)
+            B = B - A
+            B = (mat * vec(B.x,B.y,B.z,1)).xyz
+            B = vec(B.x,-B.y,B.z) -- idk why I have to do this
+            
+            if B.z > 0 -- is in front
+            and math.abs(B.x / B.z) < 0.5 -- is within the local X position
+            and math.abs(B.y / B.z) < 0.5 -- is within the local Y position 
+            and closest > (math.abs(B.x / B.z) + math.abs(B.y / B.z)) then
+               closest = math.abs(B.x / B.z) + math.abs(B.y / B.z)
+               stare_at = p
+            end
+         end
+      end
+      if #can_look_at > 0 then
+         stare_at = can_look_at[math.floor(math.random()*(#can_look_at-1)+1.5)]
+      end
+   end
+   
+   if stare_at and stare_at:isLoaded() then
+      local mat = matrices.mat4()
+      local head_rot = player:getRot()
+      mat:rotate(head_rot.x,-head_rot.y,0)
+      mat:invert()
+
+      local A = stare_at:getPos()+vec(0,stare_at:getEyeHeight(),0)
+      local B = player:getPos()+vec(0,player:getEyeHeight(),0)
+      A = A - B
+      A = (mat * vec(A.x,A.y,A.z,1)).xyz
+      A = vec(A.x,-A.y,A.z)
+
+      look = vec(
+         math.clamp(A.x / -A.z,-1,1),
+         math.clamp(A.y / -A.z,-1,1))
+   else
+      local offset = (player:getRot().y - player:getBodyYaw())%360
+      if offset > 180 then offset = offset - 360 end
+      look = vec(
+         offset/90,
+         (player:getRot().x)/-90
+      )
+   end
+
+   eyes:setPos(math.clamp(look.x,-1,1),0,0)
+end)
+
 --TODO Separate the ninepatch elements into separate metatables for reusing values
