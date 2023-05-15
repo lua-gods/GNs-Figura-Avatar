@@ -131,4 +131,16 @@ events.TICK:register(function()
    eyes:setPos(math.clamp(look.x,-1,1),0,0)
 end)
 
+
+local traillib = require("libraries.GNtrailLib")
+local newSmear = traillib:newTwoLeadTrail(textures.gradient)
+
+events.WORLD_RENDER:register(function (delta)
+   if not player:isLoaded() then return end
+   local root = models.gn.base.Torso.Body.sword.Anchor1.Anchor2
+   newSmear:setLeads(
+      (root:partToWorldMatrix() * vectors.vec4(0,0,0,1)).xyz,
+      (root:partToWorldMatrix() * vectors.vec4(0,0,-32,1)).xyz,root.SmearController:getAnimPos().x * 2)
+end)
+
 --TODO Separate the ninepatch elements into separate metatables for reusing values

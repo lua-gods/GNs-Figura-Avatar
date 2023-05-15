@@ -32,11 +32,6 @@ if player:isLoaded() then
 end
 
 local swing = false
-local last = matrices.mat4()
-
-local smear_update_delay = 0
-local smear_particles = {}
-local smear_particles_age = {}
 
 local last_held_item = "minecraft:air"
 local is_holding_sword = false
@@ -89,7 +84,7 @@ events.TICK:register(function()
       if was_first_person ~= is_first_person then update_hand() was_first_person = is_first_person end
       if is_holding_sword then
          if player:getSwingTime() == 1 then
-            sounds:playSound("swing", player:getPos(), 0.5, math.random() * 0.1 + 0.8)
+            sounds:playSound("swing", player:getPos(), 0.1, math.random() * 0.1 + 0.8)
             if not player:isOnGround() and player:getVelocity().y < 0 then
                sword.state:setState(animations.sword.attack_down, true)
             else
