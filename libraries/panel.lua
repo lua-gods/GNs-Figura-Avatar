@@ -51,14 +51,43 @@ local panel = {
 function panel:setPage(page)
    self.current_page = page
    self:rebuild()
+   return self
 end
 
 function panel:update()
    self.queue_update = true
+   return self
 end
 
 function panel:rebuild()
    self.queue_rebuild = true
+   return self
+end
+
+function panel:setVisible(visible)
+   if self.visible ~= visible then
+      self.visible = visible
+      self:rebuild()
+   end
+   return self
+end
+
+
+---@param sound Minecraft.soundID
+---@param pitch number
+---@param volume number
+local function UIplaySound(sound,pitch,volume)
+   sounds:playSound(sound,client:getCameraPos()+vectors.vec3(0,-1,0),volume,pitch)
+end
+
+function panel:setSelectState(selected)
+   self.selected = selected
+   if selected then
+      UIplaySound(panel.config.theme.sounds.select.id,panel.config.theme.sounds.select.pitch,panel.config.theme.sounds.select.volume)
+   else
+      UIplaySound(panel.config.theme.sounds.deselect.id,panel.config.theme.sounds.deselect.pitch,panel.config.theme.sounds.deselect.volume)
+   end
+   panel:update()
 end
 
 for _, path in pairs(listFiles("libraries/panel_elements",false)) do
@@ -157,85 +186,26 @@ function PanelPage:newTextEdit(placeholder)
    return self
 end
 
-function PanelTextEdit:setText(text)
-   self.text = text
-   self.last_text = text
-   panel:update()
-   return self
-end
-
-function PanelTextEdit:inputListener(func)
-   self.input = func
-   panel:update()
-   return self
-end
-
-function PanelTextEdit:setWidth(width)
-   self.width = width
-   self._pxwidth = client.getTextWidth(("_"):rep(width))
-   panel:update()
-   return self
-end
-
-function PanelTextEdit:rebuild(id)
-   panel.config.hud:newText(id.."text"):outline(true):pos(0,(id-1) * panel.config.line_height)
-   panel.config.hud:newText(id.."underline"):outline(true):pos(0,(id-1) * panel.config.line_height - 1)
-   panel.config.hud:newText(id.."underline2"):outline(true):pos(2,(id-1) * panel.config.line_height - 1)
-   return {id.."underline",id.."underline2",id.."text"}
-end
-
-function PanelTextEdit:update(tasks)
-   
-end
-
--->==========[ Slider ]==========<--
----@class PanelSlider
----@field text string
----@field value number
----@field low number
----@field high number
----@field step number
----@field ON_VALUE_CHANGE KattEvent
-local PanelSlider = {}
-PanelSlider.__index = PanelSlider
-PanelSlider.__type = "panelslider"
-
-function PanelPage:newSlider(text,value,low,high,step)
-   local compose = {
-      text = text,
-      value = value,
-      low = low,
-      high = high,
-      step = step,
-      ON_VALUE_CHANGE = kitkat.newEvent()
-   }
-   setmetatable(compose,PanelSlider)
-   return compose
-end
-
----@param sound Minecraft.soundID
----@param pitch number
----@param volume number
-local function UIplaySound(sound,pitch,volume)
-   sounds:playSound(sound,client:getCameraPos()+vectors.vec3(0,-1,0),volume,pitch)
-end
-
 -->====================[ Input Handler ]====================<--
 
-local textedit_cursor_pos = 0
+events.KEY_PRESS:register(function (key,status,modifier)
+   if status == 1 then
+      if panel.visible and key == 256 then
+         if panel.visible and not panel.selected then
+            panel:setVisible(false)
+         end
+         return true
+      end
+   end
+end)
+
 
 panel.config.select.press = function ()
    if panel.visible then
-      UIplaySound(panel.config.theme.sounds.select.id,panel.config.theme.sounds.select.pitch,panel.config.theme.sounds.select.volume)
       local element = panel.current_page.elements[panel.hovering]
       element:pressed()
-      if type(element) == "paneltextedit" then
-         element.last_text = element.text
-         panel.selected = true
-         textedit_cursor_pos = #element.text
-      end
    end
-   if not panel.visible then panel.visible = true panel:rebuild() UIplaySound(panel.config.theme.sounds.intro.id,panel.config.theme.sounds.intro.pitch,panel.config.theme.sounds.intro.volume) end
+   if not panel.visible then panel:setVisible(true) panel:rebuild() end
    return true
 end
 
@@ -243,7 +213,6 @@ end
 panel.config.select.release = function ()
    if panel.visible and panel.selected then
       local element = panel.current_page.elements[panel.hovering]
-      UIplaySound(panel.config.theme.sounds.deselect.id,panel.config.theme.sounds.deselect.pitch,panel.config.theme.sounds.deselect.volume)
       element:released()
    end
 end
@@ -256,55 +225,9 @@ events.MOUSE_SCROLL:register(function (dir)
          panel.hovering = (panel.hovering + dir - 1) % #panel.current_page.elements + 1
          panel.SELECTED_CHANGED:invoke(panel.hovering)
          panel:update()
-      else
-         if type(panel.current_page.elements[panel.hovering]) == "paneltextedit" then
-            textedit_cursor_pos = math.clamp(textedit_cursor_pos + dir,0,#panel.current_page.elements[panel.hovering].text)
-            panel:update()
-         end
       end
    end
    return panel.visible
-end)
-
-events.KEY_PRESS:register(function (key,status,modifier)
-   if not panel.current_page then return end
-   local c = panel.current_page.elements[panel.hovering]
-   local typ = type(c)
-   if status == 1 then
-      if typ == "paneltextedit" and panel.selected then
-         local keystring = k2s.key2string(key,modifier)
-         if key == 259 then -- backspace
-            c.text = string.sub(c.text,1,string.len(c.text)-1)
-            textedit_cursor_pos = textedit_cursor_pos - 1
-            panel:update()
-         elseif keystring then
-            c.text = c.text:sub(1,textedit_cursor_pos)..keystring..c.text:sub(1+textedit_cursor_pos,#c.text)
-            textedit_cursor_pos = textedit_cursor_pos + 1
-            panel:update()
-         end
-         if key == 257 then -- confirm
-            panel.selected = false
-            textedit_cursor_pos = 0
-            panel:update()
-            UIplaySound(panel.config.theme.sounds.deselect.id,panel.config.theme.sounds.deselect.pitch,panel.config.theme.sounds.deselect.volume)
-         end
-         if key == 256 then -- decline
-            c.text = c.last_text
-            textedit_cursor_pos = 0
-            panel.selected = false
-            panel:update()
-            UIplaySound(panel.config.theme.sounds.deselect.id,panel.config.theme.sounds.deselect.pitch,panel.config.theme.sounds.deselect.volume)
-         end
-         return true
-      end
-      if key == 256 and panel.visible then -- exit edit mode
-         panel.visible = false
-         panel:rebuild()
-         panel.selected = false
-UIplaySound(panel.config.theme.sounds.outro.id,panel.config.theme.sounds.outro.pitch,panel.config.theme.sounds.outro.volume)
-         return true
-      end
-   end
 end)
 
 -->====================[ Renderer ]====================<--
@@ -323,91 +246,21 @@ events.WORLD_RENDER:register(function (delta)
          end
          if panel.visible then
             for i, element in pairs(panel.current_page.elements) do
-               element:rebuild(i)
+               element:rebuild(i,vectors.vec3(0,(i-1) * panel.config.line_height,0))
             end
          end
       elseif panel.queue_update and panel.visible then
          panel.queue_update = false
          for i, element in pairs(panel.current_page.elements) do
+            local tpos = vectors.vec3(0,(i-1) * panel.config.line_height,0)
             if i == panel.hovering then
                if panel.selected then
-                  element:update("active")
+                  element:update("active",tpos)
                else
-                  element:update("hover")
+                  element:update("hover",tpos)
                end
             else
-               element:update("normal")
-            end
-            local typ = type(element)
-            if typ == "paneltextedit" then
-               if panel.selected then
-                  local display_text = ""
-                  local post_cursor_display_text = ""
-                  local post_cursor = false
-                  if textedit_cursor_pos == 0 then
-                     display_text = panel.config.theme.style.textEdit.cursor
-                  end
-                  for l = string.len(element.text), 1, -1 do
-                     if l == textedit_cursor_pos then
-                        post_cursor = true
-                        display_text = panel.config.theme.style.textEdit.cursor..display_text
-                     end
-                     if post_cursor then
-                        post_cursor_display_text = element.text:sub(l,l)..post_cursor_display_text
-                     end
-                     display_text = element.text:sub(l,l)..display_text
-                     if client.getTextWidth(post_cursor_display_text) > element._pxwidth * 0.5 and client.getTextWidth(display_text) > element._pxwidth then
-                        break
-                     end
-                  end
-
-                  local trimmed_display_text = ""
-                  for e = 1, #display_text, 1 do
-                     if client.getTextWidth(trimmed_display_text) > element._pxwidth then
-                        break
-                     end
-                     trimmed_display_text = trimmed_display_text..display_text:sub(e,e)
-                  end
-                  display_text = trimmed_display_text
-
-                  local unselect_text = ""
-                  local is_overflow = false
-                  for e = 1, #element.text, 1 do
-                     if client.getTextWidth(unselect_text) > element._pxwidth then
-                        is_overflow = true
-                        break
-                     end
-                     unselect_text = unselect_text..element.text:sub(e,e)
-                  end
-                  if is_overflow then
-                     unselect_text = unselect_text.."..."
-                  end
-                  element.display_text = unselect_text
-
-                  panel.config.hud:getTask(element[3]):text(display_text)
-               else
-                  if element.text == "" then
-                     panel.config.hud:getTask(element[3]):text(string.gsub(panel.config.theme.style.textEdit.normal,"${TEXT}",'"'..element.placeholder..'"'))
-                  else
-                     if i == panel.hovering then
-                        if panel.selected then
-                           panel.config.hud:getTask(element[3]):text(string.gsub(panel.config.theme.style.textEdit.active,"${TEXT}",'"'..element.display_text..'"'))
-                        else
-                           panel.config.hud:getTask(element[3]):text(string.gsub(panel.config.theme.style.textEdit.hover,"${TEXT}",'"'..element.display_text..'"'))
-                        end
-                     else
-                        panel.config.hud:getTask(element[3]):text(string.gsub(panel.config.theme.style.textEdit.normal,"${TEXT}",'"'..element.display_text..'"'))
-                     end
-                  end
-               end
-               local underline = ("_"):rep(element.width)
-               if i == panel.hovering then
-                  panel.config.hud:getTask(element[1]):text(string.gsub(panel.config.theme.style.textEdit.hover,"${TEXT}",'"'..underline..'"'))
-                  panel.config.hud:getTask(element[2]):text(string.gsub(panel.config.theme.style.textEdit.hover,"${TEXT}",'"'..underline..'"'))
-               else
-                  panel.config.hud:getTask(element[1]):text(string.gsub(panel.config.theme.style.textEdit.normal,"${TEXT}",'"'..underline..'"'))
-                  panel.config.hud:getTask(element[2]):text(string.gsub(panel.config.theme.style.textEdit.normal,"${TEXT}",'"'..underline..'"'))
-               end
+               element:update("normal",tpos)
             end
          end
       end

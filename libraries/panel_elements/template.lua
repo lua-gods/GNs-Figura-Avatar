@@ -27,13 +27,14 @@ end
 -->========================================[ Render Handling ]=========================================<--
 
 ---@param id integer -- line number
-function Template:rebuild(id)
-   self.root.config.hud:newText("panel.template."..id):outline(true):pos(0,(id-1) * self.root.config.line_height)
-   self.tasks = {"Template"..id}
+function Template:rebuild(id,pos)
+   self.root.config.hud:newText("panel.template."..id):outline(true):pos(pos)
+   self.tasks = {"panel.template."..id}
 end
 
 ---@param state PanelElementState
-function Template:update(state)
+---@param pos Vector3
+function Template:update(state,pos)
    self.root.config.hud:getTask(self.tasks[1]):text(self.root.config.theme.style[state]:gsub("${TEXT}",'"'.."TEMPLATE"..'"'))
 end
 
@@ -47,14 +48,14 @@ end
 
 function Template:pressed()
    self.root:update()
-   self.root.selected = true
-   self.ON_PRESS:invoke()
+   self.root:setSelectState(true)
+   self.ON_PRESS:invoke(self)
 end
 
 function Template:released()
    self.root:update()
-   self.root.selected = false
-   self.ON_RELEASE:invoke()
+   self.root:setSelectState(false)
+   self.ON_RELEASE:invoke(self)
 end
 
 return Template

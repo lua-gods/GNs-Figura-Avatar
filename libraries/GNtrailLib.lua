@@ -9,7 +9,6 @@ local smears = {}
 local config = {
    world = nil
 }
-
 ---This should be called before doing anything with this library.
 ---@param model ModelPart
 ---@return table
@@ -43,6 +42,7 @@ local smearID = 0
 ---@param texture Texture
 ---@return twoLeadTrail
 function lib:newTwoLeadTrail(texture)
+   if type(texture) ~= "Texture" then texture = textures["trailworld.gradient"] end
    ---@type twoLeadTrail
    local compose = {
       ID = smearID,

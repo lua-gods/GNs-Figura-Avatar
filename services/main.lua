@@ -70,7 +70,15 @@ local look = vec(0,0)
 local check_look_update = 0
 local stare_at = nil
 
+local last_offset = 0
+local offset = 0
+
+models.gn.base.Torso.Head:setParentType("Head")
+
 events.TICK:register(function()
+   last_offset = offset
+   offset = vectors.vec2(player:getRot().x,(player:getRot().y - player:getBodyYaw()) % 360)
+   if offset.y > 180 then offset.y = offset.y - 360 end
    check_look_update = check_look_update + 1
    if check_look_update > 5 then
       check_look_update = 0
@@ -120,20 +128,25 @@ events.TICK:register(function()
          math.clamp(A.x / -A.z,-1,1),
          math.clamp(A.y / -A.z,-1,1))
    else
-      local offset = (player:getRot().y - player:getBodyYaw())%360
-      if offset > 180 then offset = offset - 360 end
       look = vec(
-         offset/90,
+         offset.y/90,
          (player:getRot().x)/-90
       )
    end
-
    eyes:setPos(math.clamp(look.x,-1,1),0,0)
+end)
+
+events.RENDER:register(function (delta, context)
+   local o = -math.lerp(last_offset,offset,delta)
+   models.gn.base.Torso:setRot(o.x*0.2,o.y*0.5,0)
+   models.gn.base.LeftLeg:setPos(0,0,math.sin(math.rad(o.y))):setRot(math.rad(o.y) * 4,0)
+   models.gn.base.RightLeg:setPos(0,0,-math.sin(math.rad(o.y))):setRot(math.rad(o.y) * -4,0)
+   models.gn.base.Torso.Head:setRot(o.x*-0.2,o.y*-0.5,0)
 end)
 
 
 local traillib = require("libraries.GNtrailLib"):setWorld(models.trailworld)
-local newSmear = traillib:newTwoLeadTrail(textures.gradient):setDivergeness(0)
+local newSmear = traillib:newTwoLeadTrail(textures["trailworld.gradient"]):setDivergeness(0)
 
 events.WORLD_RENDER:register(function (delta)
    if not player:isLoaded() then return end
@@ -173,16 +186,17 @@ end)
 
 events.ARROW_RENDER:register(function (delta,arrow)
    local id = arrow:getUUID()
+   local arrow_vel = arrow:getVelocity():length()
    local data = arrow_trails[id]
    if data then
-      local pos = arrow:getPos(delta)
-      if data.points[#data.trail.points][1] ~= data.trail.points[1][1] then
-         data.trail:setLeads(pos-cdir,pos+cdir,0.1)
-      end
-      if arrow:getVelocity():length() > 0.01 then
+      local pos = arrow:getPos(delta) 
+      data.trail:setLeads(pos-cdir,pos+cdir,arrow_vel*0.1)
+      if arrow_vel > 0.01 then
          data.health = 60
       end
    else
-      arrow_trails[id] = {health=30,trail=traillib:newTwoLeadTrail(textures.gradient):setDuration(60):setDivergeness(4)}
+      if arrow_vel > 0.01  then
+         arrow_trails[id] = {health=30,trail=traillib:newTwoLeadTrail(textures["trailworld.gradient"]):setDuration(60):setDivergeness(4)}
+      end
    end
 end)
