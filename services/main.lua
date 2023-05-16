@@ -176,8 +176,12 @@ events.ARROW_RENDER:register(function (delta,arrow)
    local data = arrow_trails[id]
    if data then
       local pos = arrow:getPos(delta)
-      data.trail:setLeads(pos-cdir,pos+cdir,0.1)
-      data.health = 40
+      if data.points[#data.trail.points][1] ~= data.trail.points[1][1] then
+         data.trail:setLeads(pos-cdir,pos+cdir,0.1)
+      end
+      if arrow:getVelocity():length() > 0.01 then
+         data.health = 60
+      end
    else
       arrow_trails[id] = {health=30,trail=traillib:newTwoLeadTrail(textures.gradient):setDuration(60):setDivergeness(4)}
    end
