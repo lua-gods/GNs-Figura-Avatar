@@ -132,14 +132,53 @@ events.TICK:register(function()
 end)
 
 
-local traillib = require("libraries.GNtrailLib")
-local newSmear = traillib:newTwoLeadTrail(textures.gradient):setDivergeness(10)
+local traillib = require("libraries.GNtrailLib"):setWorld(models.trailworld)
+local newSmear = traillib:newTwoLeadTrail(textures.gradient):setDivergeness(0)
 
 events.WORLD_RENDER:register(function (delta)
    if not player:isLoaded() then return end
-   local root = models.gn.base.Torso.Body.sword.Anchor1.Anchor2
+   local sword = models.gn.base.Torso.Body.sword.Anchor1.Anchor2
+   local sword_blade_matrix = sword:partToWorldMatrix()
+   local sword_smear_toggle = sword.SmearController:getAnimPos().x
    newSmear:setLeads(
-      (root:partToWorldMatrix() * vectors.vec4(0,0,0,1)).xyz,
-      (root:partToWorldMatrix() * vectors.vec4(0,0,-32,1)).xyz,root.SmearController:getAnimPos().x * 1)
+      (sword_blade_matrix * vectors.vec4(0,0,0,1)).xyz,
+      (sword_blade_matrix * vectors.vec4(0,0,-32,1)).xyz,
+      sword_smear_toggle * 1)
 end)
---TODO Separate the ninepatch elements into separate metatables for reusing values
+
+local arrow_trails = {}
+local cdir = vectors.vec3()
+
+events.WORLD_RENDER:register(function (delta)
+   local mat = matrices.mat4()
+   local crot = client:getCameraRot()
+   mat:rotateX(crot.x):rotateY(-crot.y)
+   cdir = mat.c1.xyz
+   local count = 0
+   for id, data in pairs(arrow_trails) do
+      count = count + 1
+      if data.health < 0 then
+         if arrow_trails[id] then
+            arrow_trails[id].trail:delete()
+            arrow_trails[id] = nil
+         end
+      elseif data.health < 40 then
+         if data.trail.leadA and data.trail.leadB then
+            data.trail:setLeads(data.trail.leadA,data.trail.leadB,0)
+         end
+      end
+      data.health = data.health - 1
+   end
+end)
+
+events.ARROW_RENDER:register(function (delta,arrow)
+   local id = arrow:getUUID()
+   local data = arrow_trails[id]
+   if data then
+      local pos = arrow:getPos(delta)
+      data.trail:setLeads(pos-cdir,pos+cdir,0.1)
+      data.health = 40
+   else
+      arrow_trails[id] = {health=30,trail=traillib:newTwoLeadTrail(textures.gradient):setDuration(60):setDivergeness(4)}
+   end
+end)
