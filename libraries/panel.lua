@@ -49,6 +49,7 @@ local panel = {
 }
 
 function panel:setPage(page)
+   panel:clearTasks()
    self.current_page = page
    self:rebuild()
    return self
@@ -72,6 +73,14 @@ function panel:setVisible(visible)
    return self
 end
 
+function panel:clearTasks()
+   if panel.current_page then
+      for i, element in pairs(panel.current_page.elements) do
+         element:clearTasks()
+      end
+   end
+   return self
+end
 
 ---@param sound Minecraft.soundID
 ---@param pitch number
@@ -153,7 +162,6 @@ function PanelPage:newElement(type)
    end
 end
 
-
 -->==========[ Text Input ]==========<--
 ---@class PanelTextEdit
 ---@field text string
@@ -203,6 +211,7 @@ end)
 panel.config.select.press = function ()
    if panel.visible then
       local element = panel.current_page.elements[panel.hovering]
+      panel.hovering = 1
       element:pressed()
    end
    if not panel.visible then panel:setVisible(true) panel:rebuild() end
@@ -213,6 +222,7 @@ end
 panel.config.select.release = function ()
    if panel.visible and panel.selected then
       local element = panel.current_page.elements[panel.hovering]
+      panel.hovering = 1
       element:released()
    end
 end

@@ -151,8 +151,8 @@ function twoLeadTrail:update()
       
       for id = 1, #self.points-1, 1 do
          local invisible = ((self.points[id][3] + self.points[id+1][3]) == 0)
-            self.sprites[id]:setEnabled(not invisible)
-            self.sprites_flipped[id]:setEnabled(not invisible)
+            self.sprites[id]:setVisible(not invisible)
+            self.sprites_flipped[id]:setVisible(not invisible)
             if not invisible then
                local v = self.sprites[id]:getVertices()
                local v2 = self.sprites_flipped[id]:getVertices()

@@ -139,8 +139,10 @@ end)
 events.RENDER:register(function (delta, context)
    local o = -math.lerp(last_offset,offset,delta)
    models.gn.base.Torso:setRot(o.x*0.2,o.y*0.5,0)
-   models.gn.base.LeftLeg:setPos(0,0,math.sin(math.rad(o.y))):setRot(math.rad(o.y) * 4,0)
-   models.gn.base.RightLeg:setPos(0,0,-math.sin(math.rad(o.y))):setRot(math.rad(o.y) * -4,0)
+   models.gn.base.Torso.LeftArm:setRot(o.x*-0.2,o.y*0.3,0)
+   models.gn.base.Torso.RightArm:setRot(o.x*-0.2,o.y*0.3,0)
+   models.gn.base.LeftLeg:setPos(0,0,math.sin(math.rad(o.y))*2):setRot(math.rad(o.y) * 8,0)
+   models.gn.base.RightLeg:setPos(0,0,-math.sin(math.rad(o.y))*2):setRot(math.rad(o.y) * -8,0)
    models.gn.base.Torso.Head:setRot(o.x*-0.2,o.y*-0.5,0)
 end)
 
@@ -200,3 +202,6 @@ events.ARROW_RENDER:register(function (delta,arrow)
       end
    end
 end)
+
+
+models.hud:setParentType("HUD")
