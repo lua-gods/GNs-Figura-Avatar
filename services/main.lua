@@ -186,6 +186,7 @@ events.WORLD_RENDER:register(function (delta)
    end
 end)
 
+---@diagnostic disable-next-line: undefined-field
 events.ARROW_RENDER:register(function (delta,arrow)
    local id = arrow:getUUID()
    local arrow_vel = arrow:getVelocity():length()

@@ -85,7 +85,7 @@ end
 
 function Label:setTextAlign(align)
    self.text_align = align
-   self:update()
+   self:updatePositioning()
    return self
 end
 
@@ -121,7 +121,7 @@ function Label:rebuild()
    self.parent:newText(taskName)
 end
 
-function Label:updatePosition()
+function Label:updatePositioning()
    return self
 end
 
