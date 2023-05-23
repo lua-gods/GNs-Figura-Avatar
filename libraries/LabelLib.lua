@@ -1,5 +1,8 @@
 local lib = {}
-
+local labels = {}
+if not H then
+   return
+end
 local config = {
    defualt_parent = models.hud
 }
@@ -23,7 +26,7 @@ local Label = {}
 Label.__index = Label
 Label.__type = "label"
 
-local labelID = 0
+local labelID = 1
 function lib.newLabel()
    ---@type Label
    local compose = {
@@ -40,6 +43,7 @@ function lib.newLabel()
    }
    setmetatable(compose,Label)
    compose:buildTasks()
+   labels[labelID] = compose
    labelID = labelID + 1
    return compose
 end
@@ -58,9 +62,11 @@ end
 ---@param x number|Vector2
 ---@param y number
 function Label:setOffset(x,y)
-   if type(x) == "number" then
+   if type(x) == "Vector2" then
+      self.offset = x 
+   else 
       self.offset = vectors.vec2(x,y)
-   else self.offset = x end
+   end
    self:updatePositioning()
    return self
 end
@@ -70,9 +76,11 @@ end
 ---@param x number|Vector2
 ---@param y number
 function Label:setAnchor(x,y)
-   if type(x) == "number" then
-      self.anchor = vectors.vec2(x,y)
-   else self.anchor = x end
+   if type(x) == "Vector2" then
+      self.anchor = x * 0.5 
+   else 
+      self.anchor = vectors.vec2(x * 0.5,y * 0.5)
+   end
    self:updatePositioning()
    return self
 end
@@ -82,9 +90,11 @@ end
 ---@param x number|Vector2
 ---@param y number
 function Label:setAnchorOrigin(x,y)
-   if type(x) == "number" then
+   if type(x) == "Vector2" then
+      self.origin = x 
+   else 
       self.origin = vectors.vec2(x,y)
-   else self.origin = x end
+   end
    self:updatePositioning()
    return self
 end
@@ -107,6 +117,12 @@ function Label:setMaxSize(x,y)
    return self
 end
 
+---queues itself for deletion on the next frame
+function Label:delete()
+   self:clearTasks()
+   labels[self.id] = nil
+end
+
 ---sets the modelPart thats gonna contain the rendering
 ---@param model ModelPart
 function Label:setParent(model)
@@ -125,7 +141,7 @@ end
 
 function Label:buildTasks()
    local taskName = "gnlabellib."..self.id..".label"
-   self.tasks[taskName] =  self.parent:newText(taskName)
+   self.tasks[taskName] =  self.parent:newText(taskName):shadow(true)
    self:updateTextDisplay()
    self:updatePositioning()
 end
@@ -135,7 +151,7 @@ function Label:updatePositioning()
    for task_name, task in pairs(self.tasks) do
       local pos = vectors.vec2(self.anchor.x-0.5,self.anchor.y-0.5)
       *client:getScaledWindowSize()
-      task:pos(pos.x,pos.y,0)
+      task:pos(pos.x+self.offset.x,pos.y+self.offset.y,0)
    end
    return self
 end
@@ -147,5 +163,16 @@ function Label:updateTextDisplay()
    end
    return self
 end
+
+local last_window_size = vectors.vec2()
+events.WORLD_RENDER:register(function (delta)
+   local window_size = client:getWindowSize()
+   if last_window_size ~= window_size then
+      last_window_size = window_size
+      for _, label in pairs(labels) do
+         label:updatePositioning()
+      end
+   end
+end)
 
 return lib

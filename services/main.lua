@@ -142,12 +142,14 @@ local newSmear = traillib:newTwoLeadTrail(textures["trailworld.gradient"]):setDu
 events.WORLD_RENDER:register(function (delta)
    if not player:isLoaded() then return end
    local sword = models.gn.base.Torso.Body.sword.Anchor1.Anchor2
-   local sword_blade_matrix = sword:partToWorldMatrix()
    local sword_smear_toggle = sword.SmearController:getAnimPos().x
-   newSmear:setLeads(
-      (sword_blade_matrix * vectors.vec4(0,0,0,1)).xyz,
-      (sword_blade_matrix * vectors.vec4(0,0,-32,1)).xyz,
-      sword_smear_toggle * 1)
+   if sword_smear_toggle < 0 then
+      local sword_blade_matrix = sword:partToWorldMatrix()
+      newSmear:setLeads(
+         (sword_blade_matrix * vectors.vec4(0,0,0,1)).xyz,
+         (sword_blade_matrix * vectors.vec4(0,0,-32,1)).xyz,
+         sword_smear_toggle * 1)
+   end
 end)
 
 --local arrow_trails = {}
@@ -195,6 +197,7 @@ end)
 
 
 local labellib = require("libraries.LabelLib")
-
+labellib:newLabel():setText("hello"):setAnchor(0,0)
+labellib:newLabel():setText("AAA"):setAnchor(0,0):setOffset(0,10):delete()
 
 models.hud:setParentType("HUD")
