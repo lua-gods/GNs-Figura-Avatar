@@ -39,6 +39,7 @@ function lib.newLabel()
       tasks = {},
    }
    setmetatable(compose,Label)
+   compose:buildTasks()
    labelID = labelID + 1
    return compose
 end
@@ -48,6 +49,8 @@ end
 ---@return Label
 function Label:setText(text)
    self.text = text
+   self:updateTextDisplay()
+   self:updatePositioning()
    return self
 end
 
@@ -58,6 +61,7 @@ function Label:setOffset(x,y)
    if type(x) == "number" then
       self.offset = vectors.vec2(x,y)
    else self.offset = x end
+   self:updatePositioning()
    return self
 end
 
@@ -69,6 +73,7 @@ function Label:setAnchor(x,y)
    if type(x) == "number" then
       self.anchor = vectors.vec2(x,y)
    else self.anchor = x end
+   self:updatePositioning()
    return self
 end
 
@@ -80,6 +85,7 @@ function Label:setAnchorOrigin(x,y)
    if type(x) == "number" then
       self.origin = vectors.vec2(x,y)
    else self.origin = x end
+   self:updatePositioning()
    return self
 end
 
@@ -104,28 +110,41 @@ end
 ---sets the modelPart thats gonna contain the rendering
 ---@param model ModelPart
 function Label:setParent(model)
-   self:clear()
+   self:clearTasks()
    self.parent = model
-   self:rebuild()
+   self:buildTasks()
    return self
 end
 
-function Label:clear()
+function Label:clearTasks()
    for id, task in pairs(self.tasks) do
       self.parent:removeTask(id)
    end
 end
 
-function Label:rebuild()
+
+function Label:buildTasks()
    local taskName = "gnlabellib."..self.id..".label"
-   self.parent:newText(taskName)
+   self.tasks[taskName] =  self.parent:newText(taskName)
+   self:updateTextDisplay()
+   self:updatePositioning()
 end
 
 function Label:updatePositioning()
+   local i = 0
+   for task_name, task in pairs(self.tasks) do
+      local pos = vectors.vec2(self.anchor.x-0.5,self.anchor.y-0.5)
+      *client:getScaledWindowSize()
+      task:pos(pos.x,pos.y,0)
+   end
    return self
 end
 
 function Label:updateTextDisplay()
+   local i = 0
+   for task_name, task in pairs(self.tasks) do
+      task:text(self.text)
+   end
    return self
 end
 
