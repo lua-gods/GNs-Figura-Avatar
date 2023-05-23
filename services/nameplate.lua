@@ -1,3 +1,4 @@
+---@diagnostic disable: assign-type-mismatch, param-type-mismatch
 --{"text":"ඞ🔥🌱","font":"figura:default"}
 local config = {
    theme = {
@@ -6,7 +7,6 @@ local config = {
    },
    username = "GNamimates",
 }
-
 
 for key, value in pairs(config.theme) do
    config.theme[key] = vectors.hexToRGB(value)
@@ -35,7 +35,7 @@ local function rebuild()
       status = status.."]"
       status = '{"text":"'..status..'","color":"dark_gray"}'
    end
-   composite = '{"font":"minecraft:default","text":""},{"text":"${badges}:hat:","font":"figura:emoji","color":"#'..vectors.rgbToHex(vectors.hsvToRGB(config.theme.from))..'"},'
+   composite = '{"font":"minecraft:default","text":""},{"text":"${badges}:tophat:","font":"figura:emoji","color":"#'..vectors.rgbToHex(vectors.hsvToRGB(config.theme.from))..'"},'
    local name = config.username
    for i = 1, #name, 1 do
       local percentage = i/#name
@@ -47,7 +47,7 @@ local function rebuild()
 end
 
 
-nameplate.ENTITY:shadow(true)
+nameplate.ENTITY:shadow(true):setPos(0,-0.1,0)
 
 local n = {}
 
@@ -77,55 +77,5 @@ if host:isHost() then
       end
    end)
 end
-
-function pings.syncstatus(...)
-   raw_status = {...}
-   updateNameplate()
-end
-
-function n:setStatus(...)
-   pings.syncstatus(...)
-end
-
-function n:setNick(name)
-   config.username = name
-   updateNameplate()
-end
-local rainbow = false
-
-function pings.syncnick(nick)
-   models.gn:setPrimaryRenderType("CUTOUT_CULL")
-   models.gn:setSecondaryRenderType("NONE")
-   models.gn:setScale(1,1,1)
-   models.gn:setPivot(0,0,0)
-   models:setColor(1,1,1)
-   rainbow = false
-   if nick == "Dinnerbone" or nick == "Grumm" then
-      models.gn:setScale(-1,-1,1)
-      models.gn:setPivot(0,16,0)
-      
-   elseif nick == "GhostAmimates" then
-      models.gn:setPrimaryRenderType("EMISSIVE")
-   elseif nick == "CADamimates" then
-      models.gn:setPrimaryRenderType("LINES_STRIP")
-   elseif nick == "EnchantedAmimates" then
-      models.gn:setSecondaryRenderType("GLINT")
-   elseif nick == "PortalAmimates" then
-      models.gn:setPrimaryRenderType("TEXTURED_PORTAL")
-   elseif nick == "BlurryAmimates" then
-      models.gn:setPrimaryRenderType("BLURRY")
-   elseif nick == "RGBNamimates" then
-      rainbow = true
-   end
-   n:setNick(nick)
-end
-
-local time = 0
-events.TICK:register(function ()
-   if rainbow then
-      time = time + 1
-      models:setColor(vectors.hsvToRGB(time*0.01,1,1))
-   end
-end)
 
 return n
