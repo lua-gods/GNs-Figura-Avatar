@@ -136,19 +136,8 @@ events.TICK:register(function()
    eyes:setPos(math.clamp(look.x,-1,1),0,0)
 end)
 
-events.RENDER:register(function (delta, context)
-   local o = -math.lerp(last_offset,offset,delta)
-   models.gn.base.Torso:setRot(o.x*0.2,o.y*0.5,0)
-   models.gn.base.Torso.LeftArm:setRot(o.x*-0.2,o.y*0.3,0)
-   models.gn.base.Torso.RightArm:setRot(o.x*-0.2,o.y*0.3,0)
-   models.gn.base.LeftLeg:setPos(0,0,math.sin(math.rad(o.y))*2):setRot(math.rad(o.y) * 8,0)
-   models.gn.base.RightLeg:setPos(0,0,-math.sin(math.rad(o.y))*2):setRot(math.rad(o.y) * -8,0)
-   models.gn.base.Torso.Head:setRot(o.x*-0.2,o.y*-0.5,0)
-end)
-
-
 local traillib = require("libraries.GNtrailLib"):setWorld(models.trailworld)
-local newSmear = traillib:newTwoLeadTrail(textures["trailworld.gradient"]):setDivergeness(0)
+local newSmear = traillib:newTwoLeadTrail(textures["trailworld.gradient"]):setDuration(20):setDivergeness(0)
 
 events.WORLD_RENDER:register(function (delta)
    if not player:isLoaded() then return end
@@ -161,48 +150,51 @@ events.WORLD_RENDER:register(function (delta)
       sword_smear_toggle * 1)
 end)
 
-local arrow_trails = {}
-local cdir = vectors.vec3()
+--local arrow_trails = {}
+--local cdir = vectors.vec3()
+--
+--events.WORLD_RENDER:register(function (delta)
+--   local mat = matrices.mat4()
+--   local crot = client:getCameraRot()
+--   mat:rotateX(crot.x):rotateY(-crot.y)
+--   cdir = mat.c1.xyz
+--   local count = 0
+--   for id, data in pairs(arrow_trails) do
+--      count = count + 1
+--      if data.health < 0 then
+--         if arrow_trails[id] then
+--            arrow_trails[id].trail:delete()
+--            arrow_trails[id] = nil
+--         end
+--      elseif data.health < 40 then
+--         if data.trail.leadA and data.trail.leadB then
+--            data.trail:setLeads(data.trail.leadA,data.trail.leadB,0)
+--         end
+--      end
+--      data.health = data.health - 1
+--   end
+--end)
+--
+-----@diagnostic disable-next-line: undefined-field
+--events.ARROW_RENDER:register(function (delta,arrow)
+--   local id = arrow:getUUID()
+--   local arrow_vel = arrow:getVelocity():length()
+--   local data = arrow_trails[id]
+--   if data then
+--      local pos = arrow:getPos(delta) 
+--      data.trail:setLeads(pos-cdir,pos+cdir,arrow_vel*0.1)
+--      if arrow_vel > 0.01 then
+--         data.health = 60
+--      end
+--   else
+--      if arrow_vel > 0.01  then
+--         arrow_trails[id] = {health=30,trail=traillib:newTwoLeadTrail(textures["trailworld.gradient"]):setDuration(60):setDivergeness(4)}
+--      end
+--   end
+--end)
 
-events.WORLD_RENDER:register(function (delta)
-   local mat = matrices.mat4()
-   local crot = client:getCameraRot()
-   mat:rotateX(crot.x):rotateY(-crot.y)
-   cdir = mat.c1.xyz
-   local count = 0
-   for id, data in pairs(arrow_trails) do
-      count = count + 1
-      if data.health < 0 then
-         if arrow_trails[id] then
-            arrow_trails[id].trail:delete()
-            arrow_trails[id] = nil
-         end
-      elseif data.health < 40 then
-         if data.trail.leadA and data.trail.leadB then
-            data.trail:setLeads(data.trail.leadA,data.trail.leadB,0)
-         end
-      end
-      data.health = data.health - 1
-   end
-end)
 
----@diagnostic disable-next-line: undefined-field
-events.ARROW_RENDER:register(function (delta,arrow)
-   local id = arrow:getUUID()
-   local arrow_vel = arrow:getVelocity():length()
-   local data = arrow_trails[id]
-   if data then
-      local pos = arrow:getPos(delta) 
-      data.trail:setLeads(pos-cdir,pos+cdir,arrow_vel*0.1)
-      if arrow_vel > 0.01 then
-         data.health = 60
-      end
-   else
-      if arrow_vel > 0.01  then
-         arrow_trails[id] = {health=30,trail=traillib:newTwoLeadTrail(textures["trailworld.gradient"]):setDuration(60):setDivergeness(4)}
-      end
-   end
-end)
+local labellib = require("libraries.LabelLib")
 
 
 models.hud:setParentType("HUD")
