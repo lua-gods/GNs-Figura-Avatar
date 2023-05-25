@@ -50,6 +50,7 @@ local panel = {
 
 function panel:setPage(page)
    panel:clearTasks()
+   panel.hovering = 1
    self.current_page = page
    self:rebuild()
    return self
@@ -211,7 +212,6 @@ end)
 panel.config.select.press = function ()
    if panel.visible then
       local element = panel.current_page.elements[panel.hovering]
-      panel.hovering = 1
       element:pressed()
    end
    if not panel.visible then panel:setVisible(true) panel:rebuild() end
@@ -222,7 +222,6 @@ end
 panel.config.select.release = function ()
    if panel.visible and panel.selected then
       local element = panel.current_page.elements[panel.hovering]
-      panel.hovering = 1
       element:released()
    end
 end
@@ -232,7 +231,7 @@ events.MOUSE_SCROLL:register(function (dir)
    if panel.visible then
       if not panel.selected then
          UIplaySound(panel.config.theme.sounds.hover.id,panel.config.theme.sounds.hover.pitch,panel.config.theme.sounds.hover.volume)
-         panel.hovering = (panel.hovering + dir - 1) % #panel.current_page.elements + 1
+         panel.hovering = (panel.hovering - dir - 1) % #panel.current_page.elements + 1
          panel.SELECTED_CHANGED:invoke(panel.hovering)
          panel:update()
       end
@@ -256,22 +255,22 @@ events.WORLD_RENDER:register(function (delta)
          end
          if panel.visible then
             for i, element in pairs(panel.current_page.elements) do
-               element:rebuild(i,vectors.vec3(0,(i-1) * panel.config.line_height,0))
+               element:rebuild(i)
             end
          end
       elseif panel.queue_update and panel.visible then
          panel.queue_update = false
          for i, element in pairs(panel.current_page.elements) do
             local tpos = vectors.vec3(0,(i-1) * panel.config.line_height,0)
+            local state = "normal"            
             if i == panel.hovering then
                if panel.selected then
-                  element:update("active",tpos)
+                  state = "active"
                else
-                  element:update("hover",tpos)
+                  state = "hover"
                end
-            else
-               element:update("normal",tpos)
             end
+            element:update(state,vectors.vec2(0,-1),vectors.vec2(95,(#panel.current_page.elements-i+1)*10))
          end
       end
    end

@@ -12,7 +12,9 @@ local panelTextEdit = {}
 panelTextEdit.__index = panelTextEdit
 panelTextEdit.__type = "paneltextedit"
 
+local label = require("libraries.GNLabelLib")
 local kitkat = require("libraries.KattEventsAPI")
+
 ---@type PanelRoot
 local root = nil
 
@@ -25,7 +27,7 @@ function panelTextEdit.new(panel)
    ---@type paneltextedit
    local compose = {
       root = panel,
-      tasks = {},
+      labels = {},
       placeholder = "placeholder",
       conrfirmed_text = "",
       text = "",
@@ -42,29 +44,27 @@ end
 -->========================================[ Render Handling ]=========================================<--
 
 ---@param id integer -- line number
-function panelTextEdit:rebuild(id,pos)
-   self.root.config.hud:newText("panel.TextEdit."..id):outline(true):pos(pos.x,pos.y,0)
-   self.root.config.hud:newText("panel.TextEdit.underline.1."..id):outline(true):pos(pos.x,pos.y,0):text(("_"):rep(self.width))
-   self.root.config.hud:newText("panel.TextEdit.underline.2."..id):outline(true):pos(pos.x+1,pos.y,0):text(("_"):rep(self.width))
-   self.root.config.hud:newText("panel.TextEdit.cursor."..id):outline(true):pos(pos.x+1,pos.y,0):text(("_"):rep(self.width))
-   self.tasks = {"panel.TextEdit."..id,"panel.TextEdit.underline.1."..id,"panel.TextEdit.underline.2."..id,"panel.TextEdit.cursor."..id}
+function panelTextEdit:rebuild(id)
+   self.labels = {label.newLabel(),label.newLabel(),label.newLabel(),label.newLabel()}
 end
 
 ---@param state PanelElementState
-function panelTextEdit:update(state,pos)
-   self.root.config.hud:getTask(self.tasks[1]):text(self.root.config.theme.style[state]:gsub("${TEXT}",'"'..self.text..'"'))
-   self.root.config.hud:getTask(self.tasks[2]):text(self.root.config.theme.style[state]:gsub("${TEXT}",'"'..("_"):rep(self.width)..'"'))
-   self.root.config.hud:getTask(self.tasks[3]):text(self.root.config.theme.style[state]:gsub("${TEXT}",'"'..("_"):rep(self.width)..'"'))
+---@param anchor Vector2
+---@param offset Vector2
+function panelTextEdit:update(state,anchor,offset)
+   self.labels[1]:setText(self.root.config.theme.style[state]:gsub("${TEXT}",'"'..self.text..'"')):setAnchor(anchor):setOffset(offset)
+   self.labels[2]:setText(self.root.config.theme.style[state]:gsub("${TEXT}",'"'..("_"):rep(self.width)..'"')):setAnchor(anchor):setOffset(offset)
+   self.labels[3]:setText(self.root.config.theme.style[state]:gsub("${TEXT}",'"'..("_"):rep(self.width)..'"')):setAnchor(anchor):setOffset(offset:add(2,0))
    if state == "active" then
-      self.root.config.hud:getTask(self.tasks[4]):text(self.root.config.theme.style[state]:gsub("${TEXT}",'"|"')):pos(pos.x-client.getTextWidth(self.text),pos.y,0)
+      self.labels[4]:setText(self.root.config.theme.style[state]:gsub("${TEXT}",'"|"')):setAnchor(anchor):setOffset(offset.x+client.getTextWidth(self.text),offset.y)
    else
-      self.root.config.hud:getTask(self.tasks[4]):text("")
+      self.labels[4]:setText("")
    end
 end
 
 function panelTextEdit:clearTasks()
-   for _, name in pairs(self.tasks) do
-      self.root.config.hud:removeTask(name)
+   for i, _ in pairs(self.labels) do
+      self.labels[i]:delete()
    end
 end
 

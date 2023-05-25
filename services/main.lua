@@ -195,7 +195,7 @@ end)
 --   end
 --end)
 
-local labellib = require("libraries.LabelLib")
+local labellib = require("libraries.GNLabelLib")
 labellib:newLabel():setText("hello"):setAnchor(0,0)
 labellib:newLabel():setText("AAA"):setAnchor(0,0):setOffset(0,10):delete()
 

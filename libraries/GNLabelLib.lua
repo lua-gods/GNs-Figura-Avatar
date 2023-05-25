@@ -1,3 +1,8 @@
+--[[______   __                _                 __
+  / ____/ | / /___ _____ ___  (_)___ ___  ____ _/ /____  _____
+ / / __/  |/ / __ `/ __ `__ \/ / __ `__ \/ __ `/ __/ _ \/ ___/
+/ /_/ / /|  / /_/ / / / / / / / / / / / / /_/ / /_/  __(__  )
+\____/_/ |_/\__,_/_/ /_/ /_/_/_/ /_/ /_/\__,_/\__/\___/____]]
 local lib = {}
 local labels = {}
 if not H then
@@ -32,7 +37,7 @@ function lib.newLabel()
    local compose = {
       id = labelID,
       parent = config.defualt_parent,
-      text = "Empty Label",
+      text = "",
       text_align = 0,
       max_size = vectors.vec2(),
       size = vectors.vec2(),
@@ -60,12 +65,12 @@ end
 
 ---sets the offset from the origin of the anchor
 ---@param x number|Vector2
----@param y number
+---@param y number|nil
 function Label:setOffset(x,y)
    if type(x) == "Vector2" then
-      self.offset = x 
+      self.offset = x:copy():mul(-1,1)
    else 
-      self.offset = vectors.vec2(x,y)
+      self.offset = vectors.vec2(-x,y)
    end
    self:updatePositioning()
    return self
@@ -74,12 +79,12 @@ end
 ---sets the anchor position  
 ---the range is from -1 to 1, top to bottom, left to right
 ---@param x number|Vector2
----@param y number
+---@param y number|nil
 function Label:setAnchor(x,y)
    if type(x) == "Vector2" then
-      self.anchor = x * 0.5 
+      self.anchor = x:copy():mul(-0.5,0.5)
    else 
-      self.anchor = vectors.vec2(x * 0.5,y * 0.5)
+      self.anchor = vectors.vec2(x * -0.5,y * 0.5)
    end
    self:updatePositioning()
    return self
@@ -88,7 +93,7 @@ end
 ---sets the anchor origin position  
 ---the range is from -1 to 1, top to bottom, left to right
 ---@param x number|Vector2
----@param y number
+---@param y number|nil
 function Label:setAnchorOrigin(x,y)
    if type(x) == "Vector2" then
       self.origin = x 
@@ -109,7 +114,7 @@ end
 ---sets the maximum size of the Label.  
 ---setting both to 0 will make the maximum size infinite
 ---@param x number|Vector2
----@param y number
+---@param y number|nil
 function Label:setMaxSize(x,y)
    if type(x) == "number" then
       self.max_size = vectors.vec2(x,y)

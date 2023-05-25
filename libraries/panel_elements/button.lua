@@ -8,6 +8,7 @@ local PanelButton = {}
 PanelButton.__index = PanelButton
 PanelButton.__type = "panelbutton"
 
+local label = require("libraries.GNLabelLib")
 local kitkat = require("libraries.KattEventsAPI")
 
 -->====================[ API ]====================<--
@@ -16,7 +17,7 @@ function PanelButton.new(panel)
    ---@type PanelButton
    local compose = {
       root = panel,
-      tasks = {},
+      labels = {},
       
       text = "Untitled Button",
       ON_PRESS = kitkat.newEvent(),
@@ -34,18 +35,18 @@ end
 
 -->====================[ Task Handling ]====================<--
 
-function PanelButton:rebuild(id,pos)
-   self.root.config.hud:newText("PanelButton"..id):outline(true):pos(pos)
-   self.tasks = {"PanelButton"..id}
+function PanelButton:rebuild(id)
+   local l = label.newLabel()
+   self.labels = {l}
 end
 
-function PanelButton:update(state,pos)
-   self.root.config.hud:getTask(self.tasks[1]):text(self.root.config.theme.style[state]:gsub("${TEXT}",'"'..self.text..'"'))
+function PanelButton:update(state,anchor,offset)
+   self.labels[1]:setText(self.root.config.theme.style[state]:gsub("${TEXT}",'"'..self.text..'"')):setAnchor(anchor):setOffset(offset)
 end
 
 function PanelButton:clearTasks()
-   for _, name in pairs(self.tasks) do
-      self.root.config.hud:removeTask(name)
+   for i, _ in pairs(self.labels) do
+      self.labels[i]:delete()
    end
 end
 

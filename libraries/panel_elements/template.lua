@@ -1,11 +1,13 @@
 ---@class Template
 ---@field root PanelRoot
+---@field text string
 ---@field ON_PRESS KattEvent
 ---@field ON_RELEASE KattEvent
 local Template = {}
 Template.__index = Template
 Template.__type = "paneltemplate"
 
+local label = require("libraries.GNLabelLib")
 local kitkat = require("libraries.KattEventsAPI")
 
 -->========================================[ API ]=========================================<--
@@ -17,6 +19,7 @@ function Template.new(panel)
    local compose = {
       root = panel,
       tasks = {},
+      text = "Template",
       ON_PRESS = kitkat.newEvent(),
       ON_RELEASE = kitkat.newEvent(),
    }
@@ -26,21 +29,21 @@ end
 
 -->========================================[ Render Handling ]=========================================<--
 
----@param id integer -- line number
-function Template:rebuild(id,pos)
-   self.root.config.hud:newText("panel.template."..id):outline(true):pos(pos)
-   self.tasks = {"panel.template."..id}
+function Template:rebuild()
+   local l = label.newLabel()
+   self.labels = {l}
 end
 
 ---@param state PanelElementState
----@param pos Vector3
-function Template:update(state,pos)
-   self.root.config.hud:getTask(self.tasks[1]):text(self.root.config.theme.style[state]:gsub("${TEXT}",'"'.."TEMPLATE"..'"'))
+---@param anchor Vector2
+---@param offset Vector2
+function Template:update(state,anchor,offset)
+   self.labels[1]:setText(self.root.config.theme.style[state]:gsub("${TEXT}",'"'..self.text..'"')):setAnchor(anchor):setOffset(offset)
 end
 
 function Template:clearTasks()
-   for _, name in pairs(self.tasks) do
-      self.root.config.hud:removeTask(name)
+   for i, _ in pairs(self.labels) do
+      self.labels[i]:delete()
    end
 end
 
