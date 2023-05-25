@@ -248,7 +248,6 @@ events.WORLD_RENDER:register(function()
 
     --render grid
     local offset = client:getCameraPos() - grid_pos
-
     local distance = math.max(
         offset:length(),
         offset:copy():add(-grid_size, 0, 0):length(),
