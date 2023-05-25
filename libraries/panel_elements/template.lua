@@ -18,7 +18,7 @@ function Template.new(panel)
    ---@type Template
    local compose = {
       root = panel,
-      tasks = {},
+      labels = {},
       text = "Template",
       ON_PRESS = kitkat.newEvent(),
       ON_RELEASE = kitkat.newEvent(),
@@ -30,8 +30,7 @@ end
 -->========================================[ Render Handling ]=========================================<--
 
 function Template:rebuild()
-   local l = label.newLabel()
-   self.labels = {l}
+   self.labels = {label.newLabel()}
 end
 
 ---@param state PanelElementState

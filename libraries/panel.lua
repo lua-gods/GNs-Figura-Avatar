@@ -86,16 +86,16 @@ end
 ---@param sound Minecraft.soundID
 ---@param pitch number
 ---@param volume number
-local function UIplaySound(sound,pitch,volume)
+function panel.UIplaySound(sound,pitch,volume)
    sounds:playSound(sound,client:getCameraPos()+vectors.vec3(0,-1,0),volume,pitch)
 end
 
 function panel:setSelectState(selected)
    self.selected = selected
    if selected then
-      UIplaySound(panel.config.theme.sounds.select.id,panel.config.theme.sounds.select.pitch,panel.config.theme.sounds.select.volume)
+      panel.UIplaySound(panel.config.theme.sounds.select.id,panel.config.theme.sounds.select.pitch,panel.config.theme.sounds.select.volume)
    else
-      UIplaySound(panel.config.theme.sounds.deselect.id,panel.config.theme.sounds.deselect.pitch,panel.config.theme.sounds.deselect.volume)
+      panel.UIplaySound(panel.config.theme.sounds.deselect.id,panel.config.theme.sounds.deselect.pitch,panel.config.theme.sounds.deselect.volume)
    end
    panel:update()
 end
@@ -230,7 +230,7 @@ events.MOUSE_SCROLL:register(function (dir)
    if not panel.current_page then return end
    if panel.visible then
       if not panel.selected then
-         UIplaySound(panel.config.theme.sounds.hover.id,panel.config.theme.sounds.hover.pitch,panel.config.theme.sounds.hover.volume)
+         panel.UIplaySound(panel.config.theme.sounds.hover.id,panel.config.theme.sounds.hover.pitch,panel.config.theme.sounds.hover.volume)
          panel.hovering = (panel.hovering - dir - 1) % #panel.current_page.elements + 1
          panel.SELECTED_CHANGED:invoke(panel.hovering)
          panel:update()
@@ -243,8 +243,6 @@ end)
 panel.config.hud:setParentType("Hud")
 
 events.WORLD_RENDER:register(function (delta)
-   local pos = client:getScaledWindowSize()/vec(-2,-1) + vec(-96,12)
-   panel.config.hud:setPos(pos.x,pos.y,-400)
 
    if panel.current_page then
       if panel.queue_rebuild then
@@ -270,7 +268,7 @@ events.WORLD_RENDER:register(function (delta)
                   state = "hover"
                end
             end
-            element:update(state,vectors.vec2(0,-1),vectors.vec2(95,(#panel.current_page.elements-i+1)*10))
+            element:update(state,vectors.vec2(0,-1),vectors.vec2(101,(#panel.current_page.elements-i+1)*10))
          end
       end
    end

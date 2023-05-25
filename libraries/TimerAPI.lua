@@ -61,10 +61,6 @@ function Timer:new(type, duration, loop, start, onFinish, onProcess)
     onProcess = onProcess,
   }
   timer.loop = loop
-  if EventsAPI then
-    timer.onFinishEvent = EventsAPI:new()
-    timer.onProcessEvent = EventsAPI:new()
-  end
   setmetatable(timer, self)
   if timerContainers[type] then
     table.insert(timerContainers[type], timer)
@@ -113,17 +109,11 @@ do
           if timer.onFinish then
             timer.onFinish()
           end
-          if EventsAPI then
-            timer.onFinishEvent:invoke()
-          end
         end
         if not timer.paused then
           timer.time = math.max(timer.time - delta, 0)
           if timer.onProcess then
             timer.onProcess((timer.duration - timer.time) / timer.duration, delta)
-          end
-          if EventsAPI then
-            timer.onProcessEvent:invoke((timer.duration - timer.time) / timer.duration, delta)
           end
         end
       end

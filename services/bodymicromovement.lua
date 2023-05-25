@@ -34,7 +34,7 @@ events.RENDER:register(function (delta, context)
       local swing = vanilla_model.LEFT_LEG:getOriginRot().x
       local is_on_ground = player:isOnGround()
       is_on_ground = is_on_ground and 1 or 0
-      models.gn.base:setPos(0,math.abs(swing)*0.007*is_on_ground,0)
+      models.gn.base:setPos(0,math.abs(swing)*0.01*is_on_ground,0)
       models.gn.base.Torso.Head:setRot(o.x*-0.2,o.y*-0.5 - swing * 0.1 * 1,0)
       models.gn.base.Torso:setRot(o.x*0.2+math.cos((time+delta)*0.1)*0.1,o.y*0.5 + swing * 0.1,0):setPos(0,math.sin((time+delta)*0.1)*0.1,0)
       models.gn.base.Torso.Body.Shirt.BClothing.Tie:setRot(math.max(o.x*-0.2,0),0,o.y*0.1)

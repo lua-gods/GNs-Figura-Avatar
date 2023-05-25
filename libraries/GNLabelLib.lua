@@ -146,7 +146,7 @@ end
 
 function Label:buildTasks()
    local taskName = "gnlabellib."..self.id..".label"
-   self.tasks[taskName] =  self.parent:newText(taskName):shadow(true)
+   self.tasks[taskName] =  self.parent:newText(taskName):outline(true)
    self:updateTextDisplay()
    self:updatePositioning()
 end
