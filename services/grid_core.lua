@@ -232,7 +232,7 @@ local function setGridUV(offset, layer, i, layer_space)
     matrix:translate(-translate)
     
     matrix:translate(-0.5, -0.5)
-    matrix:scale(layer.texture_size or 1, layer.texture_size or 1)
+    matrix:scale(layer.texture_size or 1, layer.texture_size or 1, 1)
     matrix:translate(0.5, 0.5)
 
     layer.model:setUVMatrix(matrix)
