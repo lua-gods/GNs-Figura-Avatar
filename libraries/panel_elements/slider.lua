@@ -14,12 +14,6 @@ local label = require("libraries.GNLabelLib")
 local kitkat = require("libraries.KattEventsAPI")
 local root = nil
 
-local cache = {
-   unselected_width = client.getTextWidth("•"),
-   selected_width = client.getTextWidth("█"),
-   starter_width = client.getTextWidth("[")
-}
-
 -->========================================[ API ]=========================================<--
 
 ---@param panel PanelRoot
@@ -48,28 +42,25 @@ function panelSlider:rebuild()
    for i = 1, self.count, 1 do
       dots[i] = label.newLabel()
    end
-   self.labels = {label.newLabel(),label.newLabel(),dots}
+   self.labels = {label.newLabel()}
 end
 
 ---@param state PanelElementState
 ---@param anchor Vector2
 ---@param offset Vector2
 function panelSlider:update(state,anchor,offset)
-   self.labels[1]:setText(self.root:text2jsonTheme("[",state)):setAnchor(anchor):setOffset(offset)
    if state == "active" then
-      self.labels[2]:setText(self.root:text2jsonTheme("] "..self.text,state)):setAnchor(anchor):setOffset(offset:copy():add(50,0))
-      for id, l in pairs(self.labels[3]) do
-         if id == self.selected then
-            l:setOffset(offset:copy():add(cache.starter_width+((id - 1)/self.count)*(50 - cache.starter_width)+cache.unselected_width*0.5 - 1,0)):setText(self.root.config.theme.style[state]:gsub("${TEXT}",'"[]"')):setAnchor(anchor)
+      local compose = "["
+      for i = 1, self.count, 1 do
+         if i == self.selected then
+            compose = compose.."[•]"
          else
-            l:setOffset(offset:copy():add(cache.starter_width+((id - 1)/self.count)*(50 - cache.starter_width)+cache.selected_width*0.5 - 1,0)):setText(self.root.config.theme.style[state]:gsub("${TEXT}",'"•"')):setAnchor(anchor)
+            compose = compose.." • "
          end
       end
+      self.labels[1]:setText(self.root:text2jsonTheme(compose.."] " .. self.text,state)):setAnchor(anchor):setOffset(offset)
    else
-      self.labels[2]:setText(self.root:text2jsonTheme("] "..self.text,state)):setAnchor(anchor):setOffset(offset)
-      for id, l in pairs(self.labels[3]) do
-         l:setText("")
-      end
+      self.labels[1]:setText(self.root:text2jsonTheme("[] " .. self.text,state)):setAnchor(anchor):setOffset(offset)
    end
 end
 
@@ -80,6 +71,7 @@ function panelSlider:clearTasks()
       for i, l in pairs(self.labels[3]) do
          l:delete()
       end
+      self.labels[4]:delete()
    end
 end
 
