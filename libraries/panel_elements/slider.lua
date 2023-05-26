@@ -53,14 +53,14 @@ function panelSlider:update(state,anchor,offset)
       local compose = ""
       for i = 1, self.count, 1 do
          if i == self.selected then
-            compose = compose.."[•]"
+            compose = compose.."["..i.."]"
          else
-            compose = compose.." • "
+            compose = compose.."•"
          end
       end
-      self.labels[1]:setText(self.root:text2jsonTheme(compose.." " .. self.text,state)):setAnchor(anchor):setOffset(offset)
+      self.labels[1]:setText(self.root:txt2theme(compose.." " .. self.text,state)):setAnchor(anchor):setOffset(offset)
    else
-      self.labels[1]:setText(self.root:text2jsonTheme("[•] " .. self.text,state)):setAnchor(anchor):setOffset(offset)
+      self.labels[1]:setText(self.root:txt2theme("[•] " .. self.text,state)):setAnchor(anchor):setOffset(offset)
    end
 end
 
@@ -78,7 +78,7 @@ end
 ---@return panelSlider
 function panelSlider:setItemCount(count)
    self.count = count
-   self.root:update()
+   self.root:rebuild()
    return self
 end
 

@@ -58,7 +58,7 @@ local panel = {
 ---@param text string
 ---@param style_name PanelElementState
 ---@return unknown
-function panel:text2jsonTheme(text,style_name)
+function panel:txt2theme(text,style_name)
    local f = panel.config.theme.style[style_name]:gsub("${TEXT}",'"'..text..'"')
    return f
 end
@@ -260,12 +260,12 @@ events.WORLD_RENDER:register(function (delta)
             for i, element in pairs(panel.current_page.elements) do
                element:clearTasks()
             end
-            built = true
          end
          if panel.visible then
             for i, element in pairs(panel.current_page.elements) do
                element:rebuild(i)
             end
+            built = true
          end
       elseif panel.queue_update and panel.visible then
          panel.queue_update = false

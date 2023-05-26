@@ -41,7 +41,7 @@ function PanelButton:rebuild(id)
 end
 
 function PanelButton:update(state,anchor,offset)
-   self.labels[1]:setText(self.root:text2jsonTheme(self.text,state)):setAnchor(anchor):setOffset(offset)
+   self.labels[1]:setText(self.root:txt2theme(self.text,state)):setAnchor(anchor):setOffset(offset)
 end
 
 function PanelButton:clearTasks()
