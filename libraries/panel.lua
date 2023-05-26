@@ -249,15 +249,18 @@ end)
 
 -->====================[ Renderer ]====================<--
 panel.config.hud:setParentType("Hud")
-
+local built = false
 events.WORLD_RENDER:register(function (delta)
 
    if panel.current_page then
       if panel.queue_rebuild then
          panel.queue_rebuild = false
          panel:update()
-         for i, element in pairs(panel.current_page.elements) do
-            element:clearTasks()
+         if built then
+            for i, element in pairs(panel.current_page.elements) do
+               element:clearTasks()
+            end
+            built = true
          end
          if panel.visible then
             for i, element in pairs(panel.current_page.elements) do

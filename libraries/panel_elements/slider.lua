@@ -50,7 +50,7 @@ end
 ---@param offset Vector2
 function panelSlider:update(state,anchor,offset)
    if state == "active" then
-      local compose = "["
+      local compose = ""
       for i = 1, self.count, 1 do
          if i == self.selected then
             compose = compose.."[•]"
@@ -58,21 +58,14 @@ function panelSlider:update(state,anchor,offset)
             compose = compose.." • "
          end
       end
-      self.labels[1]:setText(self.root:text2jsonTheme(compose.."] " .. self.text,state)):setAnchor(anchor):setOffset(offset)
+      self.labels[1]:setText(self.root:text2jsonTheme(compose.." " .. self.text,state)):setAnchor(anchor):setOffset(offset)
    else
-      self.labels[1]:setText(self.root:text2jsonTheme("[] " .. self.text,state)):setAnchor(anchor):setOffset(offset)
+      self.labels[1]:setText(self.root:text2jsonTheme("[•] " .. self.text,state)):setAnchor(anchor):setOffset(offset)
    end
 end
 
 function panelSlider:clearTasks()
-   if self.labels[1] then
-      self.labels[1]:delete()
-      self.labels[2]:delete()
-      for i, l in pairs(self.labels[3]) do
-         l:delete()
-      end
-      self.labels[4]:delete()
-   end
+   self.labels[1]:delete()
 end
 
 function panelSlider:setText(text)
