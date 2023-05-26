@@ -37,7 +37,7 @@ end
 ---@param anchor Vector2
 ---@param offset Vector2
 function Template:update(state,anchor,offset)
-   self.labels[1]:setText(self.root.config.theme.style[state]:gsub("${TEXT}",'"'..self.text..'"')):setAnchor(anchor):setOffset(offset)
+   self.labels[1]:setText(self.root:text2jsonTheme(self.text,state)):setAnchor(anchor):setOffset(offset)
 end
 
 function Template:clearTasks()

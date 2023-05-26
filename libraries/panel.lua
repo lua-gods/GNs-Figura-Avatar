@@ -48,6 +48,21 @@ local panel = {
    queue_rebuild = false
 }
 
+---@alias PanelElementState string
+---| "normal" -- element idle
+---| "hover" -- selector on element
+---| "active" -- element being pressed
+---| "disabled" -- element disabled
+
+---sets the theme for the given text
+---@param text string
+---@param style_name PanelElementState
+---@return unknown
+function panel:text2jsonTheme(text,style_name)
+   local f = panel.config.theme.style[style_name]:gsub("${TEXT}",'"'..text..'"')
+   return f
+end
+
 function panel:setPage(page)
    panel:clearTasks()
    panel.hovering = 1
@@ -109,13 +124,6 @@ for _, path in pairs(listFiles("libraries/panel_elements",false)) do
    end
    panel.element_types[name] = require(path)
 end
-
-
----@alias PanelElementState string
----| "normal" -- element idle
----| "hover" -- selector on element
----| "active" -- element being pressed
----| "disabled" -- element disabled
 
 -->====================[ API ]====================<--
 

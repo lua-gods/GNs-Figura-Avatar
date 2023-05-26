@@ -55,9 +55,9 @@ end
 ---@param anchor Vector2
 ---@param offset Vector2
 function panelSlider:update(state,anchor,offset)
-   self.labels[1]:setText(self.root.config.theme.style[state]:gsub("${TEXT}",'"["')):setAnchor(anchor):setOffset(offset)
+   self.labels[1]:setText(self.root:text2jsonTheme("[",state)):setAnchor(anchor):setOffset(offset)
    if state == "active" then
-      self.labels[2]:setText(self.root.config.theme.style[state]:gsub("${TEXT}",'"]'..self.text..'"')):setAnchor(anchor):setOffset(offset:copy():add(50,0))
+      self.labels[2]:setText(self.root:text2jsonTheme("] "..self.text,state)):setAnchor(anchor):setOffset(offset:copy():add(50,0))
       for id, l in pairs(self.labels[3]) do
          if id == self.selected then
             l:setOffset(offset:copy():add(cache.starter_width+((id - 1)/self.count)*(50 - cache.starter_width)+cache.unselected_width*0.5 - 1,0)):setText(self.root.config.theme.style[state]:gsub("${TEXT}",'"[]"')):setAnchor(anchor)
@@ -66,7 +66,7 @@ function panelSlider:update(state,anchor,offset)
          end
       end
    else
-      self.labels[2]:setText(self.root.config.theme.style[state]:gsub("${TEXT}",'"]'..self.text..'"')):setAnchor(anchor):setOffset(offset)
+      self.labels[2]:setText(self.root:text2jsonTheme("] "..self.text,state)):setAnchor(anchor):setOffset(offset)
       for id, l in pairs(self.labels[3]) do
          l:setText("")
       end

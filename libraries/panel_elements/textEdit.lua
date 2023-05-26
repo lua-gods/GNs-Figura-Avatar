@@ -52,13 +52,13 @@ end
 ---@param anchor Vector2
 ---@param offset Vector2
 function panelTextEdit:update(state,anchor,offset)
-   self.labels[1]:setText(self.root.config.theme.style[state]:gsub("${TEXT}",'"'..self.text..'"')):setAnchor(anchor):setOffset(offset)
-   self.labels[2]:setText(self.root.config.theme.style[state]:gsub("${TEXT}",'"'..("_"):rep(self.width)..'"')):setAnchor(anchor):setOffset(offset)
-   self.labels[3]:setText(self.root.config.theme.style[state]:gsub("${TEXT}",'"'..("_"):rep(self.width)..'"')):setAnchor(anchor):setOffset(offset:add(2,0))
+   self.labels[1]:setText(root:text2jsonTheme(self.text,state)):setAnchor(anchor):setOffset(offset)
+   self.labels[2]:setText(root:text2jsonTheme(("_"):rep(self.width),state)):setAnchor(anchor):setOffset(offset)
+   self.labels[3]:setText(root:text2jsonTheme(("_"):rep(self.width),state)):setAnchor(anchor):setOffset(offset:add(2,0))
    if state == "active" then
-      self.labels[4]:setText(self.root.config.theme.style[state]:gsub("${TEXT}",'"|"')):setAnchor(anchor):setOffset(offset.x+client.getTextWidth(self.text),offset.y)
+      self.labels[4]:setText(root:text2jsonTheme("|",state)):setAnchor(anchor):setOffset(offset.x+client.getTextWidth(self.text),offset.y)
    else
-      self.labels[4]:setText("")
+      self.labels[4]:setText(root:text2jsonTheme("",state))
    end
 end
 
