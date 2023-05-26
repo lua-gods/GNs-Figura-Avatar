@@ -228,7 +228,7 @@ local function setGridUV(offset, layer, i, layer_space)
     local translate = offset.xz / -grid_size
 
     matrix:translate(translate)
-    matrix:scale(size, size)
+    matrix:scale(size, size,1)
     matrix:translate(-translate)
     
     matrix:translate(-0.5, -0.5)
@@ -254,7 +254,6 @@ events.WORLD_RENDER:register(function()
         offset:copy():add(0, 0, -grid_size):length(),
         offset:copy():add(-grid_size, 0, -grid_size):length()
     )
-
     
     local layer_space = math.clamp(distance * 0.0001, 0.001, 0.02)
 
