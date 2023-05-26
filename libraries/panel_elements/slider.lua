@@ -60,7 +60,7 @@ function panelSlider:update(state,anchor,offset)
       end
       self.labels[1]:setText(self.root:txt2theme(compose.." " .. self.text,state)):setAnchor(anchor):setOffset(offset)
    else
-      self.labels[1]:setText(self.root:txt2theme("[•] " .. self.text,state)):setAnchor(anchor):setOffset(offset)
+      self.labels[1]:setText(self.root:txt2theme("["..self.selected.."] " .. self.text,state)):setAnchor(anchor):setOffset(offset)
    end
 end
 
