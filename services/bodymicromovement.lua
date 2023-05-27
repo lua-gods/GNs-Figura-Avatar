@@ -3,6 +3,18 @@ local config = {
    tick_span = 4, -- ticks
 }
 
+local parts = {
+   base = models.gn.base,
+   head = models.gn.base.Torso.Head,
+   body = models.gn.base.Torso,
+   left_arm = models.gn.base.Torso.LeftArm,
+   right_arm = models.gn.base.Torso.RightArm,
+   left_leg = models.gn.base.LeftLeg,
+   right_leg = models.gn.base.RightLeg,
+   
+   tie = models.gn.base.Torso.Body.Shirt.BClothing.Tie
+}
+
 local vel = vectors.vec3()
 local last_vel = vectors.vec3()
 local offset = vectors.vec2()
@@ -34,20 +46,20 @@ events.RENDER:register(function (delta, context)
       local swing = vanilla_model.LEFT_LEG:getOriginRot().x
       local is_on_ground = player:isOnGround()
       is_on_ground = is_on_ground and 1 or 0
-      models.gn.base:setPos(0,math.abs(swing)*0.01*is_on_ground,0)
-      models.gn.base.Torso.Head:setRot(o.x*-0.2,o.y*-0.5 - swing * 0.1 * 1,0)
-      models.gn.base.Torso:setRot(o.x*0.2+math.cos((time+delta)*0.1)*0.1,o.y*0.5 + swing * 0.1,0):setPos(0,math.sin((time+delta)*0.1)*0.1,0)
-      models.gn.base.Torso.Body.Shirt.BClothing.Tie:setRot(math.max(o.x*-0.2,0),0,o.y*0.1)
+      parts.base:setPos(0,math.abs(swing)*0.01*is_on_ground,0)
+      parts.head:setRot(o.x*-0.2,o.y*-0.5 - swing * 0.1 * 1,0)
+      parts.body:setRot(o.x*0.2+math.cos((time+delta)*0.1)*0.1,o.y*0.5 + swing * 0.1,0):setPos(0,math.sin((time+delta)*0.1)*0.1,0)
+      parts.tie:setRot(math.max(o.x*-0.2,0),0,o.y*0.1)
       if is_underwater and (pose == "STANDING" or pose == "CROUCHING") then
-         models.gn.base.Torso.LeftArm:setRot(o.x*-0.2,o.y*0.3,math.min(tvel.y*180-45,0))
-         models.gn.base.Torso.RightArm:setRot(o.x*-0.2,o.y*0.3,-math.min(tvel.y*180-45,0))
-         models.gn.base.LeftLeg:setRot(math.rad(o.y) * 6 + math.sin((time+delta)*0.2)*25*math.min(math.abs(tvel.y)*10,1))
-         models.gn.base.RightLeg:setRot(math.rad(o.y) * -6 - math.sin((time+delta)*0.2)*25*math.min(math.abs(tvel.y)*10,1))
+         parts.left_arm:setRot(o.x*-0.2,o.y*0.3,math.min(tvel.y*180-45,0))
+         parts.right_arm:setRot(o.x*-0.2,o.y*0.3,-math.min(tvel.y*180-45,0))
+         parts.left_leg:setRot(math.rad(o.y) * 6 + math.sin((time+delta)*0.2)*25*math.min(math.abs(tvel.y)*10,1))
+         parts.right_leg:setRot(math.rad(o.y) * -6 - math.sin((time+delta)*0.2)*25*math.min(math.abs(tvel.y)*10,1))
       else
-         models.gn.base.Torso.LeftArm:setRot(o.x*-0.2,o.y*0.3,0)
-         models.gn.base.Torso.RightArm:setRot(o.x*-0.2,o.y*0.3,0)
-         models.gn.base.LeftLeg:setPos(0,0,math.sin(math.rad(o.y))*1.5):setRot(math.rad(o.y) * 6,0)
-         models.gn.base.RightLeg:setPos(0,0,-math.sin(math.rad(o.y))*1.5):setRot(math.rad(o.y) * -6,0)
+         parts.left_arm:setRot(o.x*-0.2,o.y*0.3,-math.abs(o.y*0.1))
+         parts.right_arm:setRot(o.x*-0.2,o.y*0.3,math.abs(o.y*0.1))
+         parts.left_leg:setPos(0,0,math.sin(math.rad(o.y))*1.5):setRot(math.rad(o.y) * -6,0)
+         parts.right_leg:setPos(0,0,-math.sin(math.rad(o.y))*1.5):setRot(math.rad(o.y) * 6,0)
       end
 
       if math.random() < 0.01 then
