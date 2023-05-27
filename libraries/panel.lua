@@ -21,7 +21,12 @@ local panel = {
    visible = false,
    selected = false,
    current_page = nil,
-   element_types = {},
+   elements = { -- static anotation support :(
+      button = require("libraries.panel_elements.button"),
+      slider = require("libraries.panel_elements.slider"),
+      textEdit = require("libraries.panel_elements.textEdit"),
+      toggleButton = require("libraries.panel_elements.toggleButton"),
+   },
 
    config = {
       hud = models.menu,
@@ -47,6 +52,7 @@ local panel = {
    queue_update = false,
    queue_rebuild = false
 }
+local built = false
 
 ---@alias PanelElementState string
 ---| "normal" -- element idle
@@ -64,7 +70,7 @@ function panel:txt2theme(text,style_name)
 end
 
 function panel:setPage(page)
-   panel:clearTasks()
+   self:clearTasks()
    panel.hovering = 1
    self.current_page = page
    self:rebuild()
@@ -90,9 +96,10 @@ function panel:setVisible(visible)
 end
 
 function panel:clearTasks()
-   if panel.current_page then
+   if panel.current_page and built then
       for i, element in pairs(panel.current_page.elements) do
          element:clearTasks()
+         built = false
       end
    end
    return self
@@ -115,15 +122,15 @@ function panel:setSelectState(selected)
    panel:update()
 end
 
-for _, path in pairs(listFiles("libraries/panel_elements",false)) do
-   local name = ""
-   for i = #path, 1, -1 do
-      local c = path:sub(i,i)
-      if c == "." then break end
-      name = c..name
-   end
-   panel.element_types[name] = require(path)
-end
+--for _, path in pairs(listFiles("libraries/panel_elements",false)) do
+--   local name = ""
+--   for i = #path, 1, -1 do
+--      local c = path:sub(i,i)
+--      if c == "." then break end
+--      name = c..name
+--   end
+--   panel.elements[name] = require(path)
+--end
 
 -->====================[ API ]====================<--
 
@@ -163,44 +170,29 @@ function PanelPage:forceUpdate()
    return self
 end
 
+---@deprecated
+---@param type string
+---@return PanelButton|PanelToggleButton|panelSlider|paneltextedit
 function PanelPage:newElement(type)
-   if panel.element_types[type] then
-      local element = panel.element_types[type].new(panel)
+   if panel.elements[type] then
+      local element = panel.elements[type].new(panel)
       table.insert(self.elements,element)
       return element
    end
+   return nil
 end
 
--->==========[ Text Input ]==========<--
----@class PanelTextEdit
----@field text string
----@field width number
----@field input function
----@field ON_TEXT_CHANGE KattEvent
----@field ON_TEXT_CONFIRM KattEvent
----@field ON_TEXT_DECLINE KattEvent
-local PanelTextEdit = {}
-PanelTextEdit.__index = PanelTextEdit
-PanelTextEdit.__type = "paneltextedit"
+---comment
+function PanelPage:appendElement(instance)
+   table.insert(self.elements,instance)
+   return PanelPage
+end
 
-function PanelPage:newTextEdit(placeholder)
-   ---@PanelTextEdit
-   local compose = {
-      text = "",
-      last_text = "",
-      display_text = "",
-      placeholder = placeholder,
-      input = nil,
-      width = 20,
-      _pxwidth = 120,
-      ON_TEXT_CHANGE = kitkat.newEvent(),
-      ON_TEXT_CONFIRM = kitkat.newEvent(),
-      ON_TEXT_DECLINE = kitkat.newEvent(),
-   }
-   setmetatable(compose,PanelTextEdit)
-   panel:update()
-   table.insert(self.elements,compose)
-   return self
+function PanelPage:appendElements(tabl)
+   for key, value in pairs(tabl) do
+      table.insert(self.elements,value)
+   end
+   return PanelPage
 end
 
 -->====================[ Input Handler ]====================<--
@@ -222,7 +214,7 @@ panel.config.select.press = function ()
       local element = panel.current_page.elements[panel.hovering]
       element:pressed()
    end
-   if not panel.visible then panel:setVisible(true) panel:rebuild() end
+   if not panel.visible then panel:setVisible(true) end
    return true
 end
 
@@ -249,33 +241,29 @@ end)
 
 -->====================[ Renderer ]====================<--
 panel.config.hud:setParentType("Hud")
-local built = false
 events.WORLD_RENDER:register(function (delta)
 
    if panel.current_page then
       if panel.queue_rebuild then
          panel.queue_rebuild = false
-         panel:update()
          if built then
-            for i, element in pairs(panel.current_page.elements) do
-               element:clearTasks()
-            end
+            built = false
+            panel:clearTasks()
          end
-         if panel.visible then
+         if panel.visible and not built then
+            panel.queue_update = true
             for i, element in pairs(panel.current_page.elements) do
-               element:rebuild(i)
+               element:rebuild()
             end
             built = true
          end
-      elseif panel.queue_update and panel.visible then
+      elseif panel.queue_update and panel.visible and built then
          panel.queue_update = false
          for i, element in pairs(panel.current_page.elements) do
-            local tpos = vectors.vec3(0,(i-1) * panel.config.line_height,0)
             local state = "normal"            
             if i == panel.hovering then
                if panel.selected then
-                  state = "active"
-               else
+                  state = "active" else
                   state = "hover"
                end
             end

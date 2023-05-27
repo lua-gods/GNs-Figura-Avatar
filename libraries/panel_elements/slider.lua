@@ -62,6 +62,7 @@ function panelSlider:update(state,anchor,offset)
    else
       self.labels[1]:setText(self.root:txt2theme("["..self.selected.."] " .. self.text,state)):setAnchor(anchor):setOffset(offset)
    end
+   
 end
 
 function panelSlider:clearTasks()
@@ -78,7 +79,7 @@ end
 ---@return panelSlider
 function panelSlider:setItemCount(count)
    self.count = count
-   self.root:rebuild()
+   self.root:update()
    return self
 end
 

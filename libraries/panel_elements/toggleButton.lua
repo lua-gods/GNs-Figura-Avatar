@@ -35,7 +35,6 @@ function PanelToggleButton:setText(text)
    self.root:update()
    return self
 end
-
 -->====================[ Task Handling ]====================<--
 
 function PanelToggleButton:rebuild(id)
@@ -46,9 +45,9 @@ end
 function PanelToggleButton:update(state,anchor,offset)
    self.labels[1]:setAnchor(anchor):setOffset(offset)
    if self.toggle then
-      self.labels[1]:setText(self.root:txt2theme(self.text.." [  [ON.]",state))
+      self.labels[1]:setText(self.root:txt2theme(self.text.." [▌|",state))
    else
-      self.labels[1]:setText(self.root:txt2theme(self.text.." [OFF] ]",state))
+      self.labels[1]:setText(self.root:txt2theme(self.text.." |▌]",state))
    end
 end
 

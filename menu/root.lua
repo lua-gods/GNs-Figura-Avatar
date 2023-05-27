@@ -1,10 +1,15 @@
 local panel = require("libraries.panel")
 
 local menu = panel:newPage()
-menu:newElement("button"):setText("Wardrobe").ON_PRESS:register(function ()
-   panel:setPage(require("menu.wardrobe"))
+local items = {
+   panel.elements.toggleButton.new(panel),
+   panel.elements.textEdit.new(panel),
+   panel.elements.button.new(panel):setText("Wardrobe"),
+   panel.elements.slider.new(panel):setText("Example"):setItemCount(20)
+}
+
+items[3].ON_PRESS:register(function ()
+panel:setPage(require("menu.wardrobe"))
 end)
-menu:newElement("toggleButton")
-menu:newElement("textEdit")
-menu:newElement("slider"):setText("Example"):setItemCount(10)
+menu:appendElements(items)
 return menu

@@ -1,12 +1,12 @@
 local panel = require("libraries.panel")
 if not panel then return end
 
-local main_panel = panel:newPage()
-local canvas_panel = panel:newPage()
-canvas_panel:newElement("button"):setText("Return").ON_PRESS:register(function ()
-   panel:setPage(main_panel)
-end)
-canvas_panel:newElement("button"):setText("Place Canvas")
+--local main_panel = panel:newPage()
+--local canvas_panel = panel:newPage()
+--canvas_panel:newElement("button"):setText("Return").ON_PRESS:register(function ()
+--   panel:setPage(main_panel)
+--end)
+--canvas_panel:newElement("button"):setText("Place Canvas")
 
 
 

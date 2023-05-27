@@ -92,19 +92,20 @@ events.KEY_PRESS:register(function (key,status,modifier)
                elseif key == 257 then -- enter
                   current.confirmed_text = current.text
                   root:setSelectState(false)
-                  current.ON_TEXT_CONFIRM:invoke(current)
+                  current.ON_TEXT_CONFIRM:invoke(current.confirmed_text)
                end
                root:update()
                return true
             else
                if key == 256 then
+                  current.ON_TEXT_DECLINE:invoke(current.text)
                   if not current.confirmed_text then
                      current.text = current.confirmed_text
                      
                      current.text = ""
                   end
+                  root:update()
                   root:setSelectState(false)
-                  current.ON_TEXT_DECLINE:invoke(current)
                end
             end
          end

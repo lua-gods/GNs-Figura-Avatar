@@ -35,7 +35,7 @@ end
 
 -->====================[ Task Handling ]====================<--
 
-function PanelButton:rebuild(id)
+function PanelButton:rebuild()
    local l = label.newLabel()
    self.labels = {l}
 end

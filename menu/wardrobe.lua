@@ -1,7 +1,16 @@
 local panel = require("libraries.panel")
 
 local menu = panel:newPage()
-menu:newElement("button"):setText("Wardrobe").ON_PRESS:register(function ()
-   print("lol")
-end)
+local items = {
+   panel.elements.slider.new(panel),
+   panel.elements.button.new(panel),
+   panel.elements.button.new(panel),
+   panel.elements.button.new(panel),
+   panel.elements.button.new(panel),
+}
+
+items[1]:setText("Hello")
+
+menu:appendElements(items)
+
 return menu
