@@ -21,11 +21,12 @@ local panel = {
    visible = false,
    selected = false,
    current_page = nil,
+   page_tree = {},
    elements = { -- static anotation support :(
-      button = require("libraries.panel_elements.button"),
-      slider = require("libraries.panel_elements.slider"),
-      textEdit = require("libraries.panel_elements.textEdit"),
-      toggleButton = require("libraries.panel_elements.toggleButton"),
+      --button = require("libraries.panel_elements.button"),
+      --slider = require("libraries.panel_elements.slider"),
+      --textEdit = require("libraries.panel_elements.textEdit"),
+      --toggleButton = require("libraries.panel_elements.toggleButton"),
    },
 
    config = {
@@ -72,8 +73,17 @@ end
 function panel:setPage(page)
    self:clearTasks()
    panel.hovering = 1
+   panel.selected = false
+   self.last_page = self.current_page
    self.current_page = page
+   table.insert(self.page_tree,page)
    self:rebuild()
+   return self
+end
+
+function panel:returnToLastPage()
+   table.remove(self.page_tree,#self.page_tree)
+   panel:setPage(self.page_tree[#self.page_tree])
    return self
 end
 
@@ -122,15 +132,15 @@ function panel:setSelectState(selected)
    panel:update()
 end
 
---for _, path in pairs(listFiles("libraries/panel_elements",false)) do
---   local name = ""
---   for i = #path, 1, -1 do
---      local c = path:sub(i,i)
---      if c == "." then break end
---      name = c..name
---   end
---   panel.elements[name] = require(path)
---end
+for _, path in pairs(listFiles("libraries/panel_elements",false)) do
+   local name = ""
+   for i = #path, 1, -1 do
+      local c = path:sub(i,i)
+      if c == "." then break end
+      name = c..name
+   end
+   panel.elements[name] = require(path)
+end
 
 -->====================[ API ]====================<--
 

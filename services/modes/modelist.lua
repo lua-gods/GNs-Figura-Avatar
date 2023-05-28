@@ -23,7 +23,6 @@ function grid_start(grid)
 	-- name of mode will have prefix that will be name you used and will have : in middle
 	-- for example if your name is "my_name" and your mode is "my_amazing_mode" it will be turned into: "my_name:my_amazing_mode"
 	-- you can replace functions with nil if you dont use them
-    ---@type gridMode
 	local modelist = grid.newMode("grid:modelist")
     modelist.INIT:register(function() -- init will be executed once when loading grid mode
         local size = modelist:getGridSize()

@@ -28,7 +28,6 @@ local config = {
 }
 
 function grid_start(grid)
-    ---@type gridMode
 	local gol = grid.newMode("demo:game_of_life")
     local size = gol:getGridSize()*config.subdivide
     local frame = textures:newTexture("golworld",size,size)

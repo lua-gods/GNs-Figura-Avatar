@@ -194,5 +194,8 @@ end)
 --      end
 --   end
 --end)
+
+require("menu.wardrobe")
+
 if not H then return end
 models.hud:setParentType("HUD")

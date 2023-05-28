@@ -4,7 +4,7 @@ shirt:setSelection{
    c.newClothes():setAccessories{},
    c.newClothes():setAccessories{nil,models.gn.base.Torso.Head.ChristmasHat},
    c.newClothes():setAccessories{nil,models.gn.base.Torso.Head.topHat},
-   c.newClothes():setAccessories{nil,models.gn.base.Torso.Head.senseiHat},
+   c.newClothes():setAccessories{nil,models.gn.base.Torso.Head.StrawHat},
 }:commit()
 
 return shirt

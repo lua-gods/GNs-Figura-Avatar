@@ -20,7 +20,6 @@ local x = 0
 local y = 0
 
 function grid_start(grid)
-    ---@type gridMode
 	local myMode = grid.newMode("demo:mandelbrot")
    local res = 2^config.subdivision
    local view = textures:newTexture("mandelbrotset",res,res)

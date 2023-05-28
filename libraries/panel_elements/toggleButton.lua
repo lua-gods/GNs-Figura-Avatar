@@ -33,6 +33,7 @@ end
 function PanelToggleButton:setText(text)
    self.text = text
    self.root:update()
+   ""
    return self
 end
 -->====================[ Task Handling ]====================<--

@@ -233,7 +233,6 @@ end
 
 
 function grid_start(grid)
-    ---@type gridMode
 	local myMode = grid.newMode("demo:minesweeper")
     
     myMode.INIT:register(function()
