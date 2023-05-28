@@ -66,7 +66,7 @@ local built = false
 ---@param style_name PanelElementState
 ---@return unknown
 function panel:txt2theme(text,style_name)
-   local f = panel.config.theme.style[style_name]:gsub("${TEXT}",'"'..text..'"')
+   local f = panel.config.theme.style[style_name]:gsub("${TEXT}",'"'..text:gsub([[\]], [[\\]]):gsub([["]], [[\"]])..'"')
    return f
 end
 
