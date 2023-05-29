@@ -322,7 +322,9 @@
     "libraryFiles": "Opened",
 
     // The docs handle global variables themselves.
-    "globals": [],
+    "globals": [
+            "true_events"
+        ],
 
     // All local variables must be checked (except for the empty variable "_")
     "unusedLocalExclude": []
