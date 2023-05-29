@@ -137,13 +137,13 @@ events.TICK:register(function()
 end)
 
 local traillib = require("libraries.GNtrailLib"):setWorld(models.trailworld)
-local newSmear = traillib:newTwoLeadTrail(textures["trailworld.gradient"]):setDuration(20):setDivergeness(0)
+local newSmear = traillib:newTwoLeadTrail(textures["trailworld.gradient"]):setDuration(10):setDivergeness(0)
 
 events.WORLD_RENDER:register(function (delta)
    if not player:isLoaded() then return end
    local sword = models.gn.base.Torso.Body.sword.Anchor1.Anchor2
    local sword_smear_toggle = sword.SmearController:getAnimPos().x
-   if sword_smear_toggle < 0 then
+   if sword_smear_toggle < 0 or true then
       local sword_blade_matrix = sword:partToWorldMatrix()
       newSmear:setLeads(
          (sword_blade_matrix * vectors.vec4(0,0,0,1)).xyz,

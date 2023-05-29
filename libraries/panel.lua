@@ -256,10 +256,7 @@ events.WORLD_RENDER:register(function (delta)
    if panel.current_page then
       if panel.queue_rebuild then
          panel.queue_rebuild = false
-         if built then
-            built = false
-            panel:clearTasks()
-         end
+         panel:clearTasks()
          if panel.visible and not built then
             panel.queue_update = true
             for i, element in pairs(panel.current_page.elements) do

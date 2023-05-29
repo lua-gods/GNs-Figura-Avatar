@@ -22,8 +22,8 @@ local sword = {
    enabled = true,
 }
 
-animations.sword.attack1:speed(1.4)
-animations.sword.attack2:speed(1.4)
+animations.sword.attack1:speed(1.2)
+animations.sword.attack2:speed(1.2)
 animations.sword.attack_down:speed(1.2)
 CONFIG.path:setPivot(0,22,0)
 sword.state:setState(animations.sword.idle)
