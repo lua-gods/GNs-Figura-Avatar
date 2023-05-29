@@ -120,6 +120,7 @@ end
 ---@param volume number
 function panel.UIplaySound(sound,pitch,volume)
    sounds:playSound(sound,client:getCameraPos()+vectors.vec3(0,-1,0),volume,pitch)
+   sounds:playSound(sound,client:getCameraPos()+vectors.vec3(0,1,0),volume,pitch)
 end
 
 function panel:setSelectState(selected)
@@ -180,7 +181,6 @@ function PanelPage:forceUpdate()
    return self
 end
 
----@deprecated
 ---@param type string
 ---@return PanelButton|PanelToggleButton|panelSlider|paneltextedit
 function PanelPage:newElement(type)
@@ -236,7 +236,7 @@ panel.config.select.release = function ()
    end
 end
 
-events.MOUSE_SCROLL:register(function (dir)
+true_events.MOUSE_SCROLL:register(function (dir)
    if not panel.current_page then return end
    if panel.visible then
       if not panel.selected then
@@ -251,7 +251,7 @@ end)
 
 -->====================[ Renderer ]====================<--
 panel.config.hud:setParentType("Hud")
-events.WORLD_RENDER:register(function (delta)
+true_events.WORLD_RENDER:register(function (delta)
 
    if panel.current_page then
       if panel.queue_rebuild then

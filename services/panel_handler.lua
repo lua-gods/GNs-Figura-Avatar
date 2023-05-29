@@ -26,5 +26,6 @@ if not panel then return end
 --main_panel:newElement("button"):setText("Canvas").ON_PRESS:register(function ()
 --   panel:setPage(canvas_panel)
 --end)
-
-panel:setPage(require("menu.root"))
+if not BENCHMARK_MODE then
+   panel:setPage(require("menu.root"))
+end

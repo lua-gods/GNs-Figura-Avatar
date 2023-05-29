@@ -97,7 +97,7 @@ function panelSlider:released()
    self.ON_RELEASE:invoke(self)
 end
 
-events.MOUSE_SCROLL:register(function (dir)
+true_events.MOUSE_SCROLL:register(function (dir)
    if not root then return end
    ---@type panelSlider
    local current = root.current_page.elements[root.hovering]

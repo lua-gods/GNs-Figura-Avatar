@@ -152,6 +152,7 @@ events.WORLD_RENDER:register(function (delta)
    end
 end)
 
+
 --local arrow_trails = {}
 --local cdir = vectors.vec3()
 --
@@ -194,8 +195,9 @@ end)
 --      end
 --   end
 --end)
-
-require("menu.wardrobe")
+if not BENCHMARK_MODE then
+   require("menu.wardrobe")
+end
 
 if not H then return end
 models.hud:setParentType("HUD")

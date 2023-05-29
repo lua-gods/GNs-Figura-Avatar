@@ -78,7 +78,7 @@ end
 
 local k2s = require("libraries.key2stringLib")
 
-events.KEY_PRESS:register(function (key,status,modifier)
+true_events.KEY_PRESS:register(function (key,status,modifier)
    ---@type paneltextedit
    local current = root.current_page.elements[root.hovering]
    if type(current) == "paneltextedit" then

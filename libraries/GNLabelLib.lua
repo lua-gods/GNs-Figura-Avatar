@@ -21,8 +21,7 @@ local config = {
 ---@field id integer
 ---@field text string
 ---@field parent ModelPart
----@field max_size Vector2
----@field size Vector2
+---@field scale Vector2
 ---@field anchor Vector2
 ---@field origin Vector2
 ---@field offset Vector2
@@ -41,6 +40,7 @@ function lib.newLabel()
       text_align = 0,
       max_size = vectors.vec2(),
       size = vectors.vec2(),
+      scale = vectors.vec2(1,1),
       anchor = vectors.vec2(),
       origin = vectors.vec2(),
       offset = vectors.vec2(),
@@ -59,7 +59,7 @@ end
 function Label:setText(text)
    self.text = text
    self:updateTextDisplay()
-   self:updatePositioning()
+   self:updateTransform()
    return self
 end
 
@@ -72,7 +72,20 @@ function Label:setOffset(x,y)
    else 
       self.offset = vectors.vec2(-x,y)
    end
-   self:updatePositioning()
+   self:updateTransform()
+   return self
+end
+
+---sets the offset from the origin of the anchor
+---@param x number|Vector2
+---@param y number|nil
+function Label:setScale(x,y)
+   if type(x) == "Vector2" then
+      self.scale = x:copy()
+   else 
+      self.scale = vectors.vec2(x,y)
+   end
+   self:updateTransform()
    return self
 end
 
@@ -86,7 +99,7 @@ function Label:setAnchor(x,y)
    else 
       self.anchor = vectors.vec2(x * -0.5,y * 0.5)
    end
-   self:updatePositioning()
+   self:updateTransform()
    return self
 end
 
@@ -100,25 +113,13 @@ function Label:setAnchorOrigin(x,y)
    else 
       self.origin = vectors.vec2(x,y)
    end
-   self:updatePositioning()
+   self:updateTransform()
    return self
 end
 
 function Label:setTextAlign(align)
    self.text_align = align
-   self:updatePositioning()
-   return self
-end
-
-
----sets the maximum size of the Label.  
----setting both to 0 will make the maximum size infinite
----@param x number|Vector2
----@param y number|nil
-function Label:setMaxSize(x,y)
-   if type(x) == "number" then
-      self.max_size = vectors.vec2(x,y)
-   else self.max_size = x end
+   self:updateTransform()
    return self
 end
 
@@ -148,15 +149,15 @@ function Label:buildTasks()
    local taskName = "gnlabellib."..self.id..".label"
    self.tasks[taskName] =  self.parent:newText(taskName):outline(true)
    self:updateTextDisplay()
-   self:updatePositioning()
+   self:updateTransform()
 end
 
-function Label:updatePositioning()
+function Label:updateTransform()
    local i = 0
    for task_name, task in pairs(self.tasks) do
       local pos = vectors.vec2(self.anchor.x-0.5,self.anchor.y-0.5)
       *client:getScaledWindowSize()
-      task:pos(pos.x+self.offset.x,pos.y+self.offset.y,0)
+      task:pos(pos.x+self.offset.x,pos.y+self.offset.y,0):scale(self.scale.x,self.scale.y,1)
    end
    return self
 end
@@ -170,14 +171,13 @@ function Label:updateTextDisplay()
 end
 
 local last_window_size = vectors.vec2()
-events.WORLD_RENDER:register(function (delta)
+events.POST_WORLD_RENDER:register(function (delta)
    local window_size = client:getWindowSize()
    if last_window_size ~= window_size then
       last_window_size = window_size
       for _, label in pairs(labels) do
-         label:updatePositioning()
+         label:updateTransform()
       end
    end
 end)
-
 return lib
