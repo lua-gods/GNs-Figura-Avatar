@@ -195,9 +195,6 @@ end)
 --      end
 --   end
 --end)
-if not BENCHMARK_MODE then
-   require("menu.wardrobe")
-end
 
 if not H then return end
 models.hud:setParentType("HUD")

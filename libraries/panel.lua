@@ -236,7 +236,7 @@ panel.config.select.release = function ()
    end
 end
 
-true_events.MOUSE_SCROLL:register(function (dir)
+events.MOUSE_SCROLL:register(function (dir)
    if not panel.current_page then return end
    if panel.visible then
       if not panel.selected then
@@ -251,7 +251,7 @@ end)
 
 -->====================[ Renderer ]====================<--
 panel.config.hud:setParentType("Hud")
-true_events.WORLD_RENDER:register(function (delta)
+events.WORLD_RENDER:register(function (delta)
 
    if panel.current_page then
       if panel.queue_rebuild then

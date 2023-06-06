@@ -15,6 +15,7 @@ local parts = {
    tie = models.gn.base.Torso.Body.Shirt.BClothing.Tie
 }
 
+local is_flying = false
 local vel = vectors.vec3()
 local last_vel = vectors.vec3()
 local offset = vectors.vec2()
@@ -61,9 +62,9 @@ events.RENDER:register(function (delta, context)
          parts.left_leg:setPos(0,0,math.sin(math.rad(o.y))*1.5):setRot(math.rad(o.y) * -6,0)
          parts.right_leg:setPos(0,0,-math.sin(math.rad(o.y))*1.5):setRot(math.rad(o.y) * 6,0)
       end
-
-      if math.random() < 0.01 then
-         animations.gn.blink:play()
-      end
    end
+end)
+
+events.TICK:register(function ()
+   if math.random() < 0.02 then animations.gn.blink:play() end
 end)
