@@ -71,6 +71,7 @@ function panel:txt2theme(text,style_name)
 end
 
 function panel:setPage(page)
+   if not page then error("Page Given missing",2) end
    self:clearTasks()
    panel.hovering = 1
    panel.selected = false
@@ -220,7 +221,7 @@ end)
 
 
 panel.config.select.press = function ()
-   if panel.visible then
+   if panel.visible and panel.current_page then
       local element = panel.current_page.elements[panel.hovering]
       element:pressed()
    end

@@ -38,10 +38,6 @@ end
 
 -->========================================[ Render Handling ]=========================================<--
 function panelSlider:rebuild()
-   local dots = {}
-   for i = 1, self.count, 1 do
-      dots[i] = label.newLabel()
-   end
    self.labels = {label.newLabel()}
 end
 

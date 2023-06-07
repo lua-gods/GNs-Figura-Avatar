@@ -25,10 +25,10 @@ local lsyst = client:getSystemTime()
 
 local ls = 0
 local s = 1
-local t = 0
+local t = 1
 events.TICK:register(function ()
    local csyst = client:getSystemTime()
-   t = (csyst-lsyst) / 1000
+   t = (csyst-lsyst)/1000
    s = math.floor(t)
    if ls ~= s then
       local disp_time = ""
@@ -39,12 +39,22 @@ events.TICK:register(function ()
          if hour ~= 0 then
             local day = math.floor(hour / 24)
             if day ~= 0 then
-               disp_time = day.."d"
+               local year = math.floor(day / 356)
+               if year ~= 0 then
+                  local century = math.floor(year / 100)
+                  if century ~= 0 then
+                     disp_time = century.."cnt " .. (year % 100).."yr " .. (day % 356).."dy " .. (hour % 24).."hr " .. (minute % 60) .."m"
+                  else
+                     disp_time = year.."yr " .. (day % 31).."dy " .. (hour % 24).."hr " .. (minute % 60).."m"
+                  end
+               else
+                  disp_time = (day % 31).."dy " .. (hour % 24).."hr " .. (minute % 60).."m"
+               end
             else
-               disp_time = hour.."h"
+               disp_time = (hour % 24).."hr " .. (minute % 60).."m"
             end
          else
-            disp_time = minute.."m"
+            disp_time = (minute % 60).."m"
          end
       else
          disp_time = s.."s"

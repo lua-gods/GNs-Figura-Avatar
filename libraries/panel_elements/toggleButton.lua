@@ -45,9 +45,9 @@ end
 function PanelToggleButton:update(state,anchor,offset)
    self.labels[1]:setAnchor(anchor):setOffset(offset)
    if self.toggle then
-      self.labels[1]:setText(self.root:txt2theme(self.text.." [True]",state))
+      self.labels[1]:setText(self.root:txt2theme("[-]"..self.text,state))
    else
-      self.labels[1]:setText(self.root:txt2theme(self.text.." [False]",state))
+      self.labels[1]:setText(self.root:txt2theme("[+]"..self.text,state))
    end
 end
 
