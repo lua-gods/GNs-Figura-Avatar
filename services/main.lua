@@ -138,7 +138,6 @@ end)
 
 local traillib = require("libraries.GNtrailLib"):setWorld(models.trailworld)
 local newSmear = traillib:newTwoLeadTrail(textures["trailworld.gradient"]):setDuration(10):setDivergeness(0)
-
 events.WORLD_RENDER:register(function (delta)
    if not player:isLoaded() then return end
    local sword = models.gn.base.Torso.Body.sword.Anchor1.Anchor2

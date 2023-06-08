@@ -14,9 +14,9 @@ for key, path in pairs(paths) do
       if char == "." then break end
       name = char .. name
    end
+   ---@type macroScript
+   local script = require(path)
    menu:newElement("toggleButton"):setText(name).ON_TOGGLE:register(function (toggle)
-      ---@type macroScript
-      local script = require(path)
       script.is_active = toggle
       if toggle then
          script.ENTER:invoke()

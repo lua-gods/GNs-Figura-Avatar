@@ -1,6 +1,6 @@
 -- grid api --
 local grid_api = {}
-local text_to_texture = require("text2texture")
+local text_to_texture = require("libraries.text2texture")
 local katt_event_api = require("libraries.KattEventsAPI")
 
 local grid_api_metatable = {
