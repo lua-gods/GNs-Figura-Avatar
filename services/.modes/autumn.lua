@@ -14,11 +14,6 @@ end)
 -- grid
 local lerp = math.lerp
 
-local dt = 0
-function events.world_render(delta)
-    dt = delta
-end
-
 function grid_start(grid)
     local grid_textures = {}
     local fall_id = 0
@@ -27,7 +22,7 @@ function grid_start(grid)
 
     local max_layers
 
-    local mode_autumn = grid.newMode("auria:autumn2")
+    local mode_autumn = grid.newMode("auria:autumn")
     mode_autumn.INIT:register(function()
         max_layers = mode_autumn:getMaxLayers()
         
@@ -87,9 +82,10 @@ function grid_start(grid)
         end
     end)
 
-    mode_autumn.RENDER:register(function()
+    mode_autumn.RENDER:register(function(delta)
+        -- print(...)
         -- local t = ((client:getSystemTime() / 1000) * 20) % 1
-        local t = dt
+        local t = delta
         local settings = mode_autumn:getParameters()
         settings = settings and settings[1] or ""
         if settings == "old" or settings == "tick" then
