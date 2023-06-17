@@ -1,4 +1,4 @@
 local panel = require("libraries.panel")
+panel:setModelpart(models.hud)
 if not panel then return end
-models.hud:setParentType("HUD")
 panel:setPage(require("menu.root"))

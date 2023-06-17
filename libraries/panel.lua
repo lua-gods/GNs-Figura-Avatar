@@ -30,7 +30,7 @@ local panel = {
    },
 
    config = {
-      hud = models.menu,
+      hud = nil,
       line_height = 11,
       select = keybinds:newKeybind("Panel Select","key.keyboard.grave.accent",false),
       theme = {
@@ -68,6 +68,15 @@ local built = false
 function panel:txt2theme(text,style_name)
    local f = panel.config.theme.style[style_name]:gsub("${TEXT}",'"'..text:gsub([[\]], [[\\]]):gsub([["]], [[\"]])..'"')
    return f
+end
+
+---sets the model part on where to render the menu at
+---@param model_part modelPart
+---@return PanelRoot
+function panel:setModelpart(model_part)
+   model_part:setParentType("HUD")
+   panel.config.hud = model_part
+   return panel
 end
 
 function panel:setPage(page)
@@ -251,7 +260,6 @@ events.MOUSE_SCROLL:register(function (dir)
 end)
 
 -->====================[ Renderer ]====================<--
-panel.config.hud:setParentType("Hud")
 events.WORLD_RENDER:register(function (delta)
 
    if panel.current_page then
