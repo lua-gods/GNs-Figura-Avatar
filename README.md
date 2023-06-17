@@ -5,7 +5,7 @@ this avatar is full of scripts n things, yet it runs really fast compared to oth
 
 ##### Avatar is under the Apache License 2.0 Lisence
 # Table of Contents
-**Documentation**
+**Documentation**  
 🥶 Documented  
 😡 Undocumented
 
