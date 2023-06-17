@@ -43,23 +43,22 @@ end
 
 -->========================================[ Render Handling ]=========================================<--
 
----@param id integer -- line number
-function panelTextEdit:rebuild(id)
+function panelTextEdit:rebuild()
    self.labels = {label.newLabel(),label.newLabel(),label.newLabel(),label.newLabel()}
 end
 
----@param state PanelElementState
 ---@param anchor Vector2
 ---@param offset Vector2
-function panelTextEdit:update(state,anchor,offset)
-   self.labels[1]:setText(root:txt2theme(self.text,state)):setAnchor(anchor):setOffset(offset)
-   self.labels[2]:setText(root:txt2theme(("_"):rep(self.width),state)):setAnchor(anchor):setOffset(offset)
-   self.labels[3]:setText(root:txt2theme(("_"):rep(self.width),state)):setAnchor(anchor):setOffset(offset:add(2,0))
+function panelTextEdit:update(anchor,offset,state)
+   self.labels[1]:setText(self.text):setAnchor(anchor):setOffset(offset)
+   self.labels[2]:setText(("_"):rep(self.width)):setAnchor(anchor):setOffset(offset)
+   self.labels[3]:setText(("_"):rep(self.width)):setAnchor(anchor):setOffset(offset:add(2,0))
    if state == "active" then
-      self.labels[4]:setText(root:txt2theme("|",state)):setAnchor(anchor):setOffset(offset.x+client.getTextWidth(self.text),offset.y)
+      self.labels[4]:setText("|"):setAnchor(anchor):setOffset(offset.x+client.getTextWidth(self.text),offset.y)
    else
-      self.labels[4]:setText(root:txt2theme("",state))
+      self.labels[4]:setText("")
    end
+   return self.labels
 end
 
 function panelTextEdit:clearTasks()

@@ -42,12 +42,6 @@ local panel = {
             intro={id="minecraft:block.note_block.hat",pitch=1.5,volume=1},
             outro={id="minecraft:block.note_block.hat",pitch=1.3,volume=1},
          },
-         style = {
-            normal = '{"text":${TEXT},"color":"gray"}',
-            hover = '{"text":${TEXT},"color":"white"}',
-            active = '{"text":${TEXT},"color":"green"}',
-            disabled = '{"text":${TEXT},"color":"dark_gray"}',
-         }
       },
    },
    queue_update = false,
@@ -61,15 +55,6 @@ local built = false
 ---| "active" -- element being pressed
 ---| "disabled" -- element disabled
 
----sets the theme for the given text
----@param text string
----@param style_name PanelElementState
----@return unknown
-function panel:txt2theme(text,style_name)
-   local f = panel.config.theme.style[style_name]:gsub("${TEXT}",'"'..text:gsub([[\]], [[\\]]):gsub([["]], [[\"]])..'"')
-   return f
-end
-
 ---sets the model part on where to render the menu at
 ---@param model_part modelPart
 ---@return PanelRoot
@@ -82,11 +67,11 @@ end
 function panel:setPage(page)
    if not page then error("Page Given missing",2) end
    self:clearTasks()
-   panel.hovering = 1
    panel.selected = false
    self.last_page = self.current_page
    self.current_page = page
    table.insert(self.page_tree,page)
+   panel.hovering = #self.current_page.elements
    self:rebuild()
    return self
 end
@@ -276,6 +261,7 @@ events.WORLD_RENDER:register(function (delta)
       elseif panel.queue_update and panel.visible and built then
          panel.queue_update = false
          for i, element in pairs(panel.current_page.elements) do
+            local glow = (panel.hovering == i and not panel.selected)
             local state = "normal"            
             if i == panel.hovering then
                if panel.selected then
@@ -283,7 +269,22 @@ events.WORLD_RENDER:register(function (delta)
                   state = "hover"
                end
             end
-            element:update(state,vectors.vec2(0,-1),vectors.vec2(101,(#panel.current_page.elements-i+1)*10))
+            local labels = element:update(vectors.vec2(0,-1),vectors.vec2(101,(#panel.current_page.elements-i+1)*10),state)
+            if not labels then
+               error("Element labels not returned")
+            end
+            for _, l in pairs(labels) do
+               if glow then
+                  l:setDefaultColorRGB(1,1,1)
+                  l:setOutlineColorRGB(0.2,0.2,0.2)
+               else
+                  l:setDefaultColorRGB(0.6,0.6,0.6)
+                  l:setOutlineColorRGB(0,0,0)
+               end
+               if element.color then
+                  l:setColorRGB(element.color:unpack())
+               end
+            end
          end
       end
    end

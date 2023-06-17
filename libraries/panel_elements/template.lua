@@ -36,8 +36,9 @@ end
 ---@param state PanelElementState
 ---@param anchor Vector2
 ---@param offset Vector2
-function Template:update(state,anchor,offset)
-   self.labels[1]:setText(self.root:txt2theme(self.text,state)):setAnchor(anchor):setOffset(offset)
+function Template:update(anchor,offset,state)
+   self.labels[1]:setText(self.text):setAnchor(anchor):setOffset(offset)
+   return self.labels
 end
 
 function Template:clearTasks()

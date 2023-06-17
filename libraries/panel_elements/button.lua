@@ -33,15 +33,25 @@ function PanelButton:setText(text)
    return self
 end
 
+function PanelButton:setColorRGB(r,g,b)
+   self.color = vectors.vec3(r,g,b)
+   return self
+end
+
+function PanelButton:setColorHex(hex)
+   self.color = vectors.hexToRGB(hex)
+   return self
+end
+
 -->====================[ Task Handling ]====================<--
 
 function PanelButton:rebuild()
-   local l = label.newLabel()
-   self.labels = {l}
+   self.labels = {label.newLabel()}
 end
 
-function PanelButton:update(state,anchor,offset)
-   self.labels[1]:setText(self.root:txt2theme(self.text,state)):setAnchor(anchor):setOffset(offset)
+function PanelButton:update(anchor,offset,state)
+   self.labels[1]:setText(self.text):setAnchor(anchor):setOffset(offset)
+   return self.labels
 end
 
 function PanelButton:clearTasks()

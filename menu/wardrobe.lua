@@ -9,6 +9,11 @@ local clothing_type = {
 
 local host_clothes = {}
 
+local button = panel.elements.button.new(panel)
+button:setText("Sync").ON_PRESS:register(function ()
+   pings.syncClothing(table.unpack(host_clothes))
+end)
+
 function pings.syncClothing(...)
    host_clothes = {...}
    for key, clothing in pairs(clothing_type) do
@@ -30,20 +35,9 @@ for i, data in pairs(clothing_type) do
    table.insert(items,e)
 end
 
-local button = panel.elements.button.new(panel)
-button:setText("Sync").ON_PRESS:register(function ()
-   pings.syncClothing(table.unpack(host_clothes))
-end)
+
 table.insert(items,button)
 
-
-local ret = panel.elements.button.new(panel)
-ret:setText("Return to Menu").ON_PRESS:register(function ()
-   panel:returnToLastPage()
-end)
-table.insert(items,ret)
-
-
 menu:appendElements(items)
-
+menu:newElement("returnButton")
 return menu
