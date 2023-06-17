@@ -7,7 +7,7 @@ local lstate = vectors.vec3()
 local state = vectors.vec3()
 local vel = vectors.vec3()
 
-mac.START:register(function ()
+mac.ENTER:register(function ()
 
 end)
 
@@ -26,7 +26,7 @@ mac.FRAME:register(function (delta)
    renderer:offsetCameraPivot(0,lv.y*0.5,0)
 end)
 
-mac.END:register(function ()
+mac.EXIT:register(function ()
     renderer:offsetCameraRot(0,0,0)
     renderer:offsetCameraPivot(0,0,0)
 end)
