@@ -71,7 +71,7 @@ end
 
 function panelTextEdit:pressed()
    self.root:update()
-   self.root:setSelectState(not self.root.selected)
+   self.root:setSelectState(not self.root.is_pressed)
    self.ON_PRESS:invoke(self)
 end
 
@@ -80,9 +80,9 @@ local k2s = require("libraries.key2stringLib")
 events.KEY_PRESS:register(function (key,status,modifier)
    ---@type paneltextedit
    if not root then return end
-   local current = root.current_page.elements[root.hovering]
+   local current = root.current_page.elements[root.selected_index]
    if type(current) == "paneltextedit" then
-      if root and root.selected then
+      if root and root.is_pressed then
          if status == 1 then
                local char = k2s.key2string(key,modifier)
                if char then

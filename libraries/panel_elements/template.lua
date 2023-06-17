@@ -1,4 +1,4 @@
----@class Template
+---@class PanelMargin
 ---@field root PanelRoot
 ---@field text string
 ---@field ON_PRESS KattEvent
@@ -13,9 +13,9 @@ local kitkat = require("libraries.KattEventsAPI")
 -->========================================[ API ]=========================================<--
 
 ---@param panel PanelRoot
----@return Template
+---@return PanelMargin
 function Template.new(panel)
-   ---@type Template
+   ---@type PanelMargin
    local compose = {
       root = panel,
       labels = {},

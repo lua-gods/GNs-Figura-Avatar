@@ -97,9 +97,9 @@ end
 events.MOUSE_SCROLL:register(function (dir)
    if not root then return end
    ---@type panelSlider
-   local current = root.current_page.elements[root.hovering]
+   local current = root.current_page.elements[root.selected_index]
    if type(current) == "panelslider" then
-      if root and root.selected then
+      if root and root.is_pressed then
          current.selected = (current.selected - 1 + dir) % current.count + 1
          current.root:update()
          current.ON_SLIDE:invoke(current.selected)
