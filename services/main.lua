@@ -194,6 +194,3 @@ end)
 --      end
 --   end
 --end)
-
-if not H then return end
-models.hud:setParentType("HUD")
