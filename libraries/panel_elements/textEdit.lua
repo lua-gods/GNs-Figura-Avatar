@@ -41,6 +41,11 @@ function panelTextEdit.new(panel)
    return compose
 end
 
+function panelTextEdit:setValue(text)
+   self.text = tostring(text)
+   return self
+end
+
 -->========================================[ Render Handling ]=========================================<--
 
 function panelTextEdit:rebuild()
@@ -88,7 +93,9 @@ events.KEY_PRESS:register(function (key,status,modifier)
                if char then
                   current.text = current.text .. char
                elseif key == 259 then -- backspace
-                  current.text = current.text:sub(1,#current.text-1)
+                  if #current.text > 0 then
+                     current.text = current.text:sub(1,#current.text-1)
+                  end
                elseif key == 257 then -- enter
                   current.confirmed_text = current.text
                   root:setSelectState(false)
@@ -101,7 +108,6 @@ events.KEY_PRESS:register(function (key,status,modifier)
                   current.ON_TEXT_DECLINE:invoke(current.text)
                   if not current.confirmed_text then
                      current.text = current.confirmed_text
-                     
                      current.text = ""
                   end
                   root:update()

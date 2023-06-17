@@ -5,11 +5,18 @@ local hovering
 local UUID
 local nbt
 
+local commits = {}
 local nbtPage
 
 local waiting_chat_data = false
 
 local menu = panel:newPage()
+
+local btnSelected = menu:newElement("button"):setText("Entity"):setColorHex("#d3fc7e")
+local btnUUID = menu:newElement("button"):setText("UUID"):setColorHex("#92a1b9")
+
+menu:newElement("margin")
+
 menu:newElement("button"):setText("Commit Changes")
 menu:newElement("button"):setText("View Changes")
 menu:newElement("margin")
@@ -27,16 +34,39 @@ menu:newElement("button"):setText("NBT Viewer").ON_PRESS:register(function ()
 end)
 -->==========================================[]==========================================<--
 
-local function table2page(tbl)
+local function table2page(tbl,path)
     local page = panel:newPage()
     for key, value in pairs(tbl) do
         local button = page:newElement("button"):setText(tostring(value) .. " : " .. key)
         local type = type(value)
         if type == "table" then
             button.ON_RELEASE:register(function ()
-                panel:setPage(table2page(value))
+                if path then
+                    panel:setPage(table2page(value,path .. "." .. key))
+                else
+                    panel:setPage(table2page(value,key))
+                end
+            end)
+        elseif type == "number" then
+            local setPage = panel:newPage()
+            setPage:newElement("button"):setText(key)
+            setPage:newElement("textEdit"):setValue(value)
+            local line = setPage:newElement("button"):setText("Apply")
+            line.ON_RELEASE:register(function ()
+                panel:returnToLastPage()
+                commits[path] = line.text
+            end)
+            setPage:newElement("returnButton")
+
+            button.ON_RELEASE:register(function ()
+                panel:setPage(setPage)
+                panel.selected_index = 2
             end)
         end
+    end
+    page:newElement("margin")
+    if path then
+        page:newElement("button"):setText(path)
     end
     page:newElement("returnButton")
     return page
@@ -49,10 +79,7 @@ end
 
 -->==========================================[]==========================================<--
 
-menu:newElement("margin")
 
-local btnSelected = menu:newElement("button"):setText("Entity")
-local btnUUID = menu:newElement("button"):setText("UUID")
 local btnSelector = menu:newElement("button"):setText("waiting...")
 btnSelector.ON_PRESS:register(function ()
     selected = hovering
@@ -78,7 +105,7 @@ events.CHAT_RECEIVE_MESSAGE:register(function (message)
     if waiting_chat_data then
         for i = 1, #message, 1 do
             message = message:sub(2,#message) -- trim until first word is yeeted
-            if message:sub(1,1) == " " then
+            if message:sub(1,4) == " has" then
                 message = message:sub(2,#message)-- trim off trailing space
                 --print(message)
                 waiting_chat_data = false
