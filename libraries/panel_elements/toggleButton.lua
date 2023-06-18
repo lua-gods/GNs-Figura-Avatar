@@ -37,18 +37,22 @@ function PanelToggleButton:setText(text)
 end
 -->====================[ Task Handling ]====================<--
 
-function PanelToggleButton:rebuild(id)
-   local l = label.newLabel()
-   self.labels = {l}
+function PanelToggleButton:rebuild()
+   self.labels = {
+      title=label.newLabel(),slider=label.newLabel(),handle=label.newLabel()}
 end
 
-function PanelToggleButton:update(state,anchor,offset)
-   self.labels[1]:setAnchor(anchor):setOffset(offset)
+function PanelToggleButton:update(anchor,offset)
+   self.labels.title:setText(self.text):setAnchor(anchor):setOffset(offset:copy():add(16,0))
+   self.labels.slider:setAnchor(anchor):setOffset(offset)
    if self.toggle then
-      self.labels[1]:setText(self.root:txt2theme("[-]"..self.text,state))
+      self.labels.slider:setText("[  | "):setColorHEX("#99e65f")
+      self.labels.handle:setText("[]"):setAnchor(anchor):setOffset(offset:add(4,0))
    else
-      self.labels[1]:setText(self.root:txt2theme("[+]"..self.text,state))
+      self.labels.slider:setText("|  ] "):setColorHEX("#f5555d")
+      self.labels.handle:setText("[]"):setAnchor(anchor):setOffset(offset:add(2,0))
    end
+   return self.labels
 end
 
 function PanelToggleButton:clearTasks()

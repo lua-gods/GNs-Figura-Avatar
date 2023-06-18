@@ -1,4 +1,4 @@
----@class Template
+---@class PanelMargin
 ---@field root PanelRoot
 ---@field text string
 ---@field ON_PRESS KattEvent
@@ -13,9 +13,9 @@ local kitkat = require("libraries.KattEventsAPI")
 -->========================================[ API ]=========================================<--
 
 ---@param panel PanelRoot
----@return Template
+---@return PanelMargin
 function Template.new(panel)
-   ---@type Template
+   ---@type PanelMargin
    local compose = {
       root = panel,
       labels = {},
@@ -36,8 +36,9 @@ end
 ---@param state PanelElementState
 ---@param anchor Vector2
 ---@param offset Vector2
-function Template:update(state,anchor,offset)
-   self.labels[1]:setText(self.root:txt2theme(self.text,state)):setAnchor(anchor):setOffset(offset)
+function Template:update(anchor,offset,state)
+   self.labels[1]:setText(self.text):setAnchor(anchor):setOffset(offset)
+   return self.labels
 end
 
 function Template:clearTasks()

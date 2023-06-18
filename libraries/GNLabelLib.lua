@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-field
 --[[______   __                _                 __
   / ____/ | / /___ _____ ___  (_)___ ___  ____ _/ /____  _____
  / / __/  |/ / __ `/ __ `__ \/ / __ `__ \/ __ `/ __/ _ \/ ___/
@@ -22,6 +23,7 @@ local config = {
 ---@field text string
 ---@field parent ModelPart
 ---@field scale Vector2
+---@field color Vector3
 ---@field anchor Vector2
 ---@field origin Vector2
 ---@field offset Vector2
@@ -38,8 +40,8 @@ function lib.newLabel()
       parent = config.defualt_parent,
       text = "",
       text_align = 0,
-      max_size = vectors.vec2(),
-      size = vectors.vec2(),
+      outline_color = vectors.vec3(0,0,0),
+      default_color = vectors.vec3(1,1,1),
       scale = vectors.vec2(1,1),
       anchor = vectors.vec2(),
       origin = vectors.vec2(),
@@ -60,6 +62,60 @@ function Label:setText(text)
    self.text = text
    self:updateTextDisplay()
    self:updateTransform()
+   return self
+end
+
+---Sets the color of the label in RGB
+---@param R number
+---@param G number
+---@param B number
+function Label:setColorRGB(R,G,B)
+   self.color = vectors.vec3(R,G,B)
+   self:updateTextDisplay()
+   return self
+end
+
+---Sets the color of the label in HEX
+---@param hex string
+function Label:setColorHEX(hex)
+   self.color = vectors.hexToRGB(hex)
+   self:updateTextDisplay()
+   return self
+end
+
+---Sets the default color of the label in RGB
+---@param R number
+---@param G number
+---@param B number
+function Label:setDefaultColorRGB(R,G,B)
+   self.default_color = vectors.vec3(R,G,B)
+   self:updateTextDisplay()
+   return self
+end
+
+---Sets the default color of the label in HEX
+---@param hex string
+function Label:setDefaultColorHEX(hex)
+   self.default_color = vectors.hexToRGB(hex)
+   self:updateTextDisplay()
+   return self
+end
+
+---Sets the default color of the label in RGB
+---@param R number
+---@param G number
+---@param B number
+function Label:setOutlineColorRGB(R,G,B)
+   self.outline_color = vectors.vec3(R,G,B)
+   self:updateTextDisplay()
+   return self
+end
+
+---Sets the default color of the label in HEX
+---@param hex string
+function Label:setOutlineColorHEX(hex)
+   self.outline_color = vectors.hexToRGB(hex)
+   self:updateTextDisplay()
    return self
 end
 
@@ -96,7 +152,7 @@ end
 function Label:setAnchor(x,y)
    if type(x) == "Vector2" then
       self.anchor = x:copy():mul(-0.5,0.5)
-   else 
+   else
       self.anchor = vectors.vec2(x * -0.5,y * 0.5)
    end
    self:updateTransform()
@@ -113,12 +169,6 @@ function Label:setAnchorOrigin(x,y)
    else 
       self.origin = vectors.vec2(x,y)
    end
-   self:updateTransform()
-   return self
-end
-
-function Label:setTextAlign(align)
-   self.text_align = align
    self:updateTransform()
    return self
 end
@@ -164,8 +214,12 @@ end
 
 function Label:updateTextDisplay()
    local i = 0
+   local final_color = self.default_color
+   if self.color then
+      final_color = self.color
+   end
    for task_name, task in pairs(self.tasks) do
-      task:text(self.text)
+      task:text('{"text":"'..self.text..'","color":"#'..vectors.rgbToHex(final_color)..'"}'):outlineColor(self.outline_color)
    end
    return self
 end

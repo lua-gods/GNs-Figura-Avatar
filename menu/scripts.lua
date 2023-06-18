@@ -1,9 +1,7 @@
 local panel = require("libraries.panel")
 
 local menu = panel:newPage()
-local ret = menu:newElement("button")
-ret:setText("Return to Menu").ON_PRESS:register(function () panel:returnToLastPage()end)
-table.insert(menu,ret)
+
 
 local paths = listFiles("scripts")
 
@@ -26,8 +24,6 @@ local paths = listFiles("scripts")
    end)
 end
 
-
-
-
+menu:newElement("returnButton")
 
 return menu

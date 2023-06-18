@@ -17,9 +17,10 @@ local panel = {
    SELECTED_CHANGED = kitkat.newEvent(),
    RENDER_UPDATE = kitkat.newEvent(),
 
-   hovering = 1,
+   scroll_dir = 0,
+   selected_index = 1,
    visible = false,
-   selected = false,
+   is_pressed = false,
    current_page = nil,
    page_tree = {},
    elements = { -- static anotation support :(
@@ -30,7 +31,7 @@ local panel = {
    },
 
    config = {
-      hud = models.menu,
+      hud = nil,
       line_height = 11,
       select = keybinds:newKeybind("Panel Select","key.keyboard.grave.accent",false),
       theme = {
@@ -42,12 +43,6 @@ local panel = {
             intro={id="minecraft:block.note_block.hat",pitch=1.5,volume=1},
             outro={id="minecraft:block.note_block.hat",pitch=1.3,volume=1},
          },
-         style = {
-            normal = '{"text":${TEXT},"color":"gray"}',
-            hover = '{"text":${TEXT},"color":"white"}',
-            active = '{"text":${TEXT},"color":"green"}',
-            disabled = '{"text":${TEXT},"color":"dark_gray"}',
-         }
       },
    },
    queue_update = false,
@@ -61,30 +56,35 @@ local built = false
 ---| "active" -- element being pressed
 ---| "disabled" -- element disabled
 
----sets the theme for the given text
----@param text string
----@param style_name PanelElementState
----@return unknown
-function panel:txt2theme(text,style_name)
-   local f = panel.config.theme.style[style_name]:gsub("${TEXT}",'"'..text:gsub([[\]], [[\\]]):gsub([["]], [[\"]])..'"')
-   return f
+---sets the model part on where to render the menu at
+---@param model_part ModelPart
+---@return PanelRoot
+function panel:setModelpart(model_part)
+   model_part:setParentType("HUD")
+   panel.config.hud = model_part
+   return panel
 end
 
 function panel:setPage(page)
    if not page then error("Page Given missing",2) end
-   self:clearTasks()
-   panel.hovering = 1
-   panel.selected = false
-   self.last_page = self.current_page
-   self.current_page = page
-   table.insert(self.page_tree,page)
-   self:rebuild()
+   if page ~= self.current_page then
+      self:clearTasks()
+      panel.is_pressed = false
+      self.last_page = self.current_page
+      self.current_page = page
+      table.insert(self.page_tree,page)
+      panel.selected_index = #self.current_page.elements
+      self:rebuild()
+   end
    return self
 end
 
 function panel:returnToLastPage()
-   table.remove(self.page_tree,#self.page_tree)
-   panel:setPage(self.page_tree[#self.page_tree])
+   if #self.page_tree > 1 then
+      table.remove(self.page_tree,#self.page_tree)
+      panel:setPage(self.page_tree[#self.page_tree])
+      table.remove(self.page_tree,#self.page_tree)
+   end
    return self
 end
 
@@ -125,7 +125,7 @@ function panel.UIplaySound(sound,pitch,volume)
 end
 
 function panel:setSelectState(selected)
-   self.selected = selected
+   self.is_pressed = selected
    if selected then
       panel.UIplaySound(panel.config.theme.sounds.select.id,panel.config.theme.sounds.select.pitch,panel.config.theme.sounds.select.volume)
    else
@@ -196,14 +196,19 @@ end
 ---comment
 function PanelPage:appendElement(instance)
    table.insert(self.elements,instance)
-   return PanelPage
+   return self
 end
 
 function PanelPage:appendElements(tabl)
    for key, value in pairs(tabl) do
       table.insert(self.elements,value)
    end
-   return PanelPage
+   return self
+end
+
+function PanelPage:clearAllEmenets()
+   self.elements = {}
+   return self
 end
 
 -->====================[ Input Handler ]====================<--
@@ -211,7 +216,7 @@ end
 events.KEY_PRESS:register(function (key,status,modifier)
    if status == 1 then
       if panel.visible and key == 256 then
-         if panel.visible and not panel.selected then
+         if panel.visible and not panel.is_pressed then
             panel:setVisible(false)
          end
          return true
@@ -222,7 +227,7 @@ end)
 
 panel.config.select.press = function ()
    if panel.visible and panel.current_page then
-      local element = panel.current_page.elements[panel.hovering]
+      local element = panel.current_page.elements[panel.selected_index]
       element:pressed()
    end
    if not panel.visible then panel:setVisible(true) end
@@ -231,8 +236,8 @@ end
 
 
 panel.config.select.release = function ()
-   if panel.visible and panel.selected then
-      local element = panel.current_page.elements[panel.hovering]
+   if panel.visible and panel.is_pressed then
+      local element = panel.current_page.elements[panel.selected_index]
       element:released()
    end
 end
@@ -240,10 +245,19 @@ end
 events.MOUSE_SCROLL:register(function (dir)
    if not panel.current_page then return end
    if panel.visible then
-      if not panel.selected then
-         panel.UIplaySound(panel.config.theme.sounds.hover.id,panel.config.theme.sounds.hover.pitch,panel.config.theme.sounds.hover.volume)
-         panel.hovering = (panel.hovering - dir - 1) % #panel.current_page.elements + 1
-         panel.SELECTED_CHANGED:invoke(panel.hovering)
+      dir = -math.floor(dir + 0.5)
+      if not panel.is_pressed then
+         panel.selected_index = math.clamp(panel.selected_index + dir,1,#panel.current_page.elements)
+         panel.SELECTED_CHANGED:invoke(panel.selected_index)
+         panel.scroll_dir = dir
+         if panel.current_page and panel.current_page.elements[panel.selected_index] then
+            if panel.current_page.elements[panel.selected_index].hover then
+               local r = panel.current_page.elements[panel.selected_index].hover(panel.current_page.elements[panel.selected_index],panel)
+               if type(r) == "number" then
+                  panel.selected_index = math.clamp(r,1,#panel.current_page.elements)
+               end
+            end
+         end
          panel:update()
       end
    end
@@ -251,7 +265,6 @@ events.MOUSE_SCROLL:register(function (dir)
 end)
 
 -->====================[ Renderer ]====================<--
-panel.config.hud:setParentType("Hud")
 events.WORLD_RENDER:register(function (delta)
 
    if panel.current_page then
@@ -268,14 +281,30 @@ events.WORLD_RENDER:register(function (delta)
       elseif panel.queue_update and panel.visible and built then
          panel.queue_update = false
          for i, element in pairs(panel.current_page.elements) do
+            local glow = (panel.selected_index == i and not panel.is_pressed)
             local state = "normal"            
-            if i == panel.hovering then
-               if panel.selected then
+            if i == panel.selected_index then
+               if panel.is_pressed then
                   state = "active" else
                   state = "hover"
                end
             end
-            element:update(state,vectors.vec2(0,-1),vectors.vec2(101,(#panel.current_page.elements-i+1)*10))
+            local labels = element:update(vectors.vec2(0,-1),vectors.vec2(95,(math.min(#panel.current_page.elements,client:getScaledWindowSize().y/20)-i+1)*10 + panel.selected_index * 10),state)
+            if not labels then
+               error("Element labels not returned")
+            end
+            for _, l in pairs(labels) do
+               if glow then
+                  l:setDefaultColorRGB(1,1,1)
+                  l:setOutlineColorRGB(0.2,0.2,0.2)
+               else
+                  l:setDefaultColorRGB(0.6,0.6,0.6)
+                  l:setOutlineColorRGB(0,0,0)
+               end
+               if element.color then
+                  l:setColorRGB(element.color:unpack())
+               end
+            end
          end
       end
    end

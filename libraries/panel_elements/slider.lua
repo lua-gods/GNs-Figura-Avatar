@@ -12,6 +12,7 @@ panelSlider.__type = "panelslider"
 
 local label = require("libraries.GNLabelLib")
 local kitkat = require("libraries.KattEventsAPI")
+---@type PanelRoot
 local root = nil
 
 -->========================================[ API ]=========================================<--
@@ -44,7 +45,7 @@ end
 ---@param state PanelElementState
 ---@param anchor Vector2
 ---@param offset Vector2
-function panelSlider:update(state,anchor,offset)
+function panelSlider:update(anchor,offset,state)
    if state == "active" then
       local compose = ""
       for i = 1, self.count, 1 do
@@ -54,11 +55,11 @@ function panelSlider:update(state,anchor,offset)
             compose = compose.."•"
          end
       end
-      self.labels[1]:setText(self.root:txt2theme(compose.." " .. self.text,state)):setAnchor(anchor):setOffset(offset)
+      self.labels[1]:setText(compose.." " .. self.text):setAnchor(anchor):setOffset(offset)
    else
-      self.labels[1]:setText(self.root:txt2theme("["..self.selected.."] " .. self.text,state)):setAnchor(anchor):setOffset(offset)
+      self.labels[1]:setText("["..self.selected.."] " .. self.text):setAnchor(anchor):setOffset(offset)
    end
-   
+   return self.labels
 end
 
 function panelSlider:clearTasks()
@@ -96,9 +97,9 @@ end
 events.MOUSE_SCROLL:register(function (dir)
    if not root then return end
    ---@type panelSlider
-   local current = root.current_page.elements[root.hovering]
+   local current = root.current_page.elements[root.selected_index]
    if type(current) == "panelslider" then
-      if root and root.selected then
+      if root and root.is_pressed then
          current.selected = (current.selected - 1 + dir) % current.count + 1
          current.root:update()
          current.ON_SLIDE:invoke(current.selected)

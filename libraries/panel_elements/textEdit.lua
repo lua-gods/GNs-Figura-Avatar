@@ -41,25 +41,29 @@ function panelTextEdit.new(panel)
    return compose
 end
 
+function panelTextEdit:setValue(text)
+   self.text = tostring(text)
+   return self
+end
+
 -->========================================[ Render Handling ]=========================================<--
 
----@param id integer -- line number
-function panelTextEdit:rebuild(id)
+function panelTextEdit:rebuild()
    self.labels = {label.newLabel(),label.newLabel(),label.newLabel(),label.newLabel()}
 end
 
----@param state PanelElementState
 ---@param anchor Vector2
 ---@param offset Vector2
-function panelTextEdit:update(state,anchor,offset)
-   self.labels[1]:setText(root:txt2theme(self.text,state)):setAnchor(anchor):setOffset(offset)
-   self.labels[2]:setText(root:txt2theme(("_"):rep(self.width),state)):setAnchor(anchor):setOffset(offset)
-   self.labels[3]:setText(root:txt2theme(("_"):rep(self.width),state)):setAnchor(anchor):setOffset(offset:add(2,0))
+function panelTextEdit:update(anchor,offset,state)
+   self.labels[1]:setText(self.text):setAnchor(anchor):setOffset(offset)
+   self.labels[2]:setText(("_"):rep(self.width)):setAnchor(anchor):setOffset(offset)
+   self.labels[3]:setText(("_"):rep(self.width)):setAnchor(anchor):setOffset(offset:add(2,0))
    if state == "active" then
-      self.labels[4]:setText(root:txt2theme("|",state)):setAnchor(anchor):setOffset(offset.x+client.getTextWidth(self.text),offset.y)
+      self.labels[4]:setText("|"):setAnchor(anchor):setOffset(offset.x+client.getTextWidth(self.text),offset.y)
    else
-      self.labels[4]:setText(root:txt2theme("",state))
+      self.labels[4]:setText("")
    end
+   return self.labels
 end
 
 function panelTextEdit:clearTasks()
@@ -72,7 +76,7 @@ end
 
 function panelTextEdit:pressed()
    self.root:update()
-   self.root:setSelectState(not self.root.selected)
+   self.root:setSelectState(not self.root.is_pressed)
    self.ON_PRESS:invoke(self)
 end
 
@@ -81,15 +85,17 @@ local k2s = require("libraries.key2stringLib")
 events.KEY_PRESS:register(function (key,status,modifier)
    ---@type paneltextedit
    if not root then return end
-   local current = root.current_page.elements[root.hovering]
+   local current = root.current_page.elements[root.selected_index]
    if type(current) == "paneltextedit" then
-      if root and root.selected then
+      if root and root.is_pressed then
          if status == 1 then
                local char = k2s.key2string(key,modifier)
                if char then
                   current.text = current.text .. char
                elseif key == 259 then -- backspace
-                  current.text = current.text:sub(1,#current.text-1)
+                  if #current.text > 0 then
+                     current.text = current.text:sub(1,#current.text-1)
+                  end
                elseif key == 257 then -- enter
                   current.confirmed_text = current.text
                   root:setSelectState(false)
@@ -102,7 +108,6 @@ events.KEY_PRESS:register(function (key,status,modifier)
                   current.ON_TEXT_DECLINE:invoke(current.text)
                   if not current.confirmed_text then
                      current.text = current.confirmed_text
-                     
                      current.text = ""
                   end
                   root:update()

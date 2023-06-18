@@ -73,6 +73,31 @@ local function call_func(event,...)
 end
 
 -- find grid
+local function parseSign(block)
+    local data = block:getEntityData()
+    if data then
+        if data.front_text then
+            if data.front_text.messages then
+                return tostring(data.front_text.messages[1] or ""),
+                       tostring(data.front_text.messages[2] or ""),
+                       tostring(data.front_text.messages[3] or ""),
+                       tostring(data.front_text.messages[4] or "")
+            end
+        end
+        if data.back_text then
+            if data.back_text.messages then
+                return tostring(data.back_text.messages[1] or ""),
+                       tostring(data.back_text.messages[2] or ""),
+                       tostring(data.back_text.messages[3] or ""),
+                       tostring(data.back_text.messages[4] or "")
+            end
+        end
+        if data.Text1 and data.Text2 and data.Text3 and data.Text4 then
+            return tostring(data.Text1), tostring(data.Text2), tostring(data.Text3), tostring(data.Text4)
+        end
+    end
+end
+
 local grid_found = false
 local function render_grid(pos)
     if not need_to_render_grid then
@@ -125,14 +150,14 @@ local function find_grid(pos)
         for _, v in ipairs(config.special_signs_pos) do
             local bl = world.getBlockState(grid_skull_pos + v + config.match_offset)
             if bl.id:match("sign") then
-                local data = bl:getEntityData()
-                if data then
-                    if data.Text1:match("grid_mode") then
-                        local x, y, z = tonumber(data.Text2:match("[%d-.]+")) or 0, tonumber(data.Text3:match("[%d-.]+")) or 0, tonumber(data.Text4:match("[%d-.]+")) or 0
+                local t1, t2, t3, t4 = parseSign(bl)
+                if t1 then
+                    if t1:match("grid_mode") then
+                        local x, y, z = tonumber(t2:match("[%d-.]+")) or 0, tonumber(t3:match("[%d-.]+")) or 0, tonumber(t4:match("[%d-.]+")) or 0
                         if x and y and z then
-                            if data.Text2:match("~") then x = x + grid_skull_pos.x end
-                            if data.Text3:match("~") then y = y + grid_skull_pos.y end
-                            if data.Text4:match("~") then z = z + grid_skull_pos.z end
+                            if t2:match("~") then x = x + grid_skull_pos.x end
+                            if t3:match("~") then y = y + grid_skull_pos.y end
+                            if t4:match("~") then z = z + grid_skull_pos.z end
                             grid_mode_sign_pos = vec(x, y, z)
                         end
                     end
@@ -171,13 +196,13 @@ function events.world_tick()
     if override ~= "" then
         new_mode_to_set, parameters_to_set = read_mode(override)
     elseif bl.id:match("sign") then
-        local data = bl:getEntityData()
-        if data then
+        local t1, t2, t3, t4 = parseSign(bl)
+        if t1 then
             new_mode_to_set, parameters_to_set = read_mode(
-                (tostring(data.Text1):match('{"text":"(.*)"}') or "")..
-                (tostring(data.Text2):match('{"text":"(.*)"}') or "")..
-                (tostring(data.Text3):match('{"text":"(.*)"}') or "")..
-                (tostring(data.Text4):match('{"text":"(.*)"}') or "")
+                (t1:match('{"text":"(.*)"}') or "")..
+                (t2:match('{"text":"(.*)"}') or "")..
+                (t3:match('{"text":"(.*)"}') or "")..
+                (t4:match('{"text":"(.*)"}') or "")
             )
         end
     else
