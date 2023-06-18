@@ -7,13 +7,13 @@ table.insert(menu,ret)
 
 local paths = listFiles("scripts")
 
-for key, path in pairs(paths) do
-   local name = ""
-   for i = #path, 1, -1 do
-      local char = path:sub(i,i)
-      if char == "." then break end
-      name = char .. name
-   end
+   for key, path in pairs(paths) do
+      local name = ""
+      for i = #path, 1, -1 do
+         local char = path:sub(i,i)
+         if char == "." then break end
+         name = char .. name
+      end
    ---@type macroScript
    local script = require(path)
    menu:newElement("toggleButton"):setText(name).ON_TOGGLE:register(function (toggle)

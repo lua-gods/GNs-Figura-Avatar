@@ -39,7 +39,7 @@ twoLeadTrail.__index = twoLeadTrail
 
 local smearID = 0
 ---Creates a new Trail
----@param texture Texture
+---@param texture Texture?
 ---@return twoLeadTrail
 function lib:newTwoLeadTrail(texture)
    if type(texture) ~= "Texture" then texture = textures["trailworld.gradient"] end
