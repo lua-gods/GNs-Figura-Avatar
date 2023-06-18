@@ -309,5 +309,4 @@ events.WORLD_RENDER:register(function (delta)
       end
    end
 end)
-
 return panel

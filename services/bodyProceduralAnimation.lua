@@ -65,6 +65,32 @@ events.RENDER:register(function (delta, context)
    end
 end)
 
+local blink_timer = 0
+
 events.TICK:register(function ()
-   if math.random() < 0.02 then animations.gn.blink:play() end
+   blink_timer = blink_timer - 1
+   if blink_timer < 0 then
+      animations.gn.blink:play()
+      blink_timer = math.random(0.5,3) * 20
+   end
+end)
+
+local wait_timer = 0
+local wait_animations = {
+   animations.gn.arms,
+   animations.gn.scratch,
+}
+
+function pings.APAOEKAO(id)
+   wait_animations[id]:play()
+end
+
+events.TICK:register(function ()
+   if IS_AFK and H then
+      wait_timer = wait_timer - 1
+      if wait_timer < 0 then
+         pings.APAOEKAO(math.random(1,#wait_animations))
+         wait_timer = math.random(5,30) * 20
+      end
+   end
 end)
