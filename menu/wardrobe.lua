@@ -9,19 +9,21 @@ local clothing_type = {
 
 local host_clothes = {}
 
-local button = panel.elements.button.new(panel)
-button:setText("Sync").ON_PRESS:register(function ()
-   pings.syncClothing(table.unpack(host_clothes))
-end)
 
-function pings.syncClothing(...)
+function pings.GNSYNCCLOTHING(...)
    host_clothes = {...}
    for key, clothing in pairs(clothing_type) do
       clothing[2]:setSelected(host_clothes[key])
    end
 end
 
-if not H then return end
+if not host:isHost() then return end
+
+local button = panel.elements.button.new(panel)
+button:setText("Sync").ON_PRESS:register(function ()
+   pings.GNSYNCCLOTHING(table.unpack(host_clothes))
+end)
+
 local menu = panel:newPage()
 local items = {
 }

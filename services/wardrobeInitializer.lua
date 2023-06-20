@@ -6,3 +6,4 @@ end
 for _, value in pairs(listFiles("weapons",true)) do
    require(value)
 end
+require("menu.wardrobe")
