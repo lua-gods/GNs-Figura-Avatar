@@ -1,7 +1,7 @@
 local mac = require("libraries.macroScriptLib"):newScript()
 
 keybinds:newKeybind("GNERRS",keybinds:getVanillaKey("key.use")).press = function ()
-   if mac.is_active and player:isLoaded() then
+   if mac.is_active and player:isLoaded() and not player:isSneaking() then
       local target = player:getTargetedEntity()
       if target then
          if player:getVehicle() then
