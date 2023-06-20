@@ -1,4 +1,4 @@
-local mac = require("libraries.macroScriptLib"):newScript()
+local mac = require("libraries.macroScriptLib"):newScript("gn:right_click_ride")
 
 keybinds:newKeybind("GNERRS",keybinds:getVanillaKey("key.use")).press = function ()
    if mac.is_active and player:isLoaded() and not player:isSneaking() then

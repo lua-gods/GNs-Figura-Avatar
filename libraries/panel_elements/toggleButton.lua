@@ -35,6 +35,14 @@ function PanelToggleButton:setText(text)
    self.root:update()
    return self
 end
+
+function PanelToggleButton:setToggle(toggle,raw)
+   self.toggle = toggle
+   if not raw then
+      self.ON_TOGGLE:invoke(self.toggle)
+   end
+   return self
+end
 -->====================[ Task Handling ]====================<--
 
 function PanelToggleButton:rebuild()

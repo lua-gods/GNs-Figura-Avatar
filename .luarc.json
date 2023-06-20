@@ -276,7 +276,8 @@
       //;"code-after-break",
       //;"empty-block",
       //;"redundant-return",
-      "trailing-space"    // Personal preference.
+      "trailing-space",
+            "assign-type-mismatch"    // Personal preference.
       //;"unreachable-code",
       //;"unused-function",
       //;"unused-label",

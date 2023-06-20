@@ -1,4 +1,4 @@
-local mac = require("libraries.macroScriptLib"):newScript()
+local mac = require("libraries.macroScriptLib"):newScript("gn:wobbly_camera")
 
 local loc_vel = vectors.vec3()
 

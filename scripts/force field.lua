@@ -1,4 +1,4 @@
-local mac = require("libraries.macroScriptLib"):newScript()
+local mac = require("libraries.macroScriptLib"):newScript("gn:forcefield")
 
 local trailMaker = require("libraries.GNtrailLib")
 

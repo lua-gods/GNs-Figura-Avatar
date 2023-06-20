@@ -1,4 +1,4 @@
-local mac = require("libraries.macroScriptLib"):newScript()
+local mac = require("libraries.macroScriptLib"):newScript("template:empty")
 
 mac.ENTER:register(function ()
    print("ENTER")

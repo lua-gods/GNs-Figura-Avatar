@@ -1,4 +1,4 @@
-local mac = require("libraries.macroScriptLib"):newScript()
+local mac = require("libraries.macroScriptLib"):newScript("gn:movement_override")
 local lpos
 local pos
 local vel = vectors.vec3()

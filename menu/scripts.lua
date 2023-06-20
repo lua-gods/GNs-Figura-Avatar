@@ -13,14 +13,14 @@ local paths = listFiles("scripts")
          name = char .. name
       end
    ---@type macroScript
+   
+   config:setName("GN Macros States")
    local script = require(path)
-   menu:newElement("toggleButton"):setText(name).ON_TOGGLE:register(function (toggle)
-      script.is_active = toggle
-      if toggle then
-         script.ENTER:invoke()
-      else
-         script.EXIT:invoke()
-      end
+   local state = config:load(script.namespace)
+   if not state then state = false end
+
+   menu:newElement("toggleButton"):setToggle(state):setText(name).ON_TOGGLE:register(function (toggle)
+      script:setActive(toggle)
    end)
 end
 
