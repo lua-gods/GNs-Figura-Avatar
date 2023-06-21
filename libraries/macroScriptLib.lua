@@ -2,6 +2,7 @@ local lib = {}
 
 local katt = require("libraries.KattEventsAPI")
 local ms = {}
+local init_check = {}
 
 ---@class macroScript
 ---@field TICK KattEvent
@@ -14,22 +15,31 @@ local macroScript = {}
 macroScript.__index = macroScript
 
 function lib:newScript(namespace)
-   config:setName("GN Macros States")
-   local state = config:load(namespace)
-   if not state then state = false end
    ---@type macroScript
    local compose = {
       namespace = namespace,
-      is_active = state,
+      is_active = false,
       TICK = katt.newEvent(),
       FRAME = katt.newEvent(),
       ENTER = katt.newEvent(),
       EXIT = katt.newEvent(),
    }
    setmetatable(compose,macroScript)
+   
    table.insert(ms,compose)
+   table.insert(init_check,compose)
    return compose
 end
+
+events.TICK:register(function ()
+   for id, script in pairs(init_check) do
+      config:setName("GN Macros States")
+      local state = config:load(script.namespace)
+      if not state then state = false end
+      script:setActive(state)
+      table.remove(init_check,id)
+   end
+end)
 
 function macroScript:setActive(is_active)
    if self.is_active ~= is_active then

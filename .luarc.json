@@ -277,7 +277,8 @@
       //;"empty-block",
       //;"redundant-return",
       "trailing-space",
-            "assign-type-mismatch"    // Personal preference.
+            "assign-type-mismatch",
+            "param-type-mismatch"    // Personal preference.
       //;"unreachable-code",
       //;"unused-function",
       //;"unused-label",
