@@ -36,13 +36,18 @@ function PanelToggleButton:setText(text)
    return self
 end
 
-function PanelToggleButton:setToggle(toggle,raw)
-   self.toggle = toggle
-   if not raw then
-      self.ON_TOGGLE:invoke(self.toggle)
-   end
+function PanelToggleButton:setColorRGB(r,g,b)
+   self.color = vectors.vec3(r,g,b)
+   self.root:update()
    return self
 end
+
+function PanelToggleButton:setColorHex(hex)
+   self.color = vectors.hexToRGB(hex)
+   self.root:update()
+   return self
+end
+
 -->====================[ Task Handling ]====================<--
 
 function PanelToggleButton:rebuild()

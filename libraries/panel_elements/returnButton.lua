@@ -26,6 +26,18 @@ function ReturnPanelButton.new(panel)
    return compose
 end
 
+function ReturnPanelButton:setColorRGB(r,g,b)
+   self.color = vectors.vec3(r,g,b)
+   self.root:update()
+   return self
+end
+
+function ReturnPanelButton:setColorHex(hex)
+   self.color = vectors.hexToRGB(hex)
+   self.root:update()
+   return self
+end
+
 -->====================[ Task Handling ]====================<--
 
 function ReturnPanelButton:rebuild()

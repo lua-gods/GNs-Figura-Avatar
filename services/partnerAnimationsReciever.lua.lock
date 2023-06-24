@@ -1,0 +1,104 @@
+local model = models.gn.base
+
+local Head = model.Torso.Head
+local Body = model.Torso.Body
+
+local LeftArm = model.Torso.LeftArm
+local RightArm = model.Torso.RightArm
+
+local LeftLeg = model.LeftLeg
+local RightLeg = model.RightLeg
+
+local partnerUUID = nil
+
+function events.mouse_press(mouseButton)
+    if mouseButton == 1 then
+        if player:isLoaded() then
+            if player:getTargetedEntity() ~= nil then
+                pings.setAnimPartner(player:getTargetedEntity():getUUID())
+            else
+                pings.setAnimPartner(nil)
+                pings.resetPartnerRot()
+            end
+        end
+    end
+end
+
+function pings.setAnimPartner(UUID)
+    partnerUUID = UUID
+end
+
+function pings.resetPartnerRot()
+    Head:setRot()
+    Body:setRot()
+    LeftArm:setRot()
+    RightArm:setRot()
+    LeftLeg:setRot()
+    RightLeg:setRot()
+    model:setRot()
+    Head:setPos()
+    Body:setPos()
+    LeftArm:setPos()
+    RightArm:setPos()
+    LeftLeg:setPos()
+    RightLeg:setPos()
+    model:setPos()
+end
+
+function events.render()
+    if partnerUUID ~= nil then
+        for i, v in pairs(world:getPlayers()) do
+            if v:getUUID() == partnerUUID then
+                local newRotData = v:getVariable("PartnerAnimRotData")
+                local newPosData = v:getVariable("PartnerAnimPosData")
+
+                setRotations(newRotData)
+                setPositions(newPosData)
+
+                break
+            end
+        end
+    end
+end
+
+function events.tick()
+    moveIfToFar()
+
+    if player:isSneaking() and partnerUUID ~= nil then
+        partnerUUID = nil
+        pings.resetPartnerRot()
+    end
+end
+
+function moveIfToFar()
+    if host:isHost() and partnerUUID ~= nil then
+        local partner = world:getEntity(partnerUUID)
+    if (player:getPos() - partner:getPos()):length() > 0.1 then
+        host:sendChatCommand("/tp @s " .. partnerUUID)
+    end
+    end
+end
+
+function setRotations(newRotData)
+    if newRotData ~= nil then
+        Head:setRot(newRotData[1])
+        Body:setRot(newRotData[2])
+        LeftArm:setRot(newRotData[3])
+        RightArm:setRot(newRotData[4])
+        LeftLeg:setRot(newRotData[5])
+        RightLeg:setRot(newRotData[6])
+        model:setRot(newRotData[7])
+    end
+
+end
+function setPositions(newPosData)
+    if newPosData ~= nil then
+        Head:setPos(newPosData[1])
+        Body:setPos(newPosData[2])
+        LeftArm:setPos(newPosData[3])
+        RightArm:setPos(newPosData[4])
+        LeftLeg:setPos(newPosData[5])
+        RightLeg:setPos(newPosData[6])
+        model:setPos(newPosData[7])
+    end
+end

@@ -4,9 +4,10 @@
  / / __/  |/ / __ `/ __ `__ \/ / __ `__ \/ __ `/ __/ _ \/ ___/
 / /_/ / /|  / /_/ / / / / / / / / / / / / /_/ / /_/  __(__  )
 \____/_/ |_/\__,_/_/ /_/ /_/_/_/ /_/ /_/\__,_/\__/\___/____]]
-local lib = {}
+local katt = require("libraries.KattEventsAPI")
+local lib = {SCREEN_RESIZED = katt.newEvent()}
 local labels = {}
-if not H then
+if not host:isHost() then
    return
 end
 local config = {
@@ -113,8 +114,14 @@ end
 
 ---Sets the default color of the label in HEX
 ---@param hex string
-function Label:setOutlineColorHEX(hex)
+function Label:setOutlineColorHex(hex)
    self.outline_color = vectors.hexToRGB(hex)
+   self:updateTextDisplay()
+   return self
+end
+
+function Label:resetColor()
+   self.color = nil
    self:updateTextDisplay()
    return self
 end
@@ -205,11 +212,14 @@ end
 function Label:updateTransform()
    local i = 0
    for task_name, task in pairs(self.tasks) do
-      local pos = vectors.vec2(self.anchor.x-0.5,self.anchor.y-0.5)
-      *client:getScaledWindowSize()
-      task:pos(pos.x+self.offset.x,pos.y+self.offset.y,0):scale(self.scale.x,self.scale.y,1)
+      local pos = lib.pos2UI(self.offset.x,self.offset.y,self.anchor.x,self.anchor.y)
+      task:pos(pos.x,pos.y,0):scale(self.scale.x,self.scale.y,1)
    end
    return self
+end
+
+function lib.pos2UI(ox,oy,ax,ay)
+   return vectors.vec2(ax-0.5,ay-0.5)*client:getScaledWindowSize() + vectors.vec2(ox,oy)
 end
 
 function Label:updateTextDisplay()
@@ -229,6 +239,7 @@ events.POST_WORLD_RENDER:register(function (delta)
    local window_size = client:getWindowSize()
    if last_window_size ~= window_size then
       last_window_size = window_size
+      lib.SCREEN_RESIZED:invoke(window_size)
       for _, label in pairs(labels) do
          label:updateTransform()
       end

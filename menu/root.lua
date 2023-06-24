@@ -10,4 +10,7 @@ end)
 menu:newElement("button"):setText("Scripts").ON_PRESS:register(function ()
    panel:setPage(require("menu.scripts"))
 end)
+menu:newElement("button"):setText("End Gateway Generator").ON_PRESS:register(function ()
+   panel:setPage(require("menu.endgateway"))
+end)
 return menu

@@ -43,6 +43,25 @@ end
 
 function panelTextEdit:setValue(text)
    self.text = tostring(text)
+   root:update()
+   return self
+end
+
+function panelTextEdit:setPlaceholderText(text)
+   self.placeholder = tostring(text)
+   root:update()
+   return self
+end
+
+function panelTextEdit:setColorRGB(r,g,b)
+   self.color = vectors.vec3(r,g,b)
+   self.root:update()
+   return self
+end
+
+function panelTextEdit:setColorHex(hex)
+   self.color = vectors.hexToRGB(hex)
+   self.root:update()
    return self
 end
 
@@ -55,7 +74,11 @@ end
 ---@param anchor Vector2
 ---@param offset Vector2
 function panelTextEdit:update(anchor,offset,state)
-   self.labels[1]:setText(self.text):setAnchor(anchor):setOffset(offset)
+   if self.text == "" and state ~= "active" then
+      self.labels[1]:setText(self.placeholder):setAnchor(anchor):setOffset(offset):setColorRGB(0.5,0.5,0.5)
+   else
+      self.labels[1]:setText(self.text):setAnchor(anchor):setOffset(offset):resetColor()
+   end
    self.labels[2]:setText(("_"):rep(self.width)):setAnchor(anchor):setOffset(offset)
    self.labels[3]:setText(("_"):rep(self.width)):setAnchor(anchor):setOffset(offset:add(2,0))
    if state == "active" then

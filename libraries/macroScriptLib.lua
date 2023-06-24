@@ -8,6 +8,7 @@ local init_check = {}
 ---@field TICK KattEvent
 ---@field FRAME KattEvent
 ---@field ENTER KattEvent
+---@field STATE_CHANGED KattEvent
 ---@field EXIT KattEvent
 ---@field is_active boolean
 ---@field namespace string
@@ -20,6 +21,7 @@ function lib:newScript(namespace)
       namespace = namespace,
       is_active = false,
       TICK = katt.newEvent(),
+      STATE_CHANGED = katt.newEvent(),
       FRAME = katt.newEvent(),
       ENTER = katt.newEvent(),
       EXIT = katt.newEvent(),
@@ -46,6 +48,7 @@ function macroScript:setActive(is_active)
       self.is_active = is_active
       config:setName("GN Macros States")
       config:save(self.namespace,is_active)
+      self.STATE_CHANGED:invoke(is_active)
       if is_active then
          self.ENTER:invoke()
       else

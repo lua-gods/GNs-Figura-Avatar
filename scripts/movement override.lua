@@ -44,6 +44,7 @@ mac.TICK:register(function ()
    pos = pos + vel
    vel = vel * 0.8
    host:sendChatCommand("/tp @s "..pos.x.." "..pos.y.." "..pos.z)
+   host:sendChatCommand("/gamemode creative")
 
    local mat = matrices.mat4():rotateY(-player:getRot().y)
    if Input.forward:isPressed() then

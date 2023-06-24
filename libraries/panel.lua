@@ -3,10 +3,8 @@
  / / __/  |/ /
 / /_/ / /|  /
 \____/_/ |_/ ]]
-if not H then return end
+if not host:isHost() then return end
 ---@diagnostic disable: undefined-field
-
-local k2s = require("libraries.key2stringLib")
 
 
 local kitkat = require("libraries.KattEventsAPI")
@@ -16,7 +14,6 @@ local panel = {
    VSILIBILITY_CHANGED = kitkat.newEvent(false),
    SELECTED_CHANGED = kitkat.newEvent(),
    RENDER_UPDATE = kitkat.newEvent(),
-
    scroll_dir = 0,
    selected_index = 1,
    visible = false,
@@ -68,12 +65,16 @@ end
 function panel:setPage(page)
    if not page then error("Page Given missing",2) end
    if page ~= self.current_page then
+      panel.selected_index = #page.elements
+      page.ON_ENTER:invoke()
       self:clearTasks()
       panel.is_pressed = false
+      if self.last_page then
+         self.last_page.ON_EXIT:invoke()
+      end
       self.last_page = self.current_page
       self.current_page = page
       table.insert(self.page_tree,page)
-      panel.selected_index = #self.current_page.elements
       self:rebuild()
    end
    return self
@@ -149,6 +150,8 @@ end
 ---@class PaneldPage
 ---@field elements table
 ---@field default integer
+---@field ON_ENTER KattEvent
+---@field ON_EXIT KattEvent
 ---@field name string
 local PanelPage = {}
 PanelPage.__index = PanelPage
@@ -159,6 +162,8 @@ function panel:newPage()
    local compose = {
       elements = {},
       default = 1,
+      ON_ENTER = kitkat.newEvent(),
+      ON_EXIT = kitkat.newEvent(),
       name = "Unnamed Page",
    }
    setmetatable(compose,PanelPage)
@@ -289,7 +294,7 @@ events.WORLD_RENDER:register(function (delta)
                   state = "hover"
                end
             end
-            local labels = element:update(vectors.vec2(0,-1),vectors.vec2(95,(math.min(#panel.current_page.elements,client:getScaledWindowSize().y/20)-i+1)*10 + panel.selected_index * 10),state)
+            local labels = element:update(vectors.vec2(0,-1),vectors.vec2(95,(math.min(#panel.current_page.elements,client:getScaledWindowSize().y/20)-i+1)*10),state)
             if not labels then
                error("Element labels not returned")
             end
@@ -301,7 +306,7 @@ events.WORLD_RENDER:register(function (delta)
                   l:setDefaultColorRGB(0.6,0.6,0.6)
                   l:setOutlineColorRGB(0,0,0)
                end
-               if element.color then
+               if element.color and not l.color then
                   l:setColorRGB(element.color:unpack())
                end
             end

@@ -16,12 +16,19 @@ local paths = listFiles("scripts")
    
    config:setName("GN Macros States")
    local script = require(path)
-   local state = config:load(script.namespace)
-   if not state then state = false end
-
-   menu:newElement("toggleButton"):setToggle(state):setText(name).ON_TOGGLE:register(function (toggle)
-      script:setActive(toggle)
-   end)
+   if script then
+      local state = config:load(script.namespace)
+      if not state then state = false end
+   
+      local t = menu:newElement("toggleButton"):setText(name)
+      t.ON_TOGGLE:register(function (toggle)
+         script:setActive(toggle)
+      end)
+      t.toggle = state
+      script.STATE_CHANGED:register(function (stat)
+         menu.toggle = stat
+      end)
+   end
 end
 
 menu:newElement("returnButton")
