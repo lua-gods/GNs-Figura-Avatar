@@ -85,4 +85,11 @@ events.TICK:register(function ()
    ls = s
 end)
 
+events.TICK:register(function ()
+   local v = client:getViewer()
+   if v then
+      nameplate.ENTITY:setVisible(v:getTargetedEntity() == player)
+   end
+end)
+
 nameplate.ENTITY:shadow(true)

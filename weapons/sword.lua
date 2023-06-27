@@ -18,7 +18,7 @@ for key, value in pairs(CONFIG.smear.gradient) do
 end
 
 local sword = {
-   state = gnanim.newStateMachine(),
+   state = gnanim:newStateMachine(),
    enabled = true,
 }
 

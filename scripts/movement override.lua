@@ -37,6 +37,7 @@ mac.ENTER:register(function ()
    pings.GNAURA(true)
    pos = player:getPos()
    lpos = pos:copy()
+   vel = player:getVelocity()
 end)
 
 mac.TICK:register(function ()

@@ -42,6 +42,14 @@ function PanelToggleButton:setColorRGB(r,g,b)
    return self
 end
 
+function PanelToggleButton:setToggle(toggle,ignore_events)
+   self.toggle = toggle
+   if not ignore_events then
+      self.ON_TOGGLE:invoke(toggle)
+   end
+   return self
+end
+
 function PanelToggleButton:setColorHex(hex)
    self.color = vectors.hexToRGB(hex)
    self.root:update()

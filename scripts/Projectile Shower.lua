@@ -17,7 +17,6 @@ local config = {
        "minecraft:oak_boat","minecraft:boat",
    }
 }
-
 keybinds:newKeybind("GNERRS",keybinds:getVanillaKey("key.use")).press = function ()
    if mac.is_active then
       local UUID = player:getUUID()
@@ -28,7 +27,6 @@ keybinds:newKeybind("GNERRS",keybinds:getVanillaKey("key.use")).press = function
           end
       end
       if proxyID ~= -1 then
-         --sounds:playSound("entity.arrow.shoot",player:getPos())
          for i = 1, config.amount, 1 do
              local vel = player:getLookDir()*config.power + vec(math.random()-0.5,math.random()-0.5,math.random()-0.5)*config.scatter*config.power
          local stringVel = {}
