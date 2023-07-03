@@ -4,6 +4,7 @@ local pos
 local lpos
 local points = 0
 local rpos
+local distance = 4
 
 local update_timer = 0
 
@@ -112,7 +113,7 @@ if host:isHost() then
                   update_timer = 0
                   
                   points = points + 1
-                  pos = mouseToWorldSpace(4)
+                  pos = mouseToWorldSpace(distance)
                   if points == 1 then
                      pings.PENSETORIGIN(c(pos.x),c(pos.y),c(pos.z))
                   else
@@ -144,6 +145,9 @@ end)
 ---@param page PanelPage
 return function (page)
    toggle = page:newElement("toggleButton"):setText("Pen")
+   page:newElement("slider"):setItemCount(20).ON_SLIDE:register(function (value)
+      distance = value
+   end)
    toggle:setToggle(state,true)
    toggle.ON_TOGGLE:register(function (toggle)
       config:setName("just GN")
