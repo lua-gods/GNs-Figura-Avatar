@@ -67,9 +67,11 @@ function panel:setPage(page)
    if page ~= self.current_page then
       panel.selected_index = #page.elements
       page.ON_ENTER:invoke()
+      page.is_active = true
       self:clearTasks()
       panel.is_pressed = false
       if self.last_page then
+         self.last_page.is_active = false
          self.last_page.ON_EXIT:invoke()
       end
       self.last_page = self.current_page
@@ -147,9 +149,10 @@ end
 
 -->====================[ API ]====================<--
 
----@class PaneldPage
+---@class PanelPage
 ---@field elements table
 ---@field default integer
+---@field is_active boolean
 ---@field ON_ENTER KattEvent
 ---@field ON_EXIT KattEvent
 ---@field name string
@@ -158,10 +161,11 @@ PanelPage.__index = PanelPage
 PanelPage.__type = "panelpage"
 
 function panel:newPage()
-   ---@type PaneldPage
+   ---@type PanelPage
    local compose = {
       elements = {},
       default = 1,
+      is_active = false,
       ON_ENTER = kitkat.newEvent(),
       ON_EXIT = kitkat.newEvent(),
       name = "Unnamed Page",

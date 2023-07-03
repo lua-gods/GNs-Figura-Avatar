@@ -20,9 +20,9 @@ local aura
 function pings.GNAURA(toggle)
    if toggle then
       aura = {
-         trailMaker:newTwoLeadTrail():setDuration(5):setDivergeness(0),
-         trailMaker:newTwoLeadTrail():setDuration(5):setDivergeness(0),
-         trailMaker:newTwoLeadTrail():setDuration(5):setDivergeness(0),
+         trailMaker:newTwoLeadTrail():setDuration(10):setDivergeness(0),
+         trailMaker:newTwoLeadTrail():setDuration(10):setDivergeness(0),
+         trailMaker:newTwoLeadTrail():setDuration(10):setDivergeness(0),
       }
    else
       if aura then
@@ -72,9 +72,6 @@ mac.FRAME:register(function (delta)
    if player:isLoaded() then
       renderer:setCameraPivot(math.lerp(lpos,pos,delta):add(0,player:getEyeHeight()))
    end
-end)
-
-events.TICK:register(function ()
    if aura then
       local ppos = player:getPos():add(0,1,0)
       for key, value in pairs(aura) do
@@ -84,6 +81,7 @@ events.TICK:register(function ()
       end
    end
 end)
+
 
 mac.EXIT:register(function ()
    for key, value in pairs(aura) do

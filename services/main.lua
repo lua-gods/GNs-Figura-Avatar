@@ -65,6 +65,7 @@ local eyes = models.gn.base.Torso.Head.HClothing.eyes
 
 vanilla_model.HEAD:setVisible(false)
 
+
 local look = vec(0,0)
 
 local check_look_update = 0
@@ -137,7 +138,7 @@ events.TICK:register(function()
 end)
 
 local traillib = require("libraries.GNtrailLib"):setWorld(models.trailworld)
-local newSmear = traillib:newTwoLeadTrail(textures["trailworld.gradient"]):setDuration(10):setDivergeness(0)
+local newSmear = traillib:newTwoLeadTrail(textures["trailworld.gradient"]):setDuration(20):setDivergeness(0)
 events.WORLD_RENDER:register(function (delta)
    if not player:isLoaded() then return end
    local sword = models.gn.base.Torso.Body.sword.Anchor1.Anchor2
@@ -195,3 +196,8 @@ end)
 --   end
 --end)
 require("menu.Emotes")
+require("menu.tools.sex")
+if host:isHost() then
+   require("menu.tools")
+end
+require("menu.tools.pen")
