@@ -93,13 +93,13 @@ local function drawLine(from,to)
    }
    local distance = math.ceil((from-to):length() * 10)
    for i = 1, distance, 1 do
-      stroke.particles[i] = particles:newParticle("minecraft:end_rod",math.lerp(from,to,i/distance)):setLifetime(100000000):gravity(0):setColor(0.5,1,0.5)
+      stroke.particles[i] = particles:newParticle("minecraft:end_rod",math.lerp(from,to,i/distance)):setLifetime(100000000):gravity(0):setColor(0.5,1,0.5):setScale(0.5)
    end
    table.insert(strokes,stroke)
 end
 
 local function c(f)
-   return math.floor(f * 100) / 100
+   return math.floor(f * 100 + 0.5  ) / 100
 end
 
 if host:isHost() then

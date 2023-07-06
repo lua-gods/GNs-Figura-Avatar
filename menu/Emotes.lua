@@ -101,6 +101,10 @@ menu:newElement("toggleButton"):setToggle(true,true):setText("Music").ON_TOGGLE:
    play_music = toggle
 end)
 
+menu:newElement("toggleButton"):setText("Force AFK").ON_TOGGLE:register(function (toggle)
+   FORCE_AFK = toggle
+end)
+
 for key, e in pairs(emotes) do
    menu:newElement("button"):setText(e.name).ON_PRESS:register(function ()
       pings.GNEMOTEID(key,play_music)

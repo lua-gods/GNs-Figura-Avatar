@@ -6,7 +6,7 @@ page:newElement("button"):setText("Entity NBT Editor").ON_RELEASE:register(funct
 end)
 
 page:newElement("button"):setText("Scripts").ON_PRESS:register(function ()
-   panel:setPage(require("menu.optools.scripts"))
+   panel:setPage(require("menu.scripts"))
 end)
 page:newElement("button"):setText("End Gateway Generator").ON_PRESS:register(function ()
    panel:setPage(require("menu.optools.endgateway"))

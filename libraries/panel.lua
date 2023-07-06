@@ -192,7 +192,7 @@ function PanelPage:forceUpdate()
 end
 
 ---@param type string
----@return PanelButton|PanelToggleButton|panelSlider|paneltextedit
+---@return PanelButton|PanelToggleButton|panelSlider|paneltextedit|panelDropdownSelection
 function PanelPage:newElement(type)
    if panel.elements[type] then
       local element = panel.elements[type].new(panel)

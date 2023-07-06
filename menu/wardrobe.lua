@@ -1,10 +1,11 @@
 local panel = require("libraries.panel")
 
 local clothing_type = {
-   {"Hat",require("wardrobes.Hat")},
-   {"Head",require("wardrobes.Head")},
-   {"Shirt",require("wardrobes.Shirt")},
-   {"Pants",require("wardrobes.Pants")},
+   --{"Hat",require("wardrobes.Hat")},
+   --{"Head",require("wardrobes.Head")},
+   --{"Shirt",require("wardrobes.Shirt")},
+   --{"Pants",require("wardrobes.Pants")},
+   {"General",require("wardrobes.Skin")},
 }
 
 local host_clothes = {}
@@ -19,27 +20,24 @@ end
 
 if not host:isHost() then return end
 
-local button = panel.elements.button.new(panel)
-button:setText("Sync").ON_PRESS:register(function ()
+local page = panel:newPage()
+local items = {}
+
+for i, data in pairs(clothing_type) do
+   host_clothes[i] = 1
+   local lol = page:newElement("dropdown")
+   local list = {}
+   for key, value in pairs(data[2].clothes) do
+      list[key] = value.name
+   end
+   lol:setSelectionList(list)
+   lol.ON_SLIDE:register(function (id)
+      data[2]:setSelected(id)
+      host_clothes[i] = id
+   end)
+end
+page:newElement("button"):setText("Sync").ON_PRESS:register(function ()
    pings.GNSYNCCLOTHING(table.unpack(host_clothes))
 end)
-
-local menu = panel:newPage()
-local items = {
-}
-for i, data in pairs(clothing_type) do
-   local e = panel.elements.slider.new(panel)
-   host_clothes[i] = 1
-   e:setItemCount(#data[2].clothes):setText(data[1]).ON_SLIDE:register(function (slide)
-      data[2]:setSelected(slide)
-      host_clothes[i] = slide
-   end)
-   table.insert(items,e)
-end
-
-
-table.insert(items,button)
-
-menu:appendElements(items)
-menu:newElement("returnButton")
-return menu
+page:newElement("returnButton")
+return page

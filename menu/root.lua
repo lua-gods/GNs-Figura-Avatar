@@ -18,8 +18,8 @@ menu:newElement("button"):setText("Emotes").ON_PRESS:register(function ()
    panel:setPage(require("menu.Emotes"))
 end)
 
-
-
+local dropdown = menu:newElement("dropdown"):setText("dropdown")
+dropdown:setSelectionList({"Hello","World","I am GN","Nice to meet you"}) 
 
 
 return menu

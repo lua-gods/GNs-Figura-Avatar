@@ -114,7 +114,8 @@ local moves = 0
 local win = false
 
 
-function ms.newGame(seed)
+function ms.newGame(seed,mode)
+   ms.config.resolution = mode:getGridSize()
    win = false
    moves = 0
    ms.texture = textures:newTexture("minesweeper",ms.config.resolution*ms.mapping.res,ms.config.resolution*ms.mapping.res)
@@ -231,12 +232,20 @@ function ms.inbounds(x,y)
    return (x >= 0 and x < ms.config.resolution and y >= 0 and y < ms.config.resolution)
 end
 
+local function stringToHash(str)
+   local hash = 0
+   for i = 1, #str do
+       local byteValue = string.byte(str, i)
+       hash = hash + byteValue
+   end
+   return hash
+end
 
 function grid_start(grid)
 	local myMode = grid.newMode("demo:minesweeper")
     
     myMode.INIT:register(function()
-        ms.newGame(285725)
+        ms.newGame(stringToHash(myMode:getParameters(true)),myMode)
         myMode:setLayerCount(1)
         myMode:setLayerTexture(ms.texture,1)
         myMode:setLayerDepth(0,1)

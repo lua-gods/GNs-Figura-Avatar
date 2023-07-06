@@ -11,8 +11,6 @@ local parts = {
    right_arm = models.gn.base.Torso.RightArm,
    left_leg = models.gn.base.LeftLeg,
    right_leg = models.gn.base.RightLeg,
-   
-   tie = models.gn.base.Torso.Body.Shirt.BClothing.Tie
 }
 
 local is_flying = false
@@ -31,7 +29,14 @@ events.TICK:register(function ()
       last_offset = offset:copy()
       last_vel = vel:copy()
       vel = player:getVelocity()
-      offset = vectors.vec2(player:getRot().x,(player:getRot().y - player:getBodyYaw()) % 360)
+      local brot
+      local vehicle = player:getVehicle()
+      if vehicle then
+         brot = vehicle:getRot().y
+      else
+         brot = player:getBodyYaw()
+      end
+      offset = vectors.vec2(player:getRot().x,(player:getRot().y - brot) % 360)
    end
 end)
 
@@ -50,7 +55,6 @@ events.RENDER:register(function (delta, context)
       parts.base:setPos(0,math.abs(swing)*0.01*is_on_ground,0)
       parts.head:setRot(o.x*-0.2,o.y*-0.5 - swing * 0.1 * 1,0)
       parts.body:setRot(o.x*0.2+math.cos((time+delta)*0.1)*0.1,o.y*0.5 + swing * 0.1,0):setPos(0,math.sin((time+delta)*0.1)*0.1,0)
-      parts.tie:setRot(math.max(o.x*-0.2,0),0,o.y*0.1)
       if is_underwater and (pose == "STANDING" or pose == "CROUCHING") then
          parts.left_arm:setRot(o.x*-0.2,o.y*0.3,math.min(tvel.y*180-45,0))
          parts.right_arm:setRot(o.x*-0.2,o.y*0.3,-math.min(tvel.y*180-45,0))

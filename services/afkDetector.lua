@@ -1,9 +1,12 @@
 TIME_SINCE_INACTIVE = 0
+FORCE_AFK = false
 local was_afk = false
 IS_AFK = false
 
 local function reset()
-   TIME_SINCE_INACTIVE = client:getSystemTime()
+   if not FORCE_AFK then
+      TIME_SINCE_INACTIVE = client:getSystemTime()
+   end
 end
 reset()
 
