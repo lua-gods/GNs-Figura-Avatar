@@ -18,7 +18,7 @@ local emotes = {
       music={
          name="kick",
          loop=true,
-         speed=0.5,
+         speed=1,
       }
    },
    {
@@ -27,8 +27,9 @@ local emotes = {
       music={
          name="kick",
          loop=true,
-         speed=0.5,
-      }},
+         speed=1,
+      }
+   },
    {
       name="Club Penguin",
       anim=animations.gn.clubPenguin,
@@ -39,21 +40,58 @@ local emotes = {
       music={
          name="oof",
          loop=false,
-         speed=0.5
+         speed=0.25
       }},
+      {
+         name="carramelDancen",
+         anim=animations.gn.carramelDancen,
+         music={
+            name="caramel",
+            loop=true,
+            speed=1
+         }},
+         {
+            name="Toilet",
+            anim=animations.gn.toilet,
+            music={
+               name="toilet",
+               loop=false,
+               speed=1
+            }},
+            {
+               name="Pirate",
+               anim=animations.gn.pirate,
+               music={
+                  name="pirate",
+                  loop=true,
+                  speed=1
+               }},
+               {
+                  name="Moai",
+                  anim=animations.gn.pirate,
+                  music={
+                     name="spog",
+                     loop=false,
+                     speed=1
+                  }},
+                  {
+                     name="Lore",
+                     anim=animations.gn.carramelDancen,
+                     music={
+                        name="lore",
+                        loop=true,
+                        speed=1
+                     }},
 }
 animations.gn.Kazotskykick:setSpeed(1.2)
+animations.gn.carramelDancen:setSpeed(1.4)
 animations.gn.Kazotskykick2:setSpeed(1.2)
 
 local dance_music
 local dance_music_id
 local ppos = vectors.vec3(0,math.huge,0)
 
-events.TICK:register(function ()
-   
-end)
-
-events.TICK:register(function ()
+events.WORLD_TICK:register(function ()
    if player:isLoaded() then
       ppos = player:getPos()
       if dance_music then
@@ -81,7 +119,7 @@ function pings.GNEMOTEID(id,music)
             if dance_music then
                dance_music:stop()
             end
-            dance_music = sounds:playSound(e.music.name,ppos,1,speed):setLoop(e.music.loop)
+            dance_music = sounds:playSound(e.music.name,ppos,1,speed):setLoop(e.music.loop):setAttenuation(2)
             dance_music_id = e.music.name
          end
       else

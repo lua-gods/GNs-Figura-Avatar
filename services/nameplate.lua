@@ -1,8 +1,7 @@
 local from = vectors.hexToRGB("#99e65f") 
 local to = vectors.hexToRGB("#1e6f50")
 local prefix = '{"text":"${badges}:<3_GN:","color":"white"}'
-local entity_name = "GNamimates"
-local chat_name = "GN"
+local entity_name = avatar:getEntityName()
 local suffix = ""
 local mid = ""
 
@@ -22,21 +21,6 @@ for i = 1, #entity_name, 1 do
 end
 
 local cmid = ""
-
-for i = 1, #chat_name, 1 do
-   local r = i/#chat_name
-   local hex = vectors.rgbToHex(
-      vectors.vec3(
-         math.lerp(from.x,to.x,r),
-         math.lerp(from.y,to.y,r),
-         math.lerp(from.z,to.z,r)
-      )
-   )
-   cmid = cmid .. '{"text":"'..chat_name:sub(i,i)..'","color":"#' .. hex .. '"}'
-   if i ~= #chat_name then
-      cmid = cmid .. ","
-   end
-end
 
 local lsyst = client:getSystemTime()
 
@@ -81,7 +65,6 @@ events.TICK:register(function ()
       suffix = '{"text":""}'
    end
    nameplate.ALL:setText('[' .. prefix .. ',' .. mid .. ',' .. suffix .. ']')
-   nameplate.CHAT:setText('[' .. prefix .. ',' .. cmid .. ',' .. suffix .. ']')
    ls = s
 end)
 

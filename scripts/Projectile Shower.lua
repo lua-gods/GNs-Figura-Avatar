@@ -37,7 +37,7 @@ keybinds:newKeybind("GNERRS",keybinds:getVanillaKey("key.use")).press = function
          vel.z = math.floor(vel.z*config.presicion)/config.presicion
          if vel.z == math.floor(vel.z) then stringVel[3] = tostring(vel.z)..".0" else stringVel[3] = tostring(vel.z)
          end
-         host:sendChatCommand("/summon "..config.proxy[proxyID+1].." ~ ~"..player:getEyeHeight().." ~ {life:1180,Motion:["..stringVel[1]..","..stringVel[2]..","..stringVel[3].."]"..",Owner:\""..UUID.."\"}")
+         host:sendChatCommand("/summon "..config.proxy[proxyID+1].." ~ ~"..player:getEyeHeight().." ~ {life:1180,Fuse:40,Motion:["..stringVel[1]..","..stringVel[2]..","..stringVel[3].."]"..",Owner:\""..UUID.."\"}")
          if config.proxy[proxyID+1] == "minecraft:tnt" then
              host:swingArm()
          end

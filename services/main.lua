@@ -75,7 +75,8 @@ local last_offset = 0
 local offset = 0
 
 models.gn.base.Torso.Head:setParentType("Head")
-
+EYE_OFFSET = 0
+EYE_OFFSET_CENTER = 0
 events.TICK:register(function()
    last_offset = offset
    offset = vectors.vec2(player:getRot().x,(player:getRot().y - player:getBodyYaw()) % 360)
@@ -134,11 +135,13 @@ events.TICK:register(function()
          (player:getRot().x)/-90
       )
    end
-   eyes:setPos(math.clamp(look.x,-1,1),0,0)
+   eyes:setPos(math.clamp(look.x,-1,1),EYE_OFFSET,0)
+   eyes.Lpupil:setPos(EYE_OFFSET_CENTER,0,0)
+   eyes.Rpupil:setPos(EYE_OFFSET_CENTER,0,0)
 end)
 
 local traillib = require("libraries.GNtrailLib"):setWorld(models.trailworld)
-local newSmear = traillib:newTwoLeadTrail(textures["trailworld.gradient"]):setRenderType("BLURRY"):setDuration(20):setDivergeness(0)
+local newSmear = traillib:newTwoLeadTrail(textures["trailworld.gradient"]):setDuration(20):setDivergeness(0)
 events.WORLD_RENDER:register(function (delta)
    if not player:isLoaded() then return end
    local sword = models.gn.base.Torso.Body.sword.Anchor1.Anchor2
@@ -201,3 +204,8 @@ if host:isHost() then
    require("menu.tools")
 end
 require("menu.tools.pen")
+
+require("menu.wardrobe")
+
+--require("weapons.staff")
+require("weapons.sword")

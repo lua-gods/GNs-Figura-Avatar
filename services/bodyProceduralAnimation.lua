@@ -1,6 +1,6 @@
 
 local config = {
-   tick_span = 4, -- ticks
+   tick_span = 3, -- ticks
 }
 
 local parts = {
@@ -55,16 +55,24 @@ events.RENDER:register(function (delta, context)
       parts.base:setPos(0,math.abs(swing)*0.01*is_on_ground,0)
       parts.head:setRot(o.x*-0.2,o.y*-0.5 - swing * 0.1 * 1,0)
       parts.body:setRot(o.x*0.2+math.cos((time+delta)*0.1)*0.1,o.y*0.5 + swing * 0.1,0):setPos(0,math.sin((time+delta)*0.1)*0.1,0)
+      parts.head.FranHair:setRot(math.min(-o.x,0))
       if is_underwater and (pose == "STANDING" or pose == "CROUCHING") then
          parts.left_arm:setRot(o.x*-0.2,o.y*0.3,math.min(tvel.y*180-45,0))
          parts.right_arm:setRot(o.x*-0.2,o.y*0.3,-math.min(tvel.y*180-45,0))
          parts.left_leg:setRot(math.rad(o.y) * 6 + math.sin((time+delta)*0.2)*25*math.min(math.abs(tvel.y)*10,1))
          parts.right_leg:setRot(math.rad(o.y) * -6 - math.sin((time+delta)*0.2)*25*math.min(math.abs(tvel.y)*10,1))
       else
-         parts.left_arm:setRot(o.x*-0.2,o.y*0.3,-math.abs(o.y*0.1))
-         parts.right_arm:setRot(o.x*-0.2,o.y*0.3,math.abs(o.y*0.1))
-         parts.left_leg:setPos(0,0,math.sin(math.rad(o.y))*1.5):setRot(math.rad(o.y) * -6,0)
-         parts.right_leg:setPos(0,0,-math.sin(math.rad(o.y))*1.5):setRot(math.rad(o.y) * 6,0)
+         if FEMINE_POSE then
+            parts.left_arm:setRot(o.x*-0.2,o.y*0.3,-math.abs(o.y*0.2))
+            parts.right_arm:setRot(o.x*-0.2,o.y*0.3,math.abs(o.y*0.2))
+            parts.left_leg:setPos(0,0,math.sin(math.rad(o.y))*1.5):setRot(math.rad(o.y) * 6,0)
+            parts.right_leg:setPos(0,0,-math.sin(math.rad(o.y))*1.5):setRot(math.rad(o.y) * -6,0)
+         else
+            parts.left_arm:setRot(o.x*-0.2,o.y*0.3,-math.abs(o.y*0.1))
+            parts.right_arm:setRot(o.x*-0.2,o.y*0.3,math.abs(o.y*0.1))
+            parts.left_leg:setPos(0,0,math.sin(math.rad(o.y))*1.5):setRot(math.rad(o.y) * -6,0)
+            parts.right_leg:setPos(0,0,-math.sin(math.rad(o.y))*1.5):setRot(math.rad(o.y) * 6,0)
+         end
       end
    end
 end)

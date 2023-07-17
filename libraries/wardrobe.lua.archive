@@ -1,0 +1,78 @@
+local panel = require("libraries.panel")
+
+local clothing_type = {
+   --{"Hat",require("wardrobes.Hat")},
+   --{"Head",require("wardrobes.Head")},
+   --{"Shirt",require("wardrobes.Shirt")},
+   --{"Pants",require("wardrobes.Pants")},
+   {"General",require("wardrobes.Skin")},
+}
+
+local host_clothes = {}
+
+local last_head_name = ""
+events.TICK:register(function ()
+   local item = player:getItem(6)
+   if item.id == "minecraft:player_head" and item.tag and item.tag.SkullOwner then
+      local head_name = item.tag.SkullOwner.Name
+      local author_name = avatar:getEntityName()
+      models.gn.base.Torso.Head.HelmetItemPivot:setScale(0,0,0)
+      if last_head_name ~= head_name then
+         if head_name == "Francielly" or author_name == "Francielly" then
+            host_clothes[1] = 5
+            clothing_type[1][2]:setSelected(5)
+         elseif head_name == "4P5" or author_name == "4P5" then
+            host_clothes[1] = 5
+            clothing_type[1][2]:setSelected(6)
+         else
+            host_clothes[1] = 1
+            models.gn.base.Torso.Head.HelmetItemPivot:setScale(1,1,1)
+            clothing_type[1][2]:setSelected(1)
+         end
+         last_head_name = head_name
+      end
+   end
+end)
+
+function pings.GNSYNCCLOTHING(...)
+   host_clothes = {...}
+   for key, clothing in pairs(clothing_type) do
+      clothing[2]:setSelected(host_clothes[key])
+   end
+end
+
+local timer = 0
+events.TICK:register(function ()
+   timer = timer + 1
+   if timer > 40 then
+      timer = 0
+
+   end
+end)
+
+if not host:isHost() then return end
+
+local page = panel:newPage()
+local items = {}
+
+for i, data in pairs(clothing_type) do
+   host_clothes[i] = 1
+   local lol = page:newElement("dropdown")
+   local list = {}
+   for key, value in pairs(data[2].clothes) do
+      list[key] = value.name
+   end
+   lol:setSelectionList(list)
+   lol.ON_SLIDE:register(function (id)
+      data[2]:setSelected(id)
+      host_clothes[i] = id
+   end)
+end
+page:newElement("button"):setText("Sync").ON_PRESS:register(function ()
+   pings.GNSYNCCLOTHING(table.unpack(host_clothes))
+end)
+page:newElement("returnButton")
+
+
+
+return page

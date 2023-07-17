@@ -1,43 +1,31 @@
-local panel = require("libraries.panel")
+local GNCL = require("libraries.GNClothingLib")
 
-local clothing_type = {
-   --{"Hat",require("wardrobes.Hat")},
-   --{"Head",require("wardrobes.Head")},
-   --{"Shirt",require("wardrobes.Shirt")},
-   --{"Pants",require("wardrobes.Pants")},
-   {"General",require("wardrobes.Skin")},
+local everything = GNCL:newWardrobe(64,64)
+everything:setDefaultTexture(textures["textures.skin.black_skin"])
+everything:setTexturable{
+   models.gn.base.Torso.Head.HClothing,
+   models.gn.base.Torso.Body.Shirt.BClothing,
+   models.gn.base.Torso.LeftArm.LAClothing,
+   models.gn.base.Torso.RightArm.RAClothing,
+   models.gn.base.LeftLeg.LLClothing,
+   models.gn.base.RightLeg.RLClothing}
+local hairGN = everything:newClothing("hairGN"):setTexture(textures["textures.hair.default"]):setLayer("hair")
+
+local faceGN = everything:newClothing("faceGN"):setTexture(textures["textures.face.t_eyes"]):setLayer("eyes")
+
+local whiteLongSleeves = everything:newClothing("whiteLongSleeves"):setTexture(textures["textures.shirt.white_long_sleeves"])
+local blackSleeves = everything:newClothing("whiteLongSleeves"):setTexture(textures["textures.shirt.black_sleeves"])
+local green_tie = everything:newClothing("tieGreen"):setTexture(textures["textures.shirt.green_buisness_tie"]):setLayer("tie")
+local blackPants = everything:newClothing("blackPants"):setTexture(textures["textures.pants.black_pants"]):setLayer("pants")
+local GNsword = everything:newClothing("GNsword"):setLayer("weapon"):setAccessories{
+   models.gn.base.Torso.Body.sword
 }
+faceGN:equip()
+whiteLongSleeves:equip()
+--blackSleeves:equip()
+hairGN:equip()
 
-local host_clothes = {}
+GNsword:equip()
 
-
-function pings.GNSYNCCLOTHING(...)
-   host_clothes = {...}
-   for key, clothing in pairs(clothing_type) do
-      clothing[2]:setSelected(host_clothes[key])
-   end
-end
-
-if not host:isHost() then return end
-
-local page = panel:newPage()
-local items = {}
-
-for i, data in pairs(clothing_type) do
-   host_clothes[i] = 1
-   local lol = page:newElement("dropdown")
-   local list = {}
-   for key, value in pairs(data[2].clothes) do
-      list[key] = value.name
-   end
-   lol:setSelectionList(list)
-   lol.ON_SLIDE:register(function (id)
-      data[2]:setSelected(id)
-      host_clothes[i] = id
-   end)
-end
-page:newElement("button"):setText("Sync").ON_PRESS:register(function ()
-   pings.GNSYNCCLOTHING(table.unpack(host_clothes))
-end)
-page:newElement("returnButton")
-return page
+green_tie:equip()
+blackPants:equip()
