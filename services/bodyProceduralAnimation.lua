@@ -14,12 +14,15 @@ local parts = {
 }
 
 local is_flying = false
+local is_underwater = false
+
 local vel = vectors.vec3()
 local last_vel = vectors.vec3()
+
 local offset = vectors.vec2()
 local last_offset = vectors.vec2()
+
 local time = 0
-local is_underwater = false
 local pose = nil
 events.TICK:register(function ()
    time = time + 1
