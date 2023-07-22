@@ -49,39 +49,13 @@ local emotes = {
             name="caramel",
             loop=true,
             speed=1
-         }},
-         {
-            name="Toilet",
-            anim=animations.gn.toilet,
-            music={
-               name="toilet",
-               loop=false,
-               speed=1
-            }},
-            {
-               name="Pirate",
-               anim=animations.gn.pirate,
-               music={
-                  name="pirate",
-                  loop=true,
-                  speed=1
-               }},
-               {
-                  name="Moai",
-                  anim=animations.gn.pirate,
-                  music={
-                     name="spog",
-                     loop=false,
-                     speed=1
-                  }},
-                  {
-                     name="Lore",
-                     anim=animations.gn.carramelDancen,
-                     music={
-                        name="lore",
-                        loop=true,
-                        speed=1
-                     }},
+         }
+      },
+      {
+         name="Sit Down",
+         anim=animations.gn.sit,
+      },
+         
 }
 animations.gn.Kazotskykick:setSpeed(1.2)
 animations.gn.carramelDancen:setSpeed(1.4)
@@ -148,6 +122,13 @@ for key, e in pairs(emotes) do
       pings.GNEMOTEID(key,play_music)
    end)
 end
+
+events.WORLD_RENDER:register(function (delta)
+   local eye = models.gn.EyeHeight:getAnimPos()/16
+   renderer:offsetCameraPivot(eye)
+   renderer:setEyeOffset(eye)
+   nameplate.ENTITY:setPos(eye)
+end)
 
 menu:newElement("returnButton")
 return menu

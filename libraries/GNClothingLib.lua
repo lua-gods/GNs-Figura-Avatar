@@ -151,6 +151,9 @@ function lib:newWardrobe(bake_size_x,bake_size_y)
       update = false,
       id = id,
    }
+   compose.bakeTexture:applyFunc(0,0,64,64,function (clr,x,y)
+      return textures["clothes.default_skin"]:getPixel(x,y)
+   end)
    setmetatable(compose,Wardrobe)
    wardrobes[id] = compose
    return compose
