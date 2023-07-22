@@ -59,13 +59,14 @@ events.TICK:register(function ()
          else
             disp_time = s.."s"
          end
-         suffix = '{"text":"\n[AFK : '.. disp_time ..']","color":"gray"}'
+         suffix = '{"text":"\n[Idle : '.. disp_time ..']","color":"gray"}'
       end
    else
       suffix = '{"text":""}'
    end
    nameplate.ALL:setText('[' .. prefix .. ',' .. mid .. ',' .. suffix .. ']')
+   nameplate.CHAT:setText('[' .. prefix .. ',' .. mid..']')
    ls = s
 end)
 
-nameplate.ENTITY:shadow(true)
+nameplate.ENTITY:outline(true):setOutlineColor(to * 0.4)
