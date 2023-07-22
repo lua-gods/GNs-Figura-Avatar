@@ -1,7 +1,7 @@
 local panel = require("libraries.panel")
 local page = panel:newPage()
 
-require("menu.tools.teslacoul")(page)
+require("menu.tools.sex")(page)
 require("menu.tools.pen")(page)
 page:newElement("textEdit"):setPlaceholderText("IP address here")
 page:newElement("slider")
