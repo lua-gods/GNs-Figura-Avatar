@@ -1,0 +1,54 @@
+local mac = require("libraries.macroScriptLib"):newScript("gn:auto_spectator")
+
+local checks = {
+   vectors.vec3(1,1,1),
+   vectors.vec3(-1,1,1),
+   vectors.vec3(1,1,-1),
+   vectors.vec3(-1,1,-1),
+   vectors.vec3(1,-0.01,1),
+   vectors.vec3(-1,-0.01,1),
+   vectors.vec3(1,-0.01,-1),
+   vectors.vec3(-1,-0.01,-1),
+}
+
+local function collision(pos)
+   local block, brpos = world.getBlockState(pos), pos % 1
+   local coll = block:getCollisionShape()
+   for key, AABB in pairs(coll) do
+      if AABB[1].x <= brpos.x and AABB[1].y <= brpos.y and AABB[1].z <= brpos.z
+      and AABB[2].x >= brpos.x and AABB[2].y >= brpos.y and AABB[2].z >= brpos.z then
+         return true
+      end
+   end
+end
+
+local colliding = false
+local was_colliding = false
+
+local cooldown = 0
+
+mac.TICK:register(function ()
+   local gamemode = player:getGamemode()
+   if gamemode == "CREATIVE" or gamemode == "SPECTATOR" then
+      local box = player:getBoundingBox():mul(0.5,1,0.5):add(0.01,0.01,0.01)
+      local pos = player:getPos() + player:getVelocity()
+      colliding = false
+      for key, check in pairs(checks) do
+         if collision(pos+box * check) then
+            colliding = true
+            cooldown = 10
+         end
+      end
+   
+      if was_colliding ~= colliding then
+         if colliding then
+            host:sendChatCommand("gamemode spectator")
+         else
+            host:sendChatCommand("gamemode creative")
+         end
+      end
+      was_colliding = cooldown < 0
+   end
+end)
+
+return mac
