@@ -5,7 +5,7 @@ local t = 0
 local jump_key = keybinds:fromVanilla("key.sneak")
 local control = keybinds:newKeybind("Control","key.keyboard.left.control")
 jump_key.press = function ()
-   if control:isPressed() then
+   if control:isPressed() and mac.is_active then
 
       pings.DOUBLE_JUMP()
    end

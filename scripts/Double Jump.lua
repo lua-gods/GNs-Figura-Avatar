@@ -5,14 +5,15 @@ local t = 0
 local jump_key = keybinds:fromVanilla("key.jump")
 local jumps = 0
 jump_key.press = function ()
-   if jumps > 0 and not player:isOnGround() and not player:isFlying() then
+   if jumps > 0 and not player:isOnGround() and not player:isFlying() and mac.is_active then
       pings.DOUBLE_JUMP()
+      jumps = jumps - 1
    end
 end
 
 events.TICK:register(function ()
    if player:isOnGround() then
-      jumps = 6
+      jumps = 1
    end
 end)
 
