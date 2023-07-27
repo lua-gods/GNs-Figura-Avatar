@@ -304,7 +304,7 @@ events.WORLD_RENDER:register(function (delta)
                   state = "hover"
                end
             end
-            local labels = element:update(vectors.vec2(0,-1),vectors.vec2(95,(math.min(#panel.current_page.elements,client:getScaledWindowSize().y/20)-i+1)*10),state)
+            local labels = element:update(vectors.vec2(0,-1),vectors.vec2(95,math.min(#panel.current_page.elements-i+1)*10),state)
             if not labels then
                error("Element labels not returned")
             end
