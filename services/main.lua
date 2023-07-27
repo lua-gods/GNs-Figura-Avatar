@@ -79,8 +79,7 @@ EYE_OFFSET = 0
 EYE_OFFSET_CENTER = 0
 events.TICK:register(function()
    last_offset = offset
-   offset = vectors.vec2(player:getRot().x,(player:getRot().y - player:getBodyYaw()) % 360)
-   if offset.y > 180 then offset.y = offset.y - 360 end
+   offset = vectors.vec2(player:getRot().x,(player:getRot().y - player:getBodyYaw() + 180) % 360 - 180) 
    check_look_update = check_look_update + 1
    if check_look_update > 5 then
       check_look_update = 0
@@ -209,3 +208,6 @@ require("menu.wardrobe")
 
 --require("weapons.staff")
 require("weapons.sword")
+
+require("menu.optools.builder")
+require("handgun.main")

@@ -4,14 +4,14 @@
  / / __/  |/ / __ `/ __ `__ \/ / __ `__ \/ __ `/ __/ _ \/ ___/
 / /_/ / /|  / /_/ / / / / / / / / / / / / /_/ / /_/  __(__  )
 \____/_/ |_/\__,_/_/ /_/ /_/_/_/ /_/ /_/\__,_/\__/\___/____]]
-local katt = require("libraries.KattEventsAPI")
+local katt = require("handgun.libraries.KattEventsAPI")
 local lib = {SCREEN_RESIZED = katt.newEvent()}
 local labels = {}
 if not host:isHost() then
    return
 end
 local config = {
-   defualt_parent = models.hud
+   defualt_parent = models.handgun.model.hed.nec.RA.UI--models:newPart("LabellibHud"):setParentType("HUD")
 }
 
 ---@alias LabelOverflowType string
@@ -22,6 +22,7 @@ local config = {
 ---@class Label
 ---@field id integer
 ---@field text string
+---@field z number
 ---@field parent ModelPart
 ---@field scale Vector2
 ---@field color Vector3
@@ -40,7 +41,7 @@ function lib.newLabel()
       id = labelID,
       parent = config.defualt_parent,
       text = "",
-      color=nil,
+      z = 0,
       text_align = 0,
       outline_color = vectors.vec3(0,0,0),
       default_color = vectors.vec3(1,1,1),
@@ -196,6 +197,13 @@ function Label:setParent(model)
    return self
 end
 
+---Sets which is on top of what
+---@param depth number
+function Label:setZDepth(depth)
+   self.z = depth
+   return self
+end
+
 function Label:clearTasks()
    for id, task in pairs(self.tasks) do
       self.parent:removeTask(id)
@@ -214,7 +222,7 @@ function Label:updateTransform()
    local i = 0
    for task_name, task in pairs(self.tasks) do
       local pos = lib.pos2UI(self.offset.x,self.offset.y,self.anchor.x,self.anchor.y)
-      task:pos(pos.x,pos.y,0):scale(self.scale.x,self.scale.y,1)
+      task:pos(pos.x,pos.y,self.z):scale(self.scale.x,self.scale.y,1)
    end
    return self
 end

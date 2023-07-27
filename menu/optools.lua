@@ -1,8 +1,8 @@
 local panel = require("libraries.panel")
 local page = panel:newPage()
 
-page:newElement("button"):setText("Entity NBT Editor").ON_RELEASE:register(function ()
-   panel:setPage(require("menu.optools.entitiyNbtEditor"))
+page:newElement("button"):setText("Builder").ON_PRESS:register(function ()
+   panel:setPage(require("menu.optools.builder"))
 end)
 
 page:newElement("button"):setText("Scripts").ON_PRESS:register(function ()
@@ -18,6 +18,8 @@ end)
 page:newElement("button"):setText("worldEdit Helper").ON_PRESS:register(function ()
    panel:setPage(require("menu.optools.worldEdit helper"))
 end)
+
+
 
 page:newElement("returnButton")
 

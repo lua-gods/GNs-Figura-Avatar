@@ -6,16 +6,21 @@
 ---@diagnostic disable: param-type-mismatch
 
 local config = {
-   model_path = models.gndrawlibspatial,
+   ---@type ModelPart
+   model_path = models:newPart("gndrawlibspatialworld"):setParentType("WORLD"),
    texture_task_name_prefix = "gndrawlibspatial", -- prefix .. type
-   white_texture = textures:newTexture("gndrawlibspatialwhitetexture",1,1):setPixel(0,0,vectors.vec3(1,1,1)),
+   white_texture = textures:newTexture("gnwhite",1,1):setPixel(0,0,vectors.vec3(1,1,1)),
 
    default_line_color = vectors.vec3(0,1,0)
 }
 
 local vecp = require("libraries.GNVecPlus")
 
-local draw = {elements={Line={}}}
+
+local lcpos = vectors.vec3()
+local cpos = vectors.vec3()
+
+local draw = {elements={Line={}},queue_update={}}
 config.model_path:setParentType("World")
 config.model_path:setScale(16,16,16)
 
@@ -31,13 +36,13 @@ config.model_path:setScale(16,16,16)
 ---@field UniformWidth boolean
 ---@field Visible boolean
 ---@field Delete boolean
----@field SpriteTask any
+---@field Task any
 local Line = {}
 Line.__index = Line
+Line.__type = "Line"
 
-local function UpdateTransform(line)
-   local rot = vecp.toAngle(line.Dir)
-   line.Transform = matrices.mat4():rotate(rot):invert()
+function Line:updateTransform()
+   draw.queue_update[#draw.queue_update+1] = self
 end
 
 ---@param x number|Vector3
@@ -51,7 +56,7 @@ function Line:from(x,y,z)
    end
    self.Dir = self.To-self.From
    self.Length = self.Dir:length()
-   UpdateTransform(self)
+   self:updateTransform()
    return self
 end
 
@@ -65,7 +70,7 @@ function Line:to(x,y,z)
    end
    self.Dir = self.To-self.From
    self.Length = self.Dir:length()
-   UpdateTransform(self)
+   self:updateTransform()
    return self
 end
 
@@ -76,7 +81,7 @@ function Line:dir(x,y,z)
    end
    self.To = self.From + self.Dir
    self.Length = self.Dir:length()
-   UpdateTransform(self)
+   self:updateTransform()
    return self
 end
 
@@ -84,11 +89,13 @@ function Line:length(dist)
    self.Length = dist
    self.Dir = self.Dir:normalize()*dist
    self.To = self.From+self.Dir
+   self:updateTransform()
    return self
 end
 
 function Line:depth(dist)
    self.Depth = dist
+   self:updateTransform()
    return self
 end
 
@@ -100,12 +107,14 @@ function Line:color(r,g,b)
       self.Color = r:copy()
    else self.Color = vectors.vec3(r,g,b)
    end
-   self.SpriteTask:setColor(self.Color)
+   self.Task:setColor(self.Color)
+   self:updateTransform()
    return self
 end
 
 function Line:width(width)
    self.Width = width
+   self:updateTransform()
    return self
 end
 
@@ -133,6 +142,8 @@ function draw:newLine()
    lineID = lineID + 1
    ---@type Line
    local compound = {
+      Dir=nil,
+      Length=nil,
       id = lineID,
       From = vectors.vec3(),
       To = vectors.vec3(),
@@ -150,28 +161,38 @@ function draw:newLine()
    return compound
 end
 
-local lcpos = vectors.vec3()
+
 local llinec = 0
 events.WORLD_RENDER:register(function (delta)
-   local cpos = client:getCameraPos()
+   cpos = client:getCameraPos()
    local linec = #draw.elements.Line
    if cpos ~= lcpos or llinec ~= linec then
       lcpos = cpos
       llinec = linec
-      cpos = (cpos)
       for id, line in pairs(draw.elements.Line) do
-         if line.Visible then
-            local rot = vecp.toAngle(-line.Dir)
-            local final_transform = matrices.mat4()
-            local cposoffset = (line.Transform * (cpos.xyz-line.From):augmented()).xyz
-            local y = math.deg(180-math.atan(cposoffset.x,cposoffset.z))
-            final_transform:translate(0.5,0,line.Depth):scale(line.Width,line.Length+line.Width*0.5,1):translate(0,line.Width*0.25,0):rotateY(y):rotateZ(rot.z):rotateX(rot.x):rotateY(rot.y):translate(line.From)
-            line.Task:setMatrix(final_transform):setEnabled(true)
+         line:updateTransform()
+      end
+   end
+   for key, e in pairs(draw.queue_update) do
+      if type(e) == "Line" then
+         if e.Visible and e.Dir then
+            local a = vectors.worldToScreenSpace(e.From)
+            local b = vectors.worldToScreenSpace(e.To)
+            if a.z > 0 or b.z > 0 then
+               local mat = matrices.mat4()
+               local offset = (cpos-e.From)
+               mat.c2 = (-e.Dir:normalize() * (e.Length + e.Width * 0.5)):augmented(0)
+               mat.c3 = (vecp.flattenVector3ToNormal(offset,-e.Dir):normalize()):augmented(0)
+               mat.c1 = vectors.rotateAroundAxis(90,mat.c3.xyz,e.Dir):augmented(0) * e.Width
+               mat.c4 = (e.From + mat.c1.xyz * 0.5 - e.Dir:normalized() * e.Width * 0.25):augmented()
+               e.Task:setMatrix(mat * (1 + e.Depth)):setVisible(true)
+            end
          else
-            line.Task:setEnabled(false)
+            e.Task:setVisible(false)
          end
       end
    end
+   draw.queue_update = {}
 end)
-
+draw.config = config
 return draw

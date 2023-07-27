@@ -11,7 +11,8 @@ local update_timer = 0
 local draw_queue = {}
 
 local strokes = {}
-local decay_strokes = {}
+
+local line = require("libraries.GNDrawLib")
 
 function pings.PENSETORIGIN(x,y,z)
    rpos = vectors.vec3(x,y,z)
@@ -29,8 +30,8 @@ end
 
 function pings.PENCLEAR()
    for key, stroke in pairs(strokes) do
-      for key, p in pairs(stroke.particles) do
-         p:remove()
+      for key, value in pairs(stroke.lines) do
+         value:delete()
       end
    end
    strokes = {}
@@ -89,17 +90,20 @@ local function drawLine(from,to)
       id = compose_id,
       from = from,
       to = to,
-      particles = {}
+      lines = {}
    }
-   local distance = math.ceil((from-to):length() * 10)
-   for i = 1, distance, 1 do
-      stroke.particles[i] = particles:newParticle("minecraft:end_rod",math.lerp(from,to,i/distance)):setLifetime(100000000):gravity(0):setColor(0.5,1,0.5):setScale(0.5)
-   end
+   local l = line:newLine()
+   local l2 = line:newLine()
+   local l3 = line:newLine()
+   stroke.lines = {l,l2,l3}
+   l:from(from):to(to):color(0,1,0):width(0.1)
+   l2:from(from):to(to):color(0,0,0):width(0.15):depth(0.05)
+   l3:from(from):to(to):color(1,1,1):width(0.2):depth(0.1)
    table.insert(strokes,stroke)
 end
 
 local function c(f)
-   return math.floor(f * 100 + 0.5  ) / 100
+   return math.floor(f * 100 + 0.5) / 100
 end
 
 if host:isHost() then

@@ -53,8 +53,10 @@ end
 
 function panelDropdownSelection:rebuild()
    self.labels = {label.newLabel(),label.newLabel(),label.newLabel()}
-   for i = 1, #self.selection, 1 do
-      self.labels[i+3] = label.newLabel()
+   if self.selection then
+      for i = 1, #self.selection, 1 do
+         self.labels[#self.labels + 1] = label.newLabel()
+      end
    end
 end
 
@@ -102,7 +104,7 @@ function panelDropdownSelection:released()
 end
 
 events.MOUSE_SCROLL:register(function (dir)
-   if not root then return end
+   if not root or not root.current_page then return end
    ---@type panelDropdownSelection
    local current = root.current_page.elements[root.selected_index]
    if type(current) == "panelDropdownSelection" then

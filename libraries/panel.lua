@@ -21,10 +21,13 @@ local panel = {
    current_page = nil,
    page_tree = {},
    elements = { -- static anotation support :(
-      --button = require("libraries.panel_elements.button"),
-      --slider = require("libraries.panel_elements.slider"),
-      --textEdit = require("libraries.panel_elements.textEdit"),
-      --toggleButton = require("libraries.panel_elements.toggleButton"),
+      button = require("libraries.panel_elements.button"),
+      slider = require("libraries.panel_elements.slider"),
+      textEdit = require("libraries.panel_elements.textEdit"),
+      toggleButton = require("libraries.panel_elements.toggleButton"),
+      dropdown = require("libraries.panel_elements.dropdown"),
+      returnButton = require("libraries.panel_elements.returnButton"),
+      margin = require("libraries.panel_elements.margin"),
    },
 
    config = {
@@ -137,15 +140,15 @@ function panel:setSelectState(selected)
    panel:update()
 end
 
-for _, path in pairs(listFiles("libraries/panel_elements",false)) do
-   local name = ""
-   for i = #path, 1, -1 do
-      local c = path:sub(i,i)
-      if c == "." then break end
-      name = c..name
-   end
-   panel.elements[name] = require(path)
-end
+--for _, path in pairs(listFiles("libraries/panel_elements",false)) do
+--   local name = ""
+--   for i = #path, 1, -1 do
+--      local c = path:sub(i,i)
+--      if c == "." then break end
+--      name = c..name
+--   end
+--   panel.elements[name] = require(path)
+--end
 
 -->====================[ API ]====================<--
 
@@ -191,13 +194,16 @@ function PanelPage:forceUpdate()
    return self
 end
 
----@param type string
+---@param elem string
 ---@return PanelButton|PanelToggleButton|panelSlider|paneltextedit|panelDropdownSelection
-function PanelPage:newElement(type)
-   if panel.elements[type] then
-      local element = panel.elements[type].new(panel)
+function PanelPage:newElement(elem)
+   if type(elem) == "string" and panel.elements[elem] then
+      local element = panel.elements[elem].new(panel)
       table.insert(self.elements,element)
       return element
+   else
+      table.insert(self.elements,elem)
+      return type
    end
    return nil
 end

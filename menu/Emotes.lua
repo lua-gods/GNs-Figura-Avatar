@@ -33,6 +33,11 @@ local emotes = {
    {
       name="Club Penguin",
       anim=animations.gn.clubPenguin,
+      music={
+         name="spog",
+         loop=true,
+         speed=1
+      }
    },
    {
       name="Roblox Death",
@@ -55,6 +60,16 @@ local emotes = {
          name="Sit Down",
          anim=animations.gn.sit,
       },
+      {
+         name="Wave",
+         anim=animations.gn.wave,
+         music={
+            name="pirate",
+            loop=true,
+            speed=1
+         }
+      },
+      
          
 }
 animations.gn.Kazotskykick:setSpeed(1.2)

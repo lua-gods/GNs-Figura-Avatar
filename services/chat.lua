@@ -21,7 +21,7 @@ local sound_control = {
             "chat.type.emote",
             "chat.type.announcement"
          },
-         play = {{id="minecraft:entity.item.pickup",pitch=0.6,volume=0.5}}
+         play = {{id="minecraft:entity.item.pickup",pitch=0.6,volume=0.08}}
       },
       {
          when = {
@@ -157,7 +157,7 @@ events.CHAT_RECEIVE_MESSAGE:register(function(message, json)
    table.insert(history, 1, {message = message, json = json})
    -->====================[ Ping ]====================<--
    local did_ping = false
-   local can_ping = (decoded_json.translate and decoded_json.translate == "chat.type.text" and decoded_json.with[1].text ~= player:getName() and not is_duplicate) -- cancel ping when message is from self
+   local can_ping = (decoded_json.translate and decoded_json.translate == "chat.type.text" and decoded_json.with[1].text ~= avatar:getEntityName() and not is_duplicate) -- cancel ping when message is from self
    if decoded_json.translate and (string.find(decoded_json.translate,"death.attack.") or string.find(decoded_json.translate,"death.fell.")) then
       sound(sound_control.chat_sounds.death.play,sound_control.ping_volume)
    elseif can_ping then

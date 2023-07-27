@@ -25,11 +25,9 @@ local last_gamemode = nil
 
 events.TICK:register(function ()
    local gamemode = player:getGamemode()
-   if last_gamemode and last_gamemode ~= gamemode then
-      if gamemode == "SPECTATOR" or last_gamemode == "SPECTATOR" then
-         local pos = player:getPos():add(0,1,0)
-         pings.GNPOOF(pos.x,pos.y,pos.z)
-      end
+   if last_gamemode and last_gamemode ~= gamemode and (gamemode == "SPECTATOR" or last_gamemode == "SPECTATOR") then
+      local pos = player:getPos():add(0,1,0)
+      pings.GNPOOF(pos.x,pos.y,pos.z)
    end
    last_gamemode = gamemode
 end)
