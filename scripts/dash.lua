@@ -7,7 +7,7 @@ local control = keybinds:newKeybind("Control","key.keyboard.left.control")
 jump_key.press = function ()
    if control:isPressed() and mac.is_active then
 
-      pings.DOUBLE_JUMP()
+      pings.DASH()
    end
 end
 
@@ -20,7 +20,7 @@ local colors = {
    vectors.hexToRGB("#134c4c"),
    vectors.hexToRGB("#0c2e44"),
 }
-function pings.DOUBLE_JUMP()
+function pings.DASH()
    if player:isLoaded() then
       local pos = player:getPos()
       sounds:playSound("minecraft:entity.illusioner.mirror_move",pos)
