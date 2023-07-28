@@ -43,9 +43,9 @@ local emotes = {
       name="Roblox Death",
       anim=animations.gn.roblox,
       music={
-         name="oof",
+         name="lego",
          loop=false,
-         speed=0.25
+         speed=1
       }},
       {
          name="carramelDancen",

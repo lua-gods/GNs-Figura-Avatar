@@ -74,7 +74,6 @@ local stare_at = nil
 local last_offset = 0
 local offset = 0
 
-models.gn.base.Torso.Head:setParentType("Head")
 EYE_OFFSET = 0
 EYE_OFFSET_CENTER = 0
 events.TICK:register(function()

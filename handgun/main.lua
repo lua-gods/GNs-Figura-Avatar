@@ -65,7 +65,7 @@ shoot.press = function()
    end
    local uuid = uuidToIntegerArray(player:getUUID())
    if player:getPermissionLevel() > 0 then
-      for i = 1, 50, 1 do
+      for i = 1, 1, 1 do
          host:sendChatCommand("/summon arrow ~ ~" .. (player:getEyeHeight()) ..
                               ' ~ {life:1180,pickup:2,Motion:[' .. stringVel[1] .. "," ..
                               stringVel[2] .. "," .. stringVel[3] .. "],Owner:[I;" .. uuid[1] .. "," ..

@@ -6,8 +6,8 @@ local jump_key = keybinds:fromVanilla("key.sneak")
 local control = keybinds:newKeybind("Control","key.keyboard.left.control")
 jump_key.press = function ()
    if control:isPressed() and mac.is_active then
-
-      pings.DASH()
+      local lol = player:getPos()
+      pings.DASH(lol.x,lol.y,lol.z)
    end
 end
 
@@ -20,19 +20,19 @@ local colors = {
    vectors.hexToRGB("#134c4c"),
    vectors.hexToRGB("#0c2e44"),
 }
-function pings.DASH()
+function pings.DASH(x,y,z)
    if player:isLoaded() then
-      local pos = player:getPos()
+      local pos = vectors.vec3(x,y,z)
       sounds:playSound("minecraft:entity.illusioner.mirror_move",pos)
       particles:newParticle("minecraft:flash",pos):setColor(0.5,1,0.4)
       local dir = player:getLookDir()
       local vel = player:getVelocity()
       for i = 1, 200, 1 do
-         local v = vectors.vec3(math.random()-0.5,math.random()-0.5,math.random()-0.5):normalize()*math.random()*0.2 + (dir) * math.random()
+         local v = vectors.vec3(math.random()-0.5,math.random()-0.5,math.random()-0.5):normalize()*math.random()*0.2 + (dir * 3) * math.random()
          particles:newParticle("minecraft:end_rod",pos):setVelocity(v):color(colors[math.random(1,#colors)])
       end
       if host:isHost() then
-         host:setVelocity(dir)
+         host:setVelocity(dir * 3)
       end
       
    end

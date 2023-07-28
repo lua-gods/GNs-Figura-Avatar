@@ -81,7 +81,13 @@ keybinds:newKeybind("GNKILL",keybinds:getVanillaKey("key.attack")).press = funct
          pos.y = math.floor(pos.y*100)/100
          pos.z = math.floor(pos.z*100)/100
          host:sendChatCommand("/summon lightning_bolt "..pos.x.." "..pos.y.." "..pos.z)
-         host:sendChatCommand("/damage "..target:getUUID().." 999999 minecraft:out_of_world")
+         if target:getType() ~= "minecraft:player" then
+            host:sendChatCommand("/data merge entity "..target:getUUID().." {Health:0}")
+            host:sendChatCommand("/kill "..target:getUUID())
+         else
+            host:sendChatCommand("/gamemode survival "..target:getName())
+            host:sendChatCommand("/damage "..target:getName().. " 99999999 minecraft:out_of_world")
+         end
          host:swingArm()
          return true
       end
