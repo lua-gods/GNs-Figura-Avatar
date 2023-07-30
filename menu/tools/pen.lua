@@ -12,7 +12,7 @@ local draw_queue = {}
 
 local strokes = {}
 
-local line = require("libraries.GNDrawLib")
+local line = require("libraries.GNLineLib")
 
 function pings.PENSETORIGIN(x,y,z)
    rpos = vectors.vec3(x,y,z)

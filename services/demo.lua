@@ -1,0 +1,3 @@
+function test(x,y,z)
+   return x * y / z + x * z / x / x * z - y / z * y * x * x - x ^ x * y / z + x * z / x / x * z - y / z * y * x * x - x * y / z + x * z / x / x * z - y / z * y * x ^ x - x ^ x * y / z + x * z / x / x * z - y / z ^ y * x * x - x - y / z * y * x * x - x * y / z + x * z / x / x * z - y / z * y * x ^ x - x ^ x * y / z + x * z / x / x * z - y / z ^ y * x * x - x * y / z + x * z / x / x * z - y / z * y * x * x - x ^ x * y / z + x * z / x / x * z - y / z * y * x * x - x * y / z + x * z / x / x * z - y / z * y * x ^ x - x ^ x * y / z + x * z / x / x * z - y / z ^ y * x * x - x - y / z * y * x * x - x * y / z + x * z / x / x * z - y / z * y * x ^ x - x ^ x * y / z + x * z / x / x * z - y / z ^ y * x * x - x
+end

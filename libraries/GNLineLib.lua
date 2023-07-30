@@ -6,15 +6,12 @@
 ---@diagnostic disable: param-type-mismatch
 
 local config = {
-   ---@type ModelPart
    model_path = models:newPart("gndrawlibspatialworld"):setParentType("WORLD"),
    texture_task_name_prefix = "gndrawlibspatial", -- prefix .. type
-   white_texture = textures:newTexture("gnwhite",1,1):setPixel(0,0,vectors.vec3(1,1,1)),
+   white_texture = textures:newTexture("gnlinepixel",1,1):setPixel(0,0,vectors.vec3(1,1,1)),
 
    default_line_color = vectors.vec3(0,1,0)
 }
-
-local vecp = require("libraries.GNVecPlus")
 
 
 local lcpos = vectors.vec3()
@@ -161,6 +158,13 @@ function draw:newLine()
    return compound
 end
 
+local function flatvec(vector, normal)
+   normal = normal:normalize()
+   local projectionMagnitude = vector:dot(normal)
+   local projection = normal * projectionMagnitude
+   local flattenedVector = vector - projection
+   return flattenedVector
+end
 
 local llinec = 0
 events.WORLD_RENDER:register(function (delta)
@@ -181,10 +185,15 @@ events.WORLD_RENDER:register(function (delta)
             if a.z > 0 or b.z > 0 then
                local mat = matrices.mat4()
                local offset = (cpos-e.From)
-               mat.c2 = (-e.Dir:normalize() * (e.Length + e.Width * 0.5)):augmented(0)
-               mat.c3 = (vecp.flattenVector3ToNormal(offset,-e.Dir):normalize()):augmented(0)
-               mat.c1 = vectors.rotateAroundAxis(90,mat.c3.xyz,e.Dir):augmented(0) * e.Width
-               mat.c4 = (e.From + mat.c1.xyz * 0.5 - e.Dir:normalized() * e.Width * 0.25):augmented()
+               local width = e.Width
+               local floppa = flatvec(offset,-e.Dir)
+               if e.UniformWidth then
+                  width = width * floppa:length()
+               end
+               mat.c2 = (-e.Dir:normalize() * (e.Length + width * 0.5)):augmented(0)
+               mat.c3 = (floppa:normalize()):augmented(0)
+               mat.c1 = vectors.rotateAroundAxis(90,mat.c3.xyz,e.Dir):augmented(0) * width
+               mat.c4 = (e.From + mat.c1.xyz * 0.5 - e.Dir:normalized() * width * 0.25):augmented()
                e.Task:setMatrix(mat * (1 + e.Depth)):setVisible(true)
             end
          else

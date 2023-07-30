@@ -29,8 +29,8 @@ local sound_control = {
             "commands.",   
          },
          play = {
-            {id="minecraft:block.note_block.banjo",pitch=1.5,volume=0.2},--{id="minecraft:entity.elder_guardian.hurt",pitch=0.9,volume=1},--{id="minecraft:entity.blaze.hurt",pitch=0.5,volume=1},
-            {id="minecraft:entity.item.pickup",pitch=0.6,volume=0.5}
+            --{id="minecraft:block.note_block.banjo",pitch=1.5,volume=0.2},--{id="minecraft:entity.elder_guardian.hurt",pitch=0.9,volume=1},--{id="minecraft:entity.blaze.hurt",pitch=0.5,volume=1},
+            {id="minecraft:entity.item.pickup",pitch=3,volume=0.2}
          },
       },
       {

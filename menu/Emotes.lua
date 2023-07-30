@@ -69,6 +69,15 @@ local emotes = {
             speed=1
          }
       },
+      {
+         name="Spin",
+         anim=animations.gn.spin,
+         music={
+            name="wash",
+            loop=true,
+            speed=1
+         }
+      },
       
          
 }
