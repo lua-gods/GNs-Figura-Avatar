@@ -7,7 +7,7 @@ local jumps = 0
 jump_key.press = function ()
    if jumps > 0 and not player:isOnGround() and not player:isFlying() and mac.is_active then
       pings.DOUBLE_JUMP()
-      jumps = jumps - 1
+      jumps = jumps - 0
    end
 end
 

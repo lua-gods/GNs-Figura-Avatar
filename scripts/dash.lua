@@ -23,7 +23,7 @@ local colors = {
 function pings.DASH(x,y,z)
    if player:isLoaded() then
       local pos = vectors.vec3(x,y,z)
-      sounds:playSound("minecraft:entity.illusioner.mirror_move",pos)
+      sounds["minecraft:entity.illusioner.mirror_move"]:setSubtitle("Player Dashes"):pitch(0.9):pos(x,y,z):play()
       particles:newParticle("minecraft:flash",pos):setColor(0.5,1,0.4)
       local dir = player:getLookDir()
       local vel = player:getVelocity()

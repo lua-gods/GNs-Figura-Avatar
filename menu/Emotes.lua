@@ -81,9 +81,7 @@ local emotes = {
       
          
 }
-animations.gn.Kazotskykick:setSpeed(1.2)
-animations.gn.carramelDancen:setSpeed(1.4)
-animations.gn.Kazotskykick2:setSpeed(1.2)
+
 
 local dance_music
 local dance_music_id
@@ -93,7 +91,10 @@ events.WORLD_TICK:register(function ()
    if player:isLoaded() then
       ppos = player:getPos()
       if dance_music then
-         dance_music:pos(ppos)
+         dance_music:pos(ppos):pitch(dance_music:getPitch() + 0.0001)
+         if dance.animation then
+            dance.animation:setSpeed(dance.animation:getSpeed() + 0.0001)
+         end
       end
    end
 end)
@@ -107,6 +108,10 @@ function pings.GNEMOTEID(id,music)
       end
       dance:setState(nil)
    else
+      e.anim:setSpeed(1)
+      animations.gn.Kazotskykick:setSpeed(1.2)
+      animations.gn.carramelDancen:setSpeed(1.4)
+      animations.gn.Kazotskykick2:setSpeed(1.2)
       dance:setState(e.anim,true)
       if e.music and e.music.name and e.music.name ~= dance_music_id then
          local speed = 1

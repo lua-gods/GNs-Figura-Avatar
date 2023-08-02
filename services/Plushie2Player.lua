@@ -21,7 +21,7 @@ events.SKULL_RENDER:register(function (delta, block, item)
       end
       
       local offset
-      if player:isLoaded() and false then
+      if player:isLoaded() then
          local bl,target = player:getTargetedBlock()
          offset = block:getPos():add(0.5,1.5,0.5)-target
       else
@@ -38,7 +38,6 @@ events.SKULL_RENDER:register(function (delta, block, item)
       parts.base:setRot(0,rot.y,0)
       parts.head:setRot(o.x*-0.4 +rot.x,-rot.y*0.2 - brot,0)
       parts.body:setRot(o.x*0.2+math.cos((time+delta)*0.1)*0.1,o.y*0.5 + brot,0):setPos(0,math.sin((time+delta)*0.1)*0.1,0)
-      parts.head.FranHair:setRot(math.min(-o.x,0)) 
 
       parts.left_arm:setRot(o.x*-0.2,o.y*0.3,-math.abs(o.y*0.1))
       parts.right_arm:setRot(o.x*-0.2,o.y*0.3,math.abs(o.y*0.1))
