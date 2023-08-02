@@ -10,9 +10,10 @@ local length = 0
 local input = keybinds:fromVanilla("key.use")
 input.press = function ()
    if mac.is_active then
-      local block,hit = player:getTargetedBlock()
-      if block:hasCollision() then
-         pings.hook(hit,(player:getPos():add(0,1,0)-hit):length())
+      local eye = player:getPos():add(0,player:getEyeHeight())
+      local data = world:linetraceBlock(true,eye,eye + player:getLookDir() * 200)
+      if data then
+         pings.hook(data.position,(player:getPos():add(0,1,0)-data.position):length())
       end
    end
 end
@@ -54,7 +55,7 @@ if host:isHost() then
          local correct = hook+dir:normalized()*math.min(length,dir:length())
          local vel = player:getVelocity()
          if dir:length() > length then
-            host:setVelocity(correct-pos + vel)
+            host:setVelocity(correct - (pos - vel))
          end
       end
    end)
