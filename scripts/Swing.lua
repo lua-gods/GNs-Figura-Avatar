@@ -23,7 +23,11 @@ input.release = function ()
 end
 
 function pings.hook(pos,len)
-   length = len
+   if len then
+      length = len - 2
+   else
+      length = nil
+   end
    if pos then
       hook = pos
       active = true
@@ -55,7 +59,7 @@ if host:isHost() then
          local correct = hook+dir:normalized()*math.min(length,dir:length())
          local vel = player:getVelocity()
          if dir:length() > length then
-            host:setVelocity(correct - (pos - vel))
+            host:setVelocity((correct - pos) * 0.1 + vel)
          end
       end
    end)
