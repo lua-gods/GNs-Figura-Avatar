@@ -129,14 +129,15 @@ end
 
 ---@return Line
 function Line:delete()
-   config.model_path:removeTask(config.texture_task_name_prefix .. "line" .. self.id)
-   draw.elements.Line[self.id] = nil
-   return self
+	config.model_path:removeTask(config.texture_task_name_prefix .. "line" .. self.id)
+	draw.elements.Line[self.id] = nil
+
+	return self
 end
 
 local lineID = 0
 function draw:newLine()
-   lineID = lineID + 1
+   lineID = #draw.elements.Line + 1
    ---@type Line
    local compound = {
       Dir=nil,
@@ -154,7 +155,7 @@ function draw:newLine()
       Task = config.model_path:newSprite(config.texture_task_name_prefix .. "line" .. lineID):setTexture(config.white_texture):setRenderType("EMISSIVE_SOLID")}
    setmetatable(compound,Line)
    compound.Task:color(compound.Color)
-   table.insert(draw.elements.Line,compound)
+   draw.elements.Line[lineID] = compound
    return compound
 end
 
@@ -173,11 +174,14 @@ events.WORLD_RENDER:register(function (delta)
    if cpos ~= lcpos or llinec ~= linec then
       lcpos = cpos
       llinec = linec
+      local count =1 
       for id, line in pairs(draw.elements.Line) do
          line:updateTransform()
+         count = count + 1
       end
    end
    for key, e in pairs(draw.queue_update) do
+
       if type(e) == "Line" then
          if e.Visible and e.Dir then
             local a = vectors.worldToScreenSpace(e.From)
@@ -201,6 +205,7 @@ events.WORLD_RENDER:register(function (delta)
          end
       end
    end
+   
    draw.queue_update = {}
 end)
 draw.config = config

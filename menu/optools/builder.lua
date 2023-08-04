@@ -104,7 +104,7 @@ local function updateTransform()
    end
    for key, line in pairs(selection_lines) do
       local value = connection_points[key]
-      line:from(math.lerp(From,To,cube_points[value[1]])):to(math.lerp(From,To,cube_points[value[2]])):depth(depth - 1):width(0.1):uniformWidth(true)
+      line:from(math.lerp(From,To,cube_points[value[1]])):to(math.lerp(From,To,cube_points[value[2]])):depth(depth - 1):width(0.1)
    end
    selection_faces.north:setMatrix(matrices.mat4():scale(-Size.x,Size.y,0):translate(To:copy():sub(Size.x,0))*depth)
    selection_faces.south:setMatrix(matrices.mat4():scale(-Size.x,-Size.y,0):translate(From) * depth)
