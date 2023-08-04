@@ -27,7 +27,9 @@ end
 local input = keybinds:fromVanilla("key.use")
 input.press = function ()
    if mac.is_active then
-      pings.hook(cursor,(player:getPos():add(0,1,0)-cursor):length())
+      if cursor then
+         pings.hook(cursor,(player:getPos():add(0,1,0)-cursor):length())
+      end
    end
 end
 
