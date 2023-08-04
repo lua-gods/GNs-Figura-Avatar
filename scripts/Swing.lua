@@ -32,7 +32,7 @@ input.press = function ()
 end
 
 mac.TICK:register(function ()
-   if mac.is_active then
+   if mac.is_active and not input:isPressed() then
       local eye = player:getPos():add(0,player:getEyeHeight())
       local rot = player:getRot()
       local mat = matrices.mat4():rotate(rot.x-90,-rot.y,0)
@@ -85,7 +85,7 @@ end)
 if host:isHost() then
    events.TICK:register(function ()
       if cursor then
-         renderer:crosshairOffset(vectors.toCameraSpace(cursor).xy:mul(-1,-1) * client:getGuiScale() * 2)
+         renderer:crosshairOffset(vectors.worldToScreenSpace(cursor).xy * client:getScaledWindowSize() / 2)
       else
          renderer:crosshairOffset()
       end
