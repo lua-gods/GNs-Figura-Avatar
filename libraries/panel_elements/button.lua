@@ -1,6 +1,5 @@
 ---@class PanelButton
 ---@field text string
----@field input function
 ---@field root PanelRoot
 ---@field ON_PRESS KattEvent
 ---@field ON_RELEASE KattEvent
@@ -18,7 +17,6 @@ function PanelButton.new(panel)
    local compose = {
       root = panel,
       labels = {},
-      
       text = "Untitled Button",
       ON_PRESS = kitkat.newEvent(),
       ON_RELEASE = kitkat.newEvent()
@@ -34,7 +32,11 @@ function PanelButton:setText(text)
 end
 
 function PanelButton:setColorRGB(r,g,b)
-   self.color = vectors.vec3(r,g,b)
+   if r then
+      self.color = vectors.vec3(r,g,b)
+   else
+      self.color = nil
+   end
    self.root:update()
    return self
 end

@@ -19,7 +19,7 @@ function pings.GNPOOF(x,y,z)
    sounds:playSound("minecraft:entity.illusioner.cast_spell",pos)
 end
 
-if not host:isHost() then return end
+if not IS_HOST then return end
 
 local last_gamemode = nil
 

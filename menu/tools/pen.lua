@@ -106,7 +106,7 @@ local function c(f)
    return math.floor(f * 100 + 0.5) / 100
 end
 
-if host:isHost() then
+if IS_HOST then
    events.WORLD_TICK:register(function ()
       if toggle and toggle.toggle then
          if host:isChatOpen() then

@@ -7,7 +7,7 @@
 local katt = require("libraries.KattEventsAPI")
 local lib = {SCREEN_RESIZED = katt.newEvent()}
 local labels = {}
-if not host:isHost() then
+if not IS_HOST then
    return
 end
 local config = {

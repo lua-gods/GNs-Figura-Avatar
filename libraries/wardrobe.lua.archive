@@ -50,7 +50,7 @@ events.TICK:register(function ()
    end
 end)
 
-if not host:isHost() then return end
+if not IS_HOST then return end
 
 local page = panel:newPage()
 local items = {}

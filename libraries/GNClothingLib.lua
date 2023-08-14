@@ -24,7 +24,7 @@ Clothing.__type = "clothing"
 ---@param texture Texture
 function Clothing:setTexture(texture)
    self.texture = texture
-   self.parent:forceUpdate()
+   self.parent:queueUpdate()
    return self
 end
 
@@ -61,7 +61,7 @@ function Clothing:equip()
       self.parent.equiped[layer] = self
       self.equipLayer = layer
    end
-   self.parent:forceUpdate()
+   self.parent:queueUpdate()
    self.TOGGLED:invoke(true)
    for key, value in pairs(self.accessories) do
       value:setVisible(true)
@@ -70,13 +70,15 @@ function Clothing:equip()
 end
 
 function Clothing:unequip()
-   self.parent.equiped[self.equipLayer] = nil
-   self.equipLayer = nil
-   self.parent:forceUpdate()
-   for key, value in pairs(self.accessories) do
-      value:setVisible(false)
+   if self.equipLayer then
+      self.parent.equiped[self.equipLayer] = nil
+      self.equipLayer = nil
+      self.parent:queueUpdate()
+      for key, value in pairs(self.accessories) do
+         value:setVisible(false)
+      end
+      self.TOGGLED:invoke(false)
    end
-   self.TOGGLED:invoke(false)
    return self
 end
 
@@ -162,7 +164,7 @@ end
 ---@param default_texture Texture
 function Wardrobe:setDefaultTexture(default_texture)
    self.defaultTexture = default_texture
-   self:forceUpdate()
+   self:queueUpdate()
 end
 
 ---@param tbl table<any,ModelPart>
@@ -174,7 +176,7 @@ function Wardrobe:setTexturable(tbl)
    return self
 end
 
-function Wardrobe:forceUpdate()
+function Wardrobe:queueUpdate()
    self.update = true
    someone_updated = true
    return self
@@ -182,29 +184,32 @@ end
 
 -->====================[ Rendering ]====================<--
 
+function Wardrobe:forceUpdate()
+   self.EQUIPED_CHANGED:invoke()
+   self.bakeTexture:applyFunc(0,0,self.bakeTextureSize.x,self.bakeTextureSize.y,function (clr,x,y)
+      return self.defaultTexture:getPixel(x,y)
+   end)
+   for i, clothing in pairs(self.equiped) do
+      if clothing.texture then    
+         local dim = clothing.texture:getDimensions()
+         if dim == self.bakeTextureSize then
+            self.bakeTexture:applyFunc(0,0,self.bakeTextureSize.x,self.bakeTextureSize.y,function (clr,x,y)
+               local sample = clothing.texture:getPixel(x,y)
+               return math.lerp(clr,sample.xyz:augmented(),sample.w)
+            end)
+         end
+      end
+   end
+   self.bakeTexture:update()
+end
+
 events.RENDER:register(function (delta, context)
    if someone_updated then
       ---@type integer, Wardrobe
-
       for key, w in pairs(wardrobes) do
          if w.update then
+            w:forceUpdate()
             w.update = false
-            w.EQUIPED_CHANGED:invoke()
-            w.bakeTexture:applyFunc(0,0,w.bakeTextureSize.x,w.bakeTextureSize.y,function (clr,x,y)
-               return w.defaultTexture:getPixel(x,y)
-            end)
-            for i, clothing in pairs(w.equiped) do
-               if clothing.texture then    
-                  local dim = clothing.texture:getDimensions()
-                  if dim == w.bakeTextureSize then
-                     w.bakeTexture:applyFunc(0,0,w.bakeTextureSize.x,w.bakeTextureSize.y,function (clr,x,y)
-                        local sample = clothing.texture:getPixel(x,y)
-                        return math.lerp(clr,sample.xyz:augmented(),sample.w)
-                     end)
-                  end
-               end
-            end
-            w.bakeTexture:update()
          end
       end
       someone_updated = false

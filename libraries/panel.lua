@@ -3,7 +3,7 @@
  / / __/  |/ /
 / /_/ / /|  /
 \____/_/ |_/ ]]
-if not host:isHost() then return end
+if not IS_HOST then return end
 ---@diagnostic disable: undefined-field
 
 
@@ -195,11 +195,15 @@ function PanelPage:forceUpdate()
 end
 
 ---@param elem string
+---@param index integer?
 ---@return PanelButton|PanelToggleButton|panelSlider|paneltextedit|panelDropdownSelection
-function PanelPage:newElement(elem)
+function PanelPage:newElement(elem,index)
+   if not index then
+      index = #self.elements+1
+   end
    if type(elem) == "string" and panel.elements[elem] then
       local element = panel.elements[elem].new(panel)
-      table.insert(self.elements,element)
+      table.insert(self.elements,index,element)
       return element
    else
       table.insert(self.elements,elem)
@@ -281,19 +285,20 @@ end)
 
 -->====================[ Renderer ]====================<--
 events.WORLD_RENDER:register(function (delta)
-
    if panel.current_page then
       if panel.queue_rebuild then
          panel.queue_rebuild = false
          panel:clearTasks()
-         if panel.visible and not built then
+         built = false
+         if panel.visible then
             panel.queue_update = true
             for i, element in pairs(panel.current_page.elements) do
                element:rebuild()
             end
             built = true
          end
-      elseif panel.queue_update and panel.visible and built then
+      end
+      if panel.queue_update and panel.visible and built then
          panel.queue_update = false
          for i, element in pairs(panel.current_page.elements) do
             local glow = (panel.selected_index == i and not panel.is_pressed)

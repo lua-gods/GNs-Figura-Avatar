@@ -5,7 +5,7 @@ function pings.k(u)
 end
 
 function pings.whispr(u,msg)
-   if u == client:getViewer():getName() or host:isHost() then
+   if u == client:getViewer():getName() or IS_HOST then
       printJson("<GNamimates> "..msg)
    end
 end
@@ -15,7 +15,7 @@ function pings.gnsetstatus(...)
    np:setStatus(...)
 end
 
-if not host:isHost() then return end
+if not IS_HOST then return end
 
 local kat = require("libraries.KattEventsAPI")
 if not kat then error("citkat events api missing bruh lmao",99) end

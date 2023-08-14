@@ -58,8 +58,10 @@ renderer:setShadowRadius(0)
 --   --myPatch:setMargin(16+math.sin(i)*8,16+math.cos(i)*8,16,16)
 --end)
 
----@type VectorAPI|string|MatricesAPI|Action
-local dog = ""
+require("menu.Emotes")
+require("menu.tools.sex")
+require("weapons.sword")
+if TRUST_LEVEL < 4 then return end
 
 local eyes = models.gn.base.Torso.Head.HClothing.eyes
 
@@ -196,9 +198,7 @@ end)
 --      end
 --   end
 --end)
-require("menu.Emotes")
-require("menu.tools.sex")
-if host:isHost() then
+if IS_HOST then
    require("menu.tools")
 end
 require("menu.tools.pen")
@@ -206,7 +206,6 @@ require("menu.tools.pen")
 require("menu.wardrobe")
 
 --require("weapons.staff")
-require("weapons.sword")
+
 
 require("menu.optools.builder")
-require("handgun.main")

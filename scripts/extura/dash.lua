@@ -31,7 +31,7 @@ function pings.DASH(x,y,z)
          local v = vectors.vec3(math.random()-0.5,math.random()-0.5,math.random()-0.5):normalize()*math.random()*0.2 + (dir * 3) * math.random()
          particles:newParticle("minecraft:end_rod",pos):setVelocity(v):color(colors[math.random(1,#colors)])
       end
-      if host:isHost() then
+      if IS_HOST then
          host:setVelocity(dir * 3)
       end
       

@@ -95,6 +95,9 @@ end
 function panelDropdownSelection:pressed()
    self.root:update()
    self.root:setSelectState(not self.root.is_pressed)
+   if not self.root.is_pressed then
+      self.ON_CONFIRM:invoke(self.selected)
+   end
    self.ON_PRESS:invoke(self)
 end
 

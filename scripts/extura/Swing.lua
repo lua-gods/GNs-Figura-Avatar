@@ -26,7 +26,7 @@ end
 
 local input = keybinds:fromVanilla("key.use")
 input.press = function ()
-   if mac.is_active then
+   if mac.is_active and cursor then
       pings.hook(cursor,(player:getPos():add(0,1,0)-cursor):length())
    end
 end
@@ -82,8 +82,8 @@ events.WORLD_RENDER:register(function (delta)
    end
 end)
 
-if host:isHost() then
-   events.TICK:register(function ()
+if IS_HOST then
+   mac.TICK:register(function ()
       if cursor then
          renderer:crosshairOffset(vectors.worldToScreenSpace(cursor).xy * client:getScaledWindowSize() / 2)
       else

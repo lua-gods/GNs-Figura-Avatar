@@ -4,7 +4,7 @@
 -- Whoops I mean: i/gur rseuDnk(fal)
 -- Whoops I mean: ... just reload the script :P
 
-if not host:isHost() then return end
+if not IS_HOST then return end
 local function registerDrunkEvents()
     events.KEY_PRESS:register(function()
         return math.random() > 0.8

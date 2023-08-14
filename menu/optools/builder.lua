@@ -135,14 +135,14 @@ updateTransform()
 
 function pings.buildSetA(pos)
    setA(pos)
-   if not host:isHost() then
+   if not IS_HOST then
       updateTransform()
    end
 end
 
 function pings.buildSetB(pos)
    setB(pos)
-   if not host:isHost() then
+   if not IS_HOST then
       updateTransform()
    end
 end
@@ -152,7 +152,7 @@ function pings.setOnTop(toggle)
    updateTransform() 
 end
 
-if not host:isHost() then return end
+if not IS_HOST then return end
 local page = panel:newPage()
 
 page:newElement("toggleButton"):setText("on Top").ON_TOGGLE:register(function (toggle)on_top = toggle end)
@@ -181,7 +181,7 @@ end
 events.TICK:register(function ()
    local cpos = client:getCameraPos()
    local cdir = vecp.toDir(client:getCameraRot())
-   if page.is_active or (not host:isHost()) then
+   if page.is_active or (not IS_HOST) then
       if input:isPressed() then
          local selected,_,dir = player:getTargetedBlock()
          local pos = selected:getPos()

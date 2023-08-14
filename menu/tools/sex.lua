@@ -1,4 +1,4 @@
-
+if not IS_HOST then return end
 local active = false
 
 local inputs = {
@@ -117,7 +117,7 @@ for key, value in pairs(inputs) do
    end)}
    
 end
-if not host:isHost() then return end
+if not IS_HOST then return end
 return function (page)
    page:newElement("toggleButton"):setText("Tesla Coil").ON_TOGGLE:register(function (toggle)
       pings.GNZAPSTATUS(toggle)

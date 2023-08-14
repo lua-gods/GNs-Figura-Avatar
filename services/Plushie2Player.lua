@@ -1,4 +1,6 @@
-
+if not (TRUST_LEVEL > 1) then
+   models.plushie:setVisible(true) return
+end
 local parts = {
    base = models.gn.base,
    head = models.gn.base.Torso.Head,
@@ -68,7 +70,6 @@ getRemember(models.gn)
 remember["gn"] = {models.gn:getParentType(),models.gn}
 
 events.RENDER:register(function (delta,context)
-   models.gn:setVisible(true)
    models.gn:setVisible(true):setScale(1)
    models.gn.base:setRot(0,0,0)
    for key, value in pairs(remember) do

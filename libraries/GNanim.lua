@@ -45,27 +45,37 @@ function AnimationStateMachine:setState(animation,forced)
    end
 end
 
-local last_system_time = 0
-events.WORLD_RENDER:register(function ()
-   local system_time = client:getSystemTime()
-   local delta = (system_time - last_system_time) * 0.001
-   for key, sm in pairs(state_machines) do
-      if sm.transition_time ~= sm.transition_duration then
-         sm.transition_time = math.min(sm.transition_time + delta,sm.transition_duration)
-         local ratio = sm.transition_time/sm.transition_duration
-         if sm.last_animation then
-            sm.last_animation:setBlend(1-ratio)
+if TRUST_LEVEL > 3 then
+   local last_system_time = 0
+   events.WORLD_RENDER:register(function ()
+      local system_time = client:getSystemTime()
+      local delta = (system_time - last_system_time) * 0.001
+      for key, sm in pairs(state_machines) do
+         if sm.transition_time ~= sm.transition_duration then
+            sm.transition_time = math.min(sm.transition_time + delta,sm.transition_duration)
+            local ratio = sm.transition_time/sm.transition_duration
+            if sm.last_animation then
+               sm.last_animation:setBlend(1-ratio)
+            end
+            if sm.animation then
+               sm.animation:setBlend(ratio)
+            end
+         else
+            if sm.last_animation and sm.last_animation ~= sm.animation then
+               sm.last_animation:stop()
+            end
          end
-         if sm.animation then
-            sm.animation:setBlend(ratio)
-         end
-      else
+      end
+      last_system_time = system_time
+   end)
+else
+   events.RENDER:register(function (delta, context)
+      for key, sm in pairs(state_machines) do
          if sm.last_animation and sm.last_animation ~= sm.animation then
             sm.last_animation:stop()
          end
       end
-   end
-   last_system_time = system_time
-end)
+   end)
+end
 
 return lib

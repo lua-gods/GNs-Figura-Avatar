@@ -1,6 +1,6 @@
 local from = vectors.hexToRGB("#99e65f") 
 local to = vectors.hexToRGB("#1e6f50")
-local prefix = '{"text":"${badges}:<3_GN:","color":"white"}'
+local prefix = '{"text":"${badges}:@gn:","color":"white"}'
 local entity_name = avatar:getEntityName()
 local suffix = ""
 local mid = ""
@@ -19,10 +19,6 @@ for i = 1, #entity_name, 1 do
       mid = mid .. ","
    end
 end
-
-local cmid = ""
-
-local lsyst = client:getSystemTime()
 
 local ls = 0
 local s = 1
@@ -69,4 +65,4 @@ events.TICK:register(function ()
    ls = s
 end)
 
-nameplate.ENTITY:outline(true):setOutlineColor(to * 0.4)
+nameplate.ENTITY:outline(true):setBackgroundColor(0,0,0,0):setOutlineColor(to * 0.4)

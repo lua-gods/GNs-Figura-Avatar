@@ -59,6 +59,11 @@ local emotes = {
       {
          name="Sit Down",
          anim=animations.gn.sit,
+         music={
+            name="night",
+            loop=true,
+            speed=1
+         }
       },
       {
          name="Wave",
@@ -91,9 +96,9 @@ events.WORLD_TICK:register(function ()
    if player:isLoaded() then
       ppos = player:getPos()
       if dance_music then
-         dance_music:pos(ppos):pitch(dance_music:getPitch() + 0.0001)
+         dance_music:pos(ppos):pitch(dance_music:getPitch() * 1.001)
          if dance.animation then
-            dance.animation:setSpeed(dance.animation:getSpeed() + 0.0001)
+            dance.animation:setSpeed(dance.animation:getSpeed() * 1.001)
          end
       end
    end
@@ -133,7 +138,7 @@ function pings.GNEMOTEID(id,music)
    end
 end
 
-if not host:isHost() then return end
+if not IS_HOST then return end
 local play_music = true
 local panel = require("libraries.panel")
 local menu = panel:newPage()

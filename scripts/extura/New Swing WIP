@@ -1,0 +1,127 @@
+local mac = require("libraries.macroScriptLib"):newScript("gn:spoodir_new")
+local linelib = require("libraries.GNLineLib")
+
+local line
+local was_active = false
+local active = false
+local hook = vectors.vec3()
+local length = 0
+
+local gravity = vectors.vec3(0,-0.08,0)
+
+local cursor
+
+local ray_count = 200
+local search_dirs = {vectors.vec3(0,0,1)}
+
+for i = 2, ray_count, 1 do
+   local t = i / ray_count / 8
+   local inclination = math.acos(1 - 2 * t)
+   local azimuth = 2 * math.pi * 0.618033 * i
+  table.insert(search_dirs,vectors.vec3(
+   math.sin(inclination) * math.sin(azimuth),
+   -math.cos(inclination),
+   math.sin(inclination) * math.cos(azimuth)
+))
+end
+
+local input = keybinds:fromVanilla("key.use")
+input.press = function ()
+   if mac.is_active and cursor then
+      pings.hook(cursor,(player:getPos():add(0,1,0)-cursor):length())
+   end
+end
+
+mac.TICK:register(function ()
+   if not input:isPressed() then
+      local eye = player:getPos():add(0,player:getEyeHeight())
+      local rot = player:getRot()
+      local mat = matrices.mat4():rotate(rot.x-90,-rot.y,0)
+      cursor = nil;
+      for i = 1, #search_dirs, 1 do
+         local dir = (mat * search_dirs[i]:augmented()).xyz
+         local data = world:linetraceBlock(true,eye,eye + dir * 50)
+         --linelib:newLine():from(player:getPos()):to(player:getPos()+dir):color(i/#search_dirs*8,0,0)
+         if data then
+            cursor = data.position
+            return
+         end
+      end
+   end
+end)
+
+input.release = function ()
+   pings.hook()
+end
+
+function pings.hook(pos,len)
+   if len then
+      sounds["minecraft:entity.arrow.hit"]:pos(pos):attenuation(2):pitch(1.5):play()
+   end
+   if len then
+      length = len
+   else
+      length = nil
+   end
+   if pos then
+      hook = pos
+      active = true
+   else
+      hook = nil
+      active = false
+   end
+   if was_active ~= active then
+      if active then
+         line = linelib:newLine()
+      else
+         line:delete()
+      end
+      was_active = active
+   end
+end
+
+mac.FRAME:register(function (delta)
+   if player:isLoaded() and active then
+      line:from(player:getPos(delta):add(0,1,0)):to(hook)
+   end
+end)
+
+if IS_HOST then
+   mac.TICK:register(function ()
+      if cursor then
+         renderer:crosshairOffset(vectors.worldToScreenSpace(cursor).xy * client:getScaledWindowSize() / 2)
+      else
+         renderer:crosshairOffset()
+      end
+      local vel = player:getVelocity() + gravity
+      if active then
+         local pos = player:getPos():add(0,1,0)
+         local dir = ((pos + vel)-hook)
+         local correct = (hook+dir:normalized()*length):sub(0,0.1,0)
+         if dir:length() > length then
+            host:setVelocity((correct - pos) * 1)
+         else
+            length = dir:length()
+         end
+      else
+         if player:isOnGround() then
+            vel = vel:mul(0.6,0,0.6)
+         end
+         if not (host:isFlying() or player:isWet()) then
+            host:setVelocity(vel)
+         end
+      end
+      --print(host:getPlayerMovement())
+   end)
+end
+
+mac.EXIT:register(function ()
+   renderer:crosshairOffset()
+   host:setHasNaturalForces(true)
+end)
+
+mac.ENTER:register(function ()
+   host:setHasNaturalForces(false)
+end)
+
+return mac

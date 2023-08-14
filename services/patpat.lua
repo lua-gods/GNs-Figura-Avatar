@@ -222,7 +222,7 @@ function pings.patpat(a, b, c)
 end
 
 -- host only
-if not host:isHost() then
+if not IS_HOST then
    return eventsList
 end
 

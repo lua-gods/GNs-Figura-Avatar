@@ -25,7 +25,7 @@ function pings.DOUBLE_JUMP()
       for i = 1, 20, 1 do
          particles:newParticle("minecraft:cloud",pos + vectors.vec3(math.random()-0.5,0,math.random()-0.5):normalize() * math.random())
       end
-      if host:isHost() then
+      if IS_HOST then
          host:setVelocity((vel.x_z * 1.25):add(0,0.5,0))
       end
       

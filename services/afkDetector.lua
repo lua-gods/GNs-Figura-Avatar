@@ -19,7 +19,7 @@ events.TICK:register(function ()
    check_time = check_time + 1
    if check_time > 20 then
       check_time = 0
-      if host:isHost() then
+      if IS_HOST then
          pings.GNISAFK(TIME_SINCE_INACTIVE)
       end
    end

@@ -1,4 +1,9 @@
 
+if not (TRUST_LEVEL > 2) then
+   models.gn:setVisible(false)
+   return
+end
+
 local config = {
    tick_span = 4, -- ticks
 }

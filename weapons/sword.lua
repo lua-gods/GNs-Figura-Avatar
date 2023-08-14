@@ -38,7 +38,7 @@ local is_holding_sword = false
 
 local is_first_person = false
 local was_first_person = false
-local h = host:isHost()
+local h = IS_HOST
 
 
 local function update_hand()

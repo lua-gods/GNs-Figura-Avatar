@@ -3,7 +3,7 @@
  / / __/  |/ / __ `/ __ `__ \/ / __ `__ \/ __ `/ __/ _ \/ ___/
 / /_/ / /|  / /_/ / / / / / / / / / / / / /_/ / /_/  __(__  )
 \____/_/ |_/\__,_/_/ /_/ /_/_/_/ /_/ /_/\__,_/\__/\___/____]] 
-if not host:isHost() then return end
+if not IS_HOST then return end
 
 local ping_when = {
    avatar:getEntityName(),

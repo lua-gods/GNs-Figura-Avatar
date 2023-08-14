@@ -26,7 +26,7 @@ local holding_weapon = false
 
 local is_first_person = false
 local was_first_person = false
-local h = host:isHost()
+local h = IS_HOST
 
 local thing = staff.group:newBlock("thing")
 thing:block("minecraft:dirt"):scale(0.4,0.4,0.4):pos(2.5,11,-10.5):rot(-90,0,0)

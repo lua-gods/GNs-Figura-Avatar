@@ -71,7 +71,7 @@ function events.tick()
 end
 
 function moveIfToFar()
-    if host:isHost() and partnerUUID ~= nil then
+    if IS_HOST and partnerUUID ~= nil then
         local partner = world:getEntity(partnerUUID)
     if (player:getPos() - partner:getPos()):length() > 0.1 then
         host:sendChatCommand("/tp @s " .. partnerUUID)

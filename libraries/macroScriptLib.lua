@@ -1,5 +1,5 @@
 local lib = {}
-
+if not (TRUST_LEVEL > 3) then return end
 local katt = require("libraries.KattEventsAPI")
 local ms = {}
 local init_check = {}
