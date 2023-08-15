@@ -13,6 +13,7 @@ everything:setTexturable{
    models.gn.base.RightLeg.RLClothing}
 local hairGN = everything:newClothing("Hair GN"):setTexture(textures["textures.hair.default"]):setLayer("hair")
 local hairScarlet = everything:newClothing("Hair Scarlet"):setTexture(textures["textures.hair.scarlet"])
+local hairAuria = everything:newClothing("Hair Auria"):setTexture(textures["textures.hair.auria"])
 
 local faceGN = everything:newClothing("Face Male"):setTexture(textures["textures.face.t_eyes"]):setLayer("eyes")
 
