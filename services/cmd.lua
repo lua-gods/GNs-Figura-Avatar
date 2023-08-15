@@ -1,7 +1,10 @@
 local prefix = "/"
-local command = {}
 
-local memorize = {}
+local memorize = {
+   math = math,
+   inf = math.huge,
+   bit32 = bit32
+}
 
 local cmd = {
    function (message,words)
@@ -11,14 +14,14 @@ local cmd = {
       for i = 1, #list, 1 do
          if expression then
             if list[i]:lower() == "=" or list[i]:lower() == "is" then
-               eval = "return " .. eval
-               for key, value in pairs(memorize) do
-                  eval = key .. "="..value..";" .. eval
-               end
-               local func = load(eval:gsub("x","*"),"expression","t",memorize)
-               local worky,result = pcall(func)
+               local code = "return function(env) _ENV = env; return"..eval:gsub(" x ","*").." end"
+               local func = load(code)
+               local worky, result = pcall(func)
                if worky then
-                  return message .. " " .. result
+                  worky, result = pcall(result, memorize)
+                  if worky then
+                     return message .. " " .. tostring(result)
+                  end
                end
             else
                eval = eval .. " " .. list[i]
