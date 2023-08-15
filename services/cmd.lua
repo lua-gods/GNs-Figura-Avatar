@@ -29,7 +29,7 @@ local cmd = {
             local what = list[i-2]
             local mid = string.lower(list[i-1])
             local with = tonumber(list[i])
-            if (mid == "is" or mid == "are") and type(with) == "number" then
+            if (mid == "is") and type(with) == "number" then
                memorize[list[i-2]] = with
                printJson('[{"text":"\\n' ..  what .. '","color":"white"},{"text":" = ","color":"gray"},{"text":"' ..  with .. '","color":"green"}]')
             end
