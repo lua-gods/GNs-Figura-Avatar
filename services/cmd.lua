@@ -14,7 +14,7 @@ local cmd = {
       for i = 1, #list, 1 do
          if expression then
             if (list[i]:lower() == "=" or list[i]:lower() == "is") and not eval:match('function%(') then
-               local code = "return function(env) _ENV = env; return"..eval:gsub(" x ","*").." end"
+               local code = "return function(env) _ENV = env; return "..eval:gsub(" x ","*").." end"
                local func = load(code)
                local worky, result = pcall(func)
                if worky then
