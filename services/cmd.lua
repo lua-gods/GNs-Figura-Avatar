@@ -11,13 +11,12 @@ local cmd = {
       for i = 1, #list, 1 do
          if expression then
             if list[i]:lower() == "=" or list[i]:lower() == "is" then
+               eval = "return " .. eval
                for key, value in pairs(memorize) do
                   eval = key .. "="..value..";" .. eval
                end
-               print(eval)
-               local func = load("return " .. eval:gsub("x","*"),"expression","t",memorize)
+               local func = load(eval:gsub("x","*"),"expression","t",memorize)
                local worky,result = pcall(func)
-               print(worky,result)
                if worky then
                   return message .. " " .. result
                end
