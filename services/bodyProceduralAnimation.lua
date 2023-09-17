@@ -41,7 +41,7 @@ events.TICK:register(function ()
 end)
 
 events.RENDER:register(function (delta, context)
-   if context == "RENDER" then
+   if context == "RENDER" or context == "FIRST_PERSON" then
       do
          local ratio = 1/config.tick_span
          delta = delta * ratio + (time % config.tick_span * ratio)

@@ -18,6 +18,7 @@ local hairAuria = everything:newClothing("Hair Auria"):setTexture(textures["text
 local faceGN = everything:newClothing("Face Male"):setTexture(textures["textures.face.t_eyes"]):setLayer("eyes")
 
 local whiteLongSleeves = everything:newClothing("Long Sleeves White"):setTexture(textures["textures.shirt.white_long_sleeves"])
+local blackHangSleeves = everything:newClothing("Black Hang Sleeves"):setTexture(textures["textures.shirt.black_hang_sleeves"])
 local blackSleeves = everything:newClothing("Black Jacket"):setTexture(textures["textures.shirt.black_sleeves"])
 local green_tie = everything:newClothing("Tie Green"):setTexture(textures["textures.shirt.green_buisness_tie"]):setLayer("tie")
 local blackPants = everything:newClothing("Pants Black"):setTexture(textures["textures.pants.black_pants"]):setLayer("pants")

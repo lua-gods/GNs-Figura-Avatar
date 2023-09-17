@@ -2,6 +2,7 @@
 local gnanim = require("libraries.GNanim")
 local dance = gnanim:newStateMachine()
 dance.transition_duration = 0.1
+local is_dancing = false
 
 local emotes = {
    {
@@ -96,44 +97,51 @@ events.WORLD_TICK:register(function ()
    if player:isLoaded() then
       ppos = player:getPos()
       if dance_music then
-         dance_music:pos(ppos):pitch(dance_music:getPitch() * 1.001)
+         dance_music:pos(ppos)--:pitch(dance_music:getPitch() * 1.001)
          if dance.animation then
-            dance.animation:setSpeed(dance.animation:getSpeed() * 1.001)
+            --dance.animation:setSpeed(dance.animation:getSpeed() * 1.001)
          end
       end
    end
 end)
 
 function pings.GNEMOTEID(id,music)
-   local e = emotes[id]
-   if dance.animation == e.anim then
-      if dance_music then
-         dance_music:stop()
-         dance_music_id = nil
-      end
-      dance:setState(nil)
-   else
-      e.anim:setSpeed(1)
-      animations.gn.Kazotskykick:setSpeed(1.2)
-      animations.gn.carramelDancen:setSpeed(1.4)
-      animations.gn.Kazotskykick2:setSpeed(1.2)
-      dance:setState(e.anim,true)
-      if e.music and e.music.name and e.music.name ~= dance_music_id then
-         local speed = 1
-         if e.music.speed then
-            speed = e.music.speed
+   if id then
+      local e = emotes[id]
+      if dance.animation == e.anim then
+         if dance_music then
+            dance_music:stop()
+            dance_music_id = nil
          end
-         if music then
-            if dance_music then
+         dance:setState(nil)
+      else
+         e.anim:setSpeed(1)
+         animations.gn.Kazotskykick:setSpeed(1.2)
+         animations.gn.carramelDancen:setSpeed(1.4)
+         animations.gn.Kazotskykick2:setSpeed(1.2)
+         dance:setState(e.anim,true)
+         if e.music and e.music.name and e.music.name ~= dance_music_id then
+            local speed = 1
+            if e.music.speed then
+               speed = e.music.speed
+            end
+            if music then
+               if dance_music then
+                  dance_music:stop()
+               end
+               dance_music = sounds:playSound(e.music.name,ppos,1,speed):setLoop(e.music.loop):setAttenuation(2)
+               dance_music_id = e.music.name
+            end
+         else
+            if dance_music and e.music and e.music.name ~= dance_music_id then
                dance_music:stop()
             end
-            dance_music = sounds:playSound(e.music.name,ppos,1,speed):setLoop(e.music.loop):setAttenuation(2)
-            dance_music_id = e.music.name
          end
-      else
-         if dance_music and e.music and e.music.name ~= dance_music_id then
-            dance_music:stop()
-         end
+      end
+   else
+      dance:setState(nil)
+      if dance_music then
+         dance_music:stop()
       end
    end
 end
@@ -153,7 +161,12 @@ end)
 
 for key, e in pairs(emotes) do
    menu:newElement("button"):setText(e.name).ON_PRESS:register(function ()
-      pings.GNEMOTEID(key,play_music)
+      is_dancing = not is_dancing
+      if is_dancing then
+         pings.GNEMOTEID(key,play_music)
+      else
+         pings.GNEMOTEID()
+      end
    end)
 end
 

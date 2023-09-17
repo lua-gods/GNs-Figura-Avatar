@@ -11,7 +11,7 @@ local length = 0
 local cursor
 
 local ray_count = 200
-local search_dirs = {vectors.vec3(0,0,1)}
+local search_dirs = {vectors.vec3(0,-1,0)}
 
 for i = 2, ray_count, 1 do
    local t = i / ray_count / 8
@@ -39,7 +39,7 @@ mac.TICK:register(function ()
       cursor = nil;
       for i = 1, #search_dirs, 1 do
          local dir = (mat * search_dirs[i]:augmented()).xyz
-         local data = world:linetraceBlock(true,eye,eye + dir * 50)
+         local data = world:linetraceBlock(true,eye,eye + dir * 100)
          --linelib:newLine():from(player:getPos()):to(player:getPos()+dir):color(i/#search_dirs*8,0,0)
          if data then
             cursor = data.position
@@ -84,11 +84,6 @@ end)
 
 if IS_HOST then
    mac.TICK:register(function ()
-      if cursor then
-         renderer:crosshairOffset(vectors.worldToScreenSpace(cursor).xy * client:getScaledWindowSize() / 2)
-      else
-         renderer:crosshairOffset()
-      end
       if active then
          local pos = player:getPos()
          local dir = (pos-hook)
@@ -99,7 +94,20 @@ if IS_HOST then
          end
       end
    end)
+   mac.FRAME:register(function (delta)
+      if cursor then
+         renderer:crosshairOffset(vectors.worldToScreenSpace(cursor).xy * client:getScaledWindowSize() / 2)
+      else
+         renderer:crosshairOffset()
+      end
+   end)
 end
+
+events.MOUSE_SCROLL:register(function (dir)
+   if active then
+      length = length * (1 + dir * -0.1)
+   end
+end)
 
 mac.EXIT:register(function ()
    renderer:crosshairOffset()

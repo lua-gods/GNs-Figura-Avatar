@@ -4,7 +4,7 @@ local config = {
    presicion = 10000,
    power = 2,
    scatter = 0.5,
-   amount = 20,
+   amount = 200,
    proxy = {
        "minecraft:bow","minecraft:arrow",
        "minecraft:snowball","minecraft:snowball",
